@@ -1,8 +1,6 @@
 *.class
 
 # Eclipse project ignores #
-.project
-.classPath
 *.log
 .settings
 bin
