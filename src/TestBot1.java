@@ -69,8 +69,68 @@ public class TestBot1 extends DefaultBWListener {
             }
         }
 
+        //if there's enough minerals, build a supply depot
+        if ((self.minerals() >= 100) && (self.supplyTotal()-self.supplyUsed() <= 3)) 
+        {
+        	//find a worker
+        	for (Unit myUnit : self.getUnits())
+        	{
+        		if(myUnit.getType().isWorker())
+        		{
+        			// find a place to build a supply depot
+        			TilePosition buildTile = getBuildTile(myUnit, UnitType.Terran_Supply_Depot, self.getStartLocation());
+        			// if found, send worker to build it
+        			if (buildTile != null)
+        			{
+        				myUnit.build(buildTile, UnitType.Terran_Supply_Depot);
+        				break;
+        			}
+        		}
+        	}
+        }
+        
         //draw my units on screen
         game.drawTextScreen(10, 25, units.toString());
+    }
+    
+    public TilePosition getBuildTile(Unit builder, UnitType buildingType, TilePosition aroundTile)
+    {
+    	TilePosition ret = null;
+    	int maxDist = 3;
+    	int stopDist = 40;
+    	
+    	// loop until we find the thing
+    	while((maxDist < stopDist) && (ret == null))
+    	{
+    		// loop through the defined area
+    		for(int i = aroundTile.getX()-maxDist; i <= aroundTile.getX()+maxDist; i++)
+    		{
+    			for(int j = aroundTile.getY()-maxDist; j <= aroundTile.getY()+maxDist; j++)
+    			{
+    				if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, false))
+    				{
+    					// move any units that are blocking this tile
+    					boolean unitsInWay = false;
+    					for(Unit u : game.getAllUnits())
+    					{
+    						if(u.getID()==builder.getID()) continue;
+    						// check if the unit is within 4 of the tile
+    						if((Math.abs(u.getTilePosition().getX()-i) < 4) &&
+    								(Math.abs(u.getTilePosition().getY()-j) < 4))
+    						{
+    							unitsInWay = true;
+    						}
+    					}
+    					if(!unitsInWay) return new TilePosition(i,j);
+    				}
+    			}
+    		}
+    		// we didn't find a valid tile, so increase max distance
+    		maxDist+=2;
+    	}
+    	
+    	if(ret == null) game.printf("Unable to find suitable build position for "+buildingType.toString());
+    	return ret;
     }
 
     public static void main(String[] args) {
