@@ -14,6 +14,7 @@ public class TestBot1 extends DefaultBWListener {
     
     private Unit scout = null;
     private HashSet<Position> enemyBuildingMemory = new HashSet<Position>();
+    private ArrayList<Unit> marines = new ArrayList<Unit>();
     
     public void run() {
         mirror.getModule().setEventListener(this);
@@ -46,6 +47,7 @@ public class TestBot1 extends DefaultBWListener {
         
         manageUnits();
         manageEnemyBuildings();
+        attackWith20Marines();
 
     }
     
@@ -102,9 +104,18 @@ public class TestBot1 extends DefaultBWListener {
      */
     public void manageUnits(){
     	StringBuilder units = new StringBuilder("My units:\n");
+    	
+    	//reset Marine List;
+    	marines.clear();
+    	
     	//iterate through my units
         for (Unit myUnit : self.getUnits()) {
             units.append(myUnit.getType()).append(" ").append(myUnit.getTilePosition()).append("\n");
+            
+            //if Marine, add to marine list. 
+            if(myUnit.getType() == UnitType.Terran_Marine){
+            	marines.add(myUnit);
+            }
 
             //if there's enough minerals, and not currently training an SCV, train an SCV
             if (myUnit.getType() == UnitType.Terran_Command_Center && self.minerals() >= 50 && !myUnit.isTraining()) {
@@ -132,7 +143,7 @@ public class TestBot1 extends DefaultBWListener {
         			}
                 }
                 //if there's enough minerals and we don't have too many, build a barracks
-                else if(self.minerals() >= 150 && self.allUnitCount(UnitType.Terran_Barracks) + self.incompleteUnitCount(UnitType.Terran_Barracks) <= 2)
+                else if(self.minerals() >= 150 && self.allUnitCount(UnitType.Terran_Barracks) + self.incompleteUnitCount(UnitType.Terran_Barracks) < 2)
                 {
                 	TilePosition buildTile = getBuildTile(myUnit, UnitType.Terran_Barracks, self.getStartLocation());
                 	if(buildTile != null)
@@ -219,6 +230,19 @@ public class TestBot1 extends DefaultBWListener {
     			}
     			if(!buildingStillThere){
     				enemyBuildingMemory.remove(p);
+    				break;
+    			}
+    		}
+    	}
+    }
+    
+    public void attackWith20Marines(){
+    	if(self.allUnitCount(UnitType.Terran_Marine) >= 10){
+    		System.out.println("Attack NOW!");
+    		for(Unit marine : marines){
+    			System.out.print("Marine, ");
+    			for(Position p : enemyBuildingMemory){
+    				marine.attack(p);
     				break;
     			}
     		}
