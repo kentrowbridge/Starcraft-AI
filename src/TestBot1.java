@@ -238,10 +238,10 @@ public class TestBot1 extends DefaultBWListener {
     
     public void attackWith20Marines(){
     	if(self.allUnitCount(UnitType.Terran_Marine) >= 10){
-    		System.out.println("Attack NOW!");
+//    		System.out.println("Attack NOW!");
     		for(Unit marine : marines){
-    			System.out.print("Marine, ");
     			for(Position p : enemyBuildingMemory){
+//    				System.out.print("Marine, ");
     				marine.attack(p);
     				break;
     			}
