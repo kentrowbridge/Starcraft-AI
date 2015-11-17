@@ -10,7 +10,7 @@ import bwapi.*;
  */
 public class MilitaryManager {
 	List<Unit> militaryUnits = new ArrayList<Unit>();
-	Squad[] squads = new Sqaud();
+	Squad[] squads = new Squad[SquadType.values().length];
 	ArmyManager armyManager = new ArmyManager();
 	BattleManager battleManager = new BattleManager();
 	

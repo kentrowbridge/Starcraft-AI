@@ -82,7 +82,7 @@ public class Squad {
 	 */
 	public ArrayList<Unit> getUnits()
 	{
-		
+		return null;
 	}
 	
 	/**
