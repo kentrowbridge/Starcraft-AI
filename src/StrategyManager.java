@@ -4,7 +4,7 @@ import bwapi.*;
 import bwta.BWTA;
 import bwta.BaseLocation;
 
-public class TestBot1 extends DefaultBWListener {
+public class StrategyManager extends DefaultBWListener {
 
     private Mirror mirror = new Mirror();
     private Game game;
@@ -21,8 +21,8 @@ public class TestBot1 extends DefaultBWListener {
     private HashSet<Position> enemyArmyPosition;
     private HashSet<Position> enemyBuildingLocation;
     
-//    private ProductionManager productionManager;
-//    private MilitaryManager militaryManager;
+    private ProductionManager productionManager;
+    private MilitaryManager militaryManager;
 
     /**
      * run()
@@ -127,6 +127,6 @@ public class TestBot1 extends DefaultBWListener {
     }
 
     public static void main(String[] args) {
-        new TestBot1().run();
+        new StrategyManager().run();
     }
 }
