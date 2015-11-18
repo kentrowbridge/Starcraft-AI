@@ -15,7 +15,7 @@ public class StrategyManager extends DefaultBWListener {
     private Hashtable<UnitType, Double> armyRatio;
     private Hashtable<UnitType, Integer> buildingInfo;
     
-    private int enemyArmyCout;
+    private int enemyArmyCount;
     private Hashtable<UnitType, Double> enemyArmyRatio;
     private Hashtable<UnitType, Integer> enemyBuildingInfo;
     private HashSet<Position> enemyArmyPosition;
