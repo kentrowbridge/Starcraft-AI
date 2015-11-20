@@ -1,3 +1,4 @@
+package StarcraftAI;
 /**
  * SquadType Enum
  * An enum containing all possible types for squads.

@@ -1,3 +1,4 @@
+package StarcraftAI;
 import java.util.*;
 public class BattleManager {
 	/**
