@@ -11,17 +11,35 @@ import bwapi.*;
  */
 public class WorkerManager {
 	
-	private List<UnitType> workerList = new ArrayList<UnitType>();
+	private List<Unit> neutralUnits = new ArrayList<Unit>();
+	private List<Unit> workerList = new ArrayList<Unit>();
 	
-	public WorkerManager(){ }
+	public WorkerManager(List<Unit> neutralUnits)
+	{
+		this.neutralUnits = neutralUnits;
+	}
 	
 	/**
 	 * update()
 	 * This method maintains the list of worker units by pruning
 	 * units that no longer exist
 	 */
-	public void update(){ }
-	
+	public void update()
+	{ 
+		for(Unit u : workerList)
+		{
+			if(u.isIdle())
+			{
+				Unit mineral = findClosestMineral(u.getPosition());
+				u.gather(mineral);
+			}
+			
+			//remove a unit that no longer exists			
+			if(!u.exists())
+				this.workerList.remove(u);
+		}
+	}
+
 	/**
 	 * getWorker()
 	 * Finds a worker unit
@@ -40,4 +58,32 @@ public class WorkerManager {
 	 * @param unit - unit to be added
 	 */
 	public void addUnit(Unit unit){ }
+
+	/**
+	 * findClosestMineral()
+	 * Finds the closest mineral to the given unit
+	 * 
+	 * @param pos - position of the unit
+	 */
+	private Unit findClosestMineral(Position pos) 
+	{
+		//init closest to first in list
+		Unit closest = this.neutralUnits.get(0);
+		
+		//find closest mineral
+		for(Unit neutral : this.neutralUnits)
+		{
+			//only check mineral fields
+			if(neutral.getType() == UnitType.Resource_Mineral_Field)
+			{
+				if(neutral.distanceTo(pos) < closest.distanceTo(pos))
+				{
+					closest = neutral;
+				}
+			}
+		}
+		
+		return closest;
+	}
 }
+

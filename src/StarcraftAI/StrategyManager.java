@@ -8,7 +8,7 @@ import bwta.BaseLocation;
 public class StrategyManager extends DefaultBWListener {
 
     private Mirror mirror = new Mirror();
-    private Game game;
+    protected Game game;
     private Player self;
     
     private int armyCount;
@@ -55,6 +55,8 @@ public class StrategyManager extends DefaultBWListener {
     public void onStart() {
         game = mirror.getGame();
         self = game.self();
+        
+        this.productionManager = new ProductionManager();
 
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
