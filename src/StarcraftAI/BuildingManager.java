@@ -43,7 +43,30 @@ public class BuildingManager {
 	 */
 	private TilePosition getPlacement(UnitType building)
 	{
-		return null;
+    	int maxDist = 3;
+    	int stopDist = 40;
+    	TilePosition aroundTile = self.getStartLocation();
+    	
+    	// loop until we find the thing
+    	while((maxDist < stopDist))
+    	{
+    		// loop through the defined area
+    		for(int i = aroundTile.getX()-maxDist; i <= aroundTile.getX()+maxDist; i++)
+    		{
+    			for(int j = aroundTile.getY()-maxDist; j <= aroundTile.getY()+maxDist; j++)
+    			{
+    				if(game.canBuildHere(null, new TilePosition(i,j), building, false))
+    				{
+    					return new TilePosition(i,j);
+    				}
+    			}
+    		}
+    		// we didn't find a valid tile, so increase max distance
+    		maxDist+=2;
+    	}
+    	
+    	game.printf("Unable to find suitable build position for "+building.toString());
+    	return null;
 	}
 	
 	/**
