@@ -9,7 +9,7 @@ import bwapi.*;
  * @author Casey Sigelmann
  *
  */
-public class ArmyManager {
+public class ArmyManager extends MilitaryManager{
 
 	/**
 	 * defend()

@@ -7,7 +7,7 @@ import bwapi.*;
  * ProductionManager uses the WorkerManager and the BuildingManager to handle build and research 
  * orders passed to it from the StrategyManager.
  */
-public class ProductionManager {
+public class ProductionManager extends StrategyManager{
 	
 	private ArrayList<List<UnitType>> productionQueue; 
 	private ArrayList<UnitType> goal;
