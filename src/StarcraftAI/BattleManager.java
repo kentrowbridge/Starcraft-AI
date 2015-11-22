@@ -1,6 +1,12 @@
 package StarcraftAI;
 import java.util.*;
-public class BattleManager {
+
+/**
+ * 
+ * @author Max Robinson
+ *
+ */
+public class BattleManager extends MilitaryManager{
 	/**
 	 * BattleManager:
 	 * Constructor for the battle Manager class. 

@@ -9,7 +9,7 @@ import bwapi.*;
  * @author Kenny Trowbridge
  *
  */
-public class MilitaryManager {
+public class MilitaryManager extends StrategyManager {
 	List<Unit> militaryUnits = new ArrayList<Unit>();
 	Squad[] squads = new Squad[SquadType.values().length];
 	ArmyManager armyManager = new ArmyManager();

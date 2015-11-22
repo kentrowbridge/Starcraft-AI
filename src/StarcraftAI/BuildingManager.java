@@ -11,7 +11,7 @@ import bwapi.*;
  * @author Kenny Trowbridge
  *
  */
-public class BuildingManager {
+public class BuildingManager extends ProductionManager{
 
 	private ArrayList<Unit> buildingList;
 	
