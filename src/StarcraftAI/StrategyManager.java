@@ -55,7 +55,10 @@ public class StrategyManager extends DefaultBWListener {
     public void onStart() {
         game = mirror.getGame();
         self = game.self();
-
+        
+        productionManager = new ProductionManager();
+        militaryManager = new MilitaryManager();
+        
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
         System.out.println("Analyzing map...");
@@ -75,6 +78,8 @@ public class StrategyManager extends DefaultBWListener {
         game.setTextSize(10);
         game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
         
+        this.update();
+        
     }
     
     /**
@@ -83,7 +88,7 @@ public class StrategyManager extends DefaultBWListener {
      * execute the strategy of the AI.    
      */
     private void update(){
-    	
+    	executeStrategy();
     }
     
     /**
@@ -92,6 +97,34 @@ public class StrategyManager extends DefaultBWListener {
      */
     private void executeStrategy(){
     	
+    	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
+		
+    	// If we are almost supply capped build a supply depot.
+    	if(self.supplyTotal() - self.supplyUsed() <= 3){
+    		productionGoal.add(UnitType.Terran_Supply_Depot);
+    	}
+    	
+    	//if there's enough minerals, and not currently training an SCV, train an SCV
+    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 20) {
+            productionGoal.add(UnitType.Terran_SCV);
+    	}
+    	
+    	// else if we don't have a barracks build a barracks. 
+        else if(self.minerals() >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 2){
+        	productionGoal.add(UnitType.Terran_Barracks);        	
+        }
+        
+        // else build marines
+        else if(self.minerals() >= 100){
+        	productionGoal.add(UnitType.Terran_Marine);
+        }
+        else{
+        	
+        }
+    	
+        //set goal for the prodution manager
+		productionManager.setGoal(productionGoal);
+		
     }
     
     /**
@@ -112,7 +145,8 @@ public class StrategyManager extends DefaultBWListener {
      * @return A tilePosition object corresponding to a given position
      */
     private TilePosition convertPositionToTilePosition(Position pos){
-    	return null;
+    	TilePosition tileCorrespondingToP = new TilePosition(pos.getX()/32, pos.getY()/32);
+    	return tileCorrespondingToP;
     }
     
     /**
@@ -124,7 +158,8 @@ public class StrategyManager extends DefaultBWListener {
      * 		a given tile position
      */
     private Position convertTilePositionToPosition(TilePosition tilePosition){
-    	return null;
+    	Position position = new Position(tilePosition.getX()*32, tilePosition.getY()*32);
+    	return position;
     }
 
     public static void main(String[] args) {
