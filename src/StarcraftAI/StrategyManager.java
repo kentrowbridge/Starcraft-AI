@@ -8,8 +8,8 @@ import bwta.BaseLocation;
 public class StrategyManager extends DefaultBWListener {
 
     private Mirror mirror = new Mirror();
-    private Game game;
-    private Player self;
+    protected Game game;
+    protected Player self;
     
     private int armyCount;
     private int scvCount;
