@@ -33,6 +33,7 @@ public class StrategyManager extends DefaultBWListener {
     public void run() {
         mirror.getModule().setEventListener(this);
         mirror.startGame();
+        System.out.println("Started.");
     }
     
     /**
@@ -54,9 +55,8 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onStart() {
         game = mirror.getGame();
+        System.out.println("game: "+game);
         self = game.self();
-        
-        this.productionManager = new ProductionManager();
 
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -65,6 +65,9 @@ public class StrategyManager extends DefaultBWListener {
         BWTA.analyze();
         System.out.println("Map data ready");
 
+        System.out.println("ProductionManager Not Initialized");
+        this.productionManager = new ProductionManager();
+        System.out.println("ProductionManager Initialized");
     }
     
     /**
@@ -76,7 +79,7 @@ public class StrategyManager extends DefaultBWListener {
     public void onFrame() {
         game.setTextSize(10);
         game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
-        
+        update();
     }
     
     /**
@@ -84,8 +87,11 @@ public class StrategyManager extends DefaultBWListener {
      * runs the necessary methods to update the AI's information as well as
      * execute the strategy of the AI.    
      */
-    private void update(){
-    	
+    private void update()
+    {
+    	System.out.println("Strategy update");
+    	System.out.println(productionManager);
+    	productionManager.update();
     }
     
     /**

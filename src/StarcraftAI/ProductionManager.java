@@ -77,7 +77,8 @@ public class ProductionManager extends StrategyManager {
 	 * 
 	 */
 	public void update(){
-		
+		System.out.println("Production update");
+		workerManager.update();
 	}
 	
 	/**

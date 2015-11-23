@@ -30,13 +30,15 @@ public class WorkerManager {
 		{
 			if(u.isIdle())
 			{
-				Unit mineral = findClosestMineral(u.getPosition());
-				u.gather(mineral);
+				//assign a task
+				u.gather(findClosestMineral(u.getPosition()));
 			}
 			
 			//remove a unit that no longer exists			
 			if(!u.exists())
+			{
 				this.workerList.remove(u);
+			}
 		}
 	}
 
@@ -57,7 +59,14 @@ public class WorkerManager {
 	 * 
 	 * @param unit - unit to be added
 	 */
-	public void addUnit(Unit unit){ }
+	public void addUnit(Unit unit)
+	{ 
+		//add only worker units
+		if (unit != null && unit.getType() == UnitType.Terran_SCV)
+		{
+			workerList.add(unit);
+		}
+	}
 
 	/**
 	 * findClosestMineral()
@@ -68,7 +77,7 @@ public class WorkerManager {
 	private Unit findClosestMineral(Position pos) 
 	{
 		//init closest to first in list
-		Unit closest = this.neutralUnits.get(0);
+		Unit closest = null;
 		
 		//find closest mineral
 		for(Unit neutral : this.neutralUnits)
