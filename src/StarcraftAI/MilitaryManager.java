@@ -11,7 +11,8 @@ import bwapi.*;
  */
 public class MilitaryManager extends StrategyManager {
 	List<Unit> militaryUnits = new ArrayList<Unit>();
-	Squad[] squads = new Squad[SquadType.values().length];
+	//Squad[] squads = new Squad[SquadType.values().length];
+	List<Squad> squads = new ArrayList<Squad>();
 	ArmyManager armyManager = new ArmyManager();
 	BattleManager battleManager = new BattleManager();
 	
