@@ -42,7 +42,19 @@ public class StrategyManager extends DefaultBWListener {
      */
     @Override
     public void onUnitCreate(Unit unit) {
-        System.out.println("New unit " + unit.getType());
+//        System.out.println("New unit " + unit.getType());
+        
+        if( unit.getType().isWorker() ){
+        	productionManager.addUnit(unit);
+        }
+        else if(unit.getType().isBuilding()){
+        	productionManager.addUnit(unit);
+        }
+        else if(!unit.getType().isNeutral()){
+        	// Military Unit
+        	
+        }
+        	
     }
     
     /**
@@ -56,8 +68,8 @@ public class StrategyManager extends DefaultBWListener {
         game = mirror.getGame();
         self = game.self();
         
-        productionManager = new ProductionManager();
-        militaryManager = new MilitaryManager();
+        productionManager = new ProductionManager(game, self);
+        militaryManager = new MilitaryManager(game, self);
         
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -77,9 +89,12 @@ public class StrategyManager extends DefaultBWListener {
     public void onFrame() {
         game.setTextSize(10);
         game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
-        
-        this.update();
-        
+        try{
+        	this.update();
+        }
+        catch(Exception e){
+        	e.printStackTrace();
+        }
     }
     
     /**
@@ -88,7 +103,14 @@ public class StrategyManager extends DefaultBWListener {
      * execute the strategy of the AI.    
      */
     private void update(){
-    	executeStrategy();
+    	try{
+    		executeStrategy();
+    	}
+    	catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	
+    	productionManager.update();
     }
     
     /**
@@ -118,12 +140,9 @@ public class StrategyManager extends DefaultBWListener {
         else if(self.minerals() >= 100){
         	productionGoal.add(UnitType.Terran_Marine);
         }
-        else{
-        	
-        }
-    	
+        
         //set goal for the prodution manager
-		productionManager.setGoal(productionGoal);
+    	productionManager.setGoal(productionGoal);
 		
     }
     
