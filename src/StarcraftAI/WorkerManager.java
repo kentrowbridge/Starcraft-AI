@@ -76,6 +76,8 @@ public class WorkerManager {
 	 */
 	private Unit findClosestMineral(Position pos) 
 	{
+		if(pos == null)
+			return null;
 		//init closest to first in list
 		Unit closest = null;
 		
@@ -85,9 +87,15 @@ public class WorkerManager {
 			//only check mineral fields
 			if(neutral.getType() == UnitType.Resource_Mineral_Field)
 			{
-				if(neutral.distanceTo(pos) < closest.distanceTo(pos))
+				try{
+					if(closest == null || neutral.getDistance(pos) < closest.getDistance(pos))
+					{
+						closest = neutral;
+					}
+				}
+				catch(Exception e)
 				{
-					closest = neutral;
+					e.printStackTrace();
 				}
 			}
 		}

@@ -33,7 +33,6 @@ public class StrategyManager extends DefaultBWListener {
     public void run() {
         mirror.getModule().setEventListener(this);
         mirror.startGame();
-        System.out.println("Started.");
     }
     
     /**
@@ -55,7 +54,6 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onStart() {
         game = mirror.getGame();
-        System.out.println("game: "+game);
         self = game.self();
 
         //Use BWTA to analyze map
@@ -65,9 +63,7 @@ public class StrategyManager extends DefaultBWListener {
         BWTA.analyze();
         System.out.println("Map data ready");
 
-        System.out.println("ProductionManager Not Initialized");
-        this.productionManager = new ProductionManager();
-        System.out.println("ProductionManager Initialized");
+        productionManager = new ProductionManager(game);
     }
     
     /**
@@ -89,8 +85,6 @@ public class StrategyManager extends DefaultBWListener {
      */
     private void update()
     {
-    	System.out.println("Strategy update");
-    	System.out.println(productionManager);
     	productionManager.update();
     }
     
