@@ -9,7 +9,7 @@ import bwapi.*;
  * @author Kenny Trowbridge
  *
  */
-public class WorkerManager {
+public class WorkerManager extends ProductionManager{
 	
 	private List<Unit> neutralUnits = new ArrayList<Unit>();
 	private List<Unit> workerList = new ArrayList<Unit>();
