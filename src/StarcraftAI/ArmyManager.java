@@ -9,8 +9,16 @@ import bwapi.*;
  * @author Casey Sigelmann
  *
  */
-public class ArmyManager extends MilitaryManager{
+public class ArmyManager{
 
+	/**
+	 * ctor
+	 * 
+	 */
+	public ArmyManager(){
+		
+	}
+	
 	/**
 	 * defend()
 	 * Positions the defend squad in a defensive position around our base.
