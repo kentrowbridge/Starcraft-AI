@@ -9,7 +9,7 @@ import bwapi.*;
  * @author Kenny Trowbridge
  *
  */
-public class WorkerManager extends ProductionManager{
+public class WorkerManager {
 	
 	private List<Unit> neutralUnits = new ArrayList<Unit>();
 	private List<Unit> workerList = new ArrayList<Unit>();
@@ -50,6 +50,14 @@ public class WorkerManager extends ProductionManager{
 	 */
 	public Unit getWorker()
 	{
+		for(Unit u : workerList)
+		{
+			if(!u.isConstructing() && u.isInterruptible())
+			{
+				return u;
+			}
+		}
+		
 		return null;
 	}
 	
