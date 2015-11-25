@@ -32,7 +32,14 @@ public class BuildingManager extends ProductionManager{
 	 * @param unit - unit type to build
 	 * @param builder - unit used to build
 	 */
-	public void build(UnitType unit, Unit builder){ }
+	public void build(UnitType unit, Unit builder)
+	{ 
+		TilePosition placement = getPlacement(unit);
+		if(placement != null)
+		{
+			builder.build(placement, unit);
+		}
+	}
 	
 	/**
 	 * getPlacement()
@@ -73,7 +80,16 @@ public class BuildingManager extends ProductionManager{
 	 * update()
 	 * This updates the building list in order to prune dead units
 	 */
-	public void update(){ }
+	public void update()
+	{
+		for(Unit building : buildingList)
+		{
+			if (!building.exists())
+			{
+				buildingList.remove(building);
+			}
+		}
+	}
 	
 	/**
 	 * checkBuildings()
