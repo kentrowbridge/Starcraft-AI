@@ -10,6 +10,8 @@ import bwapi.*;
 public class ProductionManager {
 	
 	private Game game;
+	private Player self; 
+	
 	private ArrayList<List<UnitType>> productionQueue; 
 	private ArrayList<UnitType> goals;
 	private ArrayList<UnitType> newGoal;
@@ -20,11 +22,11 @@ public class ProductionManager {
 	
 	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
 	
-	public ProductionManager(Game game){
+	public ProductionManager(Game game, Player self){
 		this.game = game;
+		this.self = self;
 		
-		buildingManager = new BuildingManager();
-		workerManager = new WorkerManager(game.getNeutralUnits());
+		this.buildingManager = new BuildingManager(game, self);
 		
 		//add starting workers to worker list
 		for(Unit u : game.self().getUnits())

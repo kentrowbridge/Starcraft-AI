@@ -9,16 +9,29 @@ import bwapi.*;
  * @author Kenny Trowbridge
  *
  */
-public class MilitaryManager extends StrategyManager {
-	List<Unit> militaryUnits = new ArrayList<Unit>();
-	Squad[] squads = new Squad[SquadType.values().length];
-	ArmyManager armyManager = new ArmyManager();
-	BattleManager battleManager = new BattleManager();
+
+public class MilitaryManager{
+	private Game game;
+	private Player self;
 	
+	protected List<Unit> militaryUnits = new ArrayList<Unit>();
+	//Squad[] squads = new Squad[SquadType.values().length];
+	List<Squad> squads = new ArrayList<Squad>();
+	private ArmyManager armyManager = new ArmyManager();
+	private BattleManager battleManager = new BattleManager();
+
 	/**
 	 * ctor
 	 */
 	public MilitaryManager(){ }
+	
+	public MilitaryManager(Game game, Player self){
+		this.game = game;
+		this.self = self;
+		
+		armyManager = new ArmyManager();
+		battleManager = new BattleManager();
+	}
 	
 	/**
 	 * addUnit()
