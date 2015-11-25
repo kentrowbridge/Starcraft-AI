@@ -9,15 +9,17 @@ import bwapi.*;
  * @author Kenny Trowbridge
  *
  */
+
 public class MilitaryManager{
 	private Game game;
 	private Player self;
 	
 	protected List<Unit> militaryUnits = new ArrayList<Unit>();
-	protected Squad[] squads = new Squad[SquadType.values().length];
+	//Squad[] squads = new Squad[SquadType.values().length];
+	List<Squad> squads = new ArrayList<Squad>();
 	private ArmyManager armyManager = new ArmyManager();
 	private BattleManager battleManager = new BattleManager();
-	
+
 	/**
 	 * ctor
 	 */

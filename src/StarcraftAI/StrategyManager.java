@@ -90,16 +90,12 @@ public class StrategyManager extends DefaultBWListener {
     public void onFrame() {
         game.setTextSize(10);
         game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
-<<<<<<< HEAD
         try{
         	this.update();
         }
         catch(Exception e){
         	e.printStackTrace();
         }
-=======
-        update();
->>>>>>> WorkerManager_dev
     }
     
     /**
@@ -107,7 +103,7 @@ public class StrategyManager extends DefaultBWListener {
      * runs the necessary methods to update the AI's information as well as
      * execute the strategy of the AI.    
      */
-<<<<<<< HEAD
+
     private void update(){
     	try{
     		executeStrategy();
@@ -115,11 +111,7 @@ public class StrategyManager extends DefaultBWListener {
     	catch(Exception e){
     		e.printStackTrace();
     	}
-    	
-=======
-    private void update()
-    {
->>>>>>> WorkerManager_dev
+
     	productionManager.update();
     }
     
