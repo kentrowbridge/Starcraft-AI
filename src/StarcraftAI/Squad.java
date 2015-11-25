@@ -32,6 +32,22 @@ public class Squad {
 	}
 	
 	/**
+	 * getSquadType
+	 * @return squadType
+	 */
+	public SquadType getSquadType() {
+		return squadType;
+	}
+
+	/**
+	 * setSquadType
+	 * @param squadType = the type of squad it is.
+	 */
+	public void setSquadType(SquadType squadType) {
+		this.squadType = squadType;
+	}
+
+	/**
 	 * isInCombat()
 	 * Determines if this squad should be classified as 'in combat'.
 	 * 
