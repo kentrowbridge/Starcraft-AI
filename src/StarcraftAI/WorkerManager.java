@@ -22,7 +22,7 @@ public class WorkerManager {
 	/**
 	 * update()
 	 * This method maintains the list of worker units by pruning
-	 * units that no longer exist
+	 * units that no longer exist. Also assigns idle units tasks
 	 */
 	public void update()
 	{ 
@@ -34,7 +34,7 @@ public class WorkerManager {
 				u.gather(findClosestMineral(u.getPosition()));
 			}
 			
-			//remove a unit that no longer exists			
+			//remove dead units		
 			if(!u.exists())
 			{
 				this.workerList.remove(u);
@@ -87,15 +87,9 @@ public class WorkerManager {
 			//only check mineral fields
 			if(neutral.getType() == UnitType.Resource_Mineral_Field)
 			{
-				try{
-					if(closest == null || neutral.getDistance(pos) < closest.getDistance(pos))
-					{
-						closest = neutral;
-					}
-				}
-				catch(Exception e)
+				if(closest == null || neutral.getDistance(pos) < closest.getDistance(pos))
 				{
-					e.printStackTrace();
+					closest = neutral;
 				}
 			}
 		}
