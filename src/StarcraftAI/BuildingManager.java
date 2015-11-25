@@ -12,11 +12,23 @@ import bwapi.*;
  * @author Casey Sigelmann
  *
  */
-public class BuildingManager extends ProductionManager{
+public class BuildingManager{
 
+	private Game game;
+	private Player self;
+	
 	private ArrayList<Unit> buildingList;
 	
-	public BuildingManager(){ }
+	/**
+	 * c'tor
+	 * @param game
+	 * @param self
+	 */
+	public BuildingManager(Game game, Player self)
+	{
+		this.game = game;
+		this.self = self;
+	}
 	
 	/**
 	 * addUnit

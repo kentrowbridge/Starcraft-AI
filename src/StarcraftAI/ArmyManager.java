@@ -16,7 +16,7 @@ import bwta.BaseLocation;
  */
 public class ArmyManager{
 	
-	private Squad[] squads = new Squad[SquadType.values().length];
+	private Squad[] squads;
 	
 	/**
 	 * ctor

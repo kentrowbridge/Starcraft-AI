@@ -1,8 +1,7 @@
 package StarcraftAI;
 import java.util.*;
 
-import bwapi.Position;
-import bwapi.Unit;
+import bwapi.*;
 
 /**
  * 
@@ -10,9 +9,14 @@ import bwapi.Unit;
  * @author Alex Bowns
  *
  */
-public class BattleManager extends MilitaryManager{
+public class BattleManager{
+	private Game game; 
+	private Player self;
+	
 	//A constant to determine if a unit is far away from a position
 	private static final double FARAWAY = 10.0;
+	
+	private Squad[] squads;
 	
 	/**
 	 * BattleManager()
@@ -20,6 +24,10 @@ public class BattleManager extends MilitaryManager{
 	 */
 	public BattleManager(){
 		
+	}
+	
+	public BattleManager(Squad[] squads){
+		this.squads = squads;
 	}
 	
 	/**

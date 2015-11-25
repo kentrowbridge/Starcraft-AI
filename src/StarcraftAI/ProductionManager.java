@@ -10,6 +10,8 @@ import bwapi.*;
 public class ProductionManager {
 	
 	private Game game;
+	private Player self; 
+	
 	private ArrayList<List<UnitType>> productionQueue; 
 	private ArrayList<UnitType> goal;
 	private ArrayList<UnitType> newGoal;
@@ -19,10 +21,11 @@ public class ProductionManager {
 	private WorkerManager workerManager;
 	
 	
-	public ProductionManager(Game game){
+	public ProductionManager(Game game, Player self){
 		this.game = game;
+		this.self = self;
 		
-		this.buildingManager = new BuildingManager();
+		this.buildingManager = new BuildingManager(game, self);
 		this.workerManager = new WorkerManager(game.getNeutralUnits());
 		
 		//add starting workers to worker list

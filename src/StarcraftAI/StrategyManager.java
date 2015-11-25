@@ -77,8 +77,6 @@ public class StrategyManager extends DefaultBWListener {
         BWTA.readMap();
         BWTA.analyze();
         System.out.println("Map data ready");
-
-        productionManager = new ProductionManager(game);
     }
     
     /**
