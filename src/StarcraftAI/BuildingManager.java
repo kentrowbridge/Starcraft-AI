@@ -50,7 +50,7 @@ public class BuildingManager{
 	 */
 	public void build(UnitType buildingType, Unit builder)
 	{ 
-		TilePosition placement = getPlacement(buildingType);
+		TilePosition placement = getPlacement(buildingType, builder);
 		if(placement != null)
 		{
 			builder.build(placement, buildingType);
@@ -64,7 +64,7 @@ public class BuildingManager{
 	 * @param buildingType - type of building to be placed
 	 * @return TilePosition - returns the location to place the building
 	 */
-	private TilePosition getPlacement(UnitType buildingType)
+	private TilePosition getPlacement(UnitType buildingType, Unit builder)
 	{
     	int maxDist = 3;
     	int stopDist = 40;
@@ -78,7 +78,7 @@ public class BuildingManager{
     		{
     			for(int j = aroundTile.getY()-maxDist; j <= aroundTile.getY()+maxDist; j++)
     			{
-    				if(game.canBuildHere(null, new TilePosition(i,j), buildingType, false))
+    				if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, false))
     				{
     					return new TilePosition(i,j);
     				}
@@ -98,12 +98,17 @@ public class BuildingManager{
 	 */
 	public void update()
 	{
+		ArrayList<Unit> buildingsToRemove = new ArrayList<Unit>();
 		for(Unit building : buildingList)
 		{
 			if (!building.exists())
 			{
-				buildingList.remove(building);
+				buildingsToRemove.add(building);
 			}
+		}
+		for(Unit building : buildingsToRemove)
+		{
+			buildingList.remove(building);
 		}
 	}
 	
