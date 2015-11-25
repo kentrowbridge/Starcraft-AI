@@ -15,10 +15,10 @@ public class MilitaryManager{
 	private Player self;
 	
 	protected List<Unit> militaryUnits = new ArrayList<Unit>();
-	//Squad[] squads = new Squad[SquadType.values().length];
-	List<Squad> squads = new ArrayList<Squad>();
-	private ArmyManager armyManager = new ArmyManager();
-	private BattleManager battleManager = new BattleManager();
+	Squad[] squads = new Squad[SquadType.values().length];
+//	List<Squad> squads = new ArrayList<Squad>();
+	private ArmyManager armyManager;
+	private BattleManager battleManager;
 
 	/**
 	 * ctor
@@ -41,7 +41,14 @@ public class MilitaryManager{
 	 * 
 	 * @param unit - unit to add
 	 */
-	public void addUnit(Unit unit){ }
+	public void addUnit(Unit unit){
+		// put unit in a squad. Default is Offense. 
+		for(Squad squad: squads){
+			if(squad.getSquadType() == SquadType.Offense){
+				squad.addUnit(unit);
+			}
+		}
+	}
 	
 	/**
 	 * update()
@@ -59,6 +66,19 @@ public class MilitaryManager{
 	 * @param command - command from the StrategyManager
 	 * @param percentCommit - percentage of units to commit to command
 	 */
-	public void command(Command command, Double percentCommit){ }
+	public void command(Command command, Double percentCommit, Position position)
+	{
+		switch(command){
+			case Attack:
+				armyManager.engage(position);
+				break;
+			case Defend:
+				armyManager.defend();
+				break;
+			case Scout:
+				armyManager.scout();
+				break;
+		}
+	}
 	
 }

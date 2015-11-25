@@ -20,6 +20,7 @@ public class ArmyManager{
 	
 	/**
 	 * ctor
+	 * default constructor
 	 * 
 	 */
 	public ArmyManager(){
@@ -31,6 +32,17 @@ public class ArmyManager{
 	 * 
 	 */
 	public ArmyManager(Squad[] squads){
+		this.squads = squads;
+	}
+	
+	/**
+	 * setSquads
+	 * given a list of squads, set those squads as the squads 
+	 * for this class to act on. 
+	 * 
+	 * @param squads - a list of squads 
+	 */
+	public void setSquads(Squad[] squads){
 		this.squads = squads;
 	}
 	
