@@ -26,6 +26,7 @@ public class WorkerManager{
 	 */
 	public void update()
 	{ 
+		List<Unit> workersToRemove = new ArrayList<Unit>();
 		for(Unit u : workerList)
 		{
 			if(u.isIdle())
@@ -34,11 +35,17 @@ public class WorkerManager{
 				u.gather(findClosestMineral(u.getPosition()));
 			}
 			
-			//remove dead units		
+			//save dead units for deletion	
 			if(!u.exists())
 			{
-				this.workerList.remove(u);
+				workersToRemove.add(u);
 			}
+		}
+		
+		//remove dead workers
+		for(Unit u : workersToRemove)
+		{
+			workerList.remove(u);
 		}
 	}
 
