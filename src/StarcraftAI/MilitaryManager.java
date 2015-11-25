@@ -15,10 +15,10 @@ public class MilitaryManager{
 	private Player self;
 	
 	protected List<Unit> militaryUnits = new ArrayList<Unit>();
-	//Squad[] squads = new Squad[SquadType.values().length];
-	List<Squad> squads = new ArrayList<Squad>();
-	private ArmyManager armyManager = new ArmyManager();
-	private BattleManager battleManager = new BattleManager();
+	Squad[] squads = new Squad[SquadType.values().length];
+//	List<Squad> squads = new ArrayList<Squad>();
+	private ArmyManager armyManager;
+	private BattleManager battleManager;
 
 	/**
 	 * ctor
@@ -42,7 +42,12 @@ public class MilitaryManager{
 	 * @param unit - unit to add
 	 */
 	public void addUnit(Unit unit){
-		
+		// put unit in a squad. Default is Offense. 
+		for(Squad squad: squads){
+			if(squad.getSquadType() == SquadType.Offense){
+				squad.addUnit(unit);
+			}
+		}
 	}
 	
 	/**
