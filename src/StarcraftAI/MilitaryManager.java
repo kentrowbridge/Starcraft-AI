@@ -41,7 +41,9 @@ public class MilitaryManager{
 	 * 
 	 * @param unit - unit to add
 	 */
-	public void addUnit(Unit unit){ }
+	public void addUnit(Unit unit){
+		
+	}
 	
 	/**
 	 * update()
@@ -59,6 +61,19 @@ public class MilitaryManager{
 	 * @param command - command from the StrategyManager
 	 * @param percentCommit - percentage of units to commit to command
 	 */
-	public void command(Command command, Double percentCommit){ }
+	public void command(Command command, Double percentCommit, Position position)
+	{
+		switch(command){
+			case Attack:
+				armyManager.engage(position);
+				break;
+			case Defend:
+				armyManager.defend();
+				break;
+			case Scout:
+				armyManager.scout();
+				break;
+		}
+	}
 	
 }
