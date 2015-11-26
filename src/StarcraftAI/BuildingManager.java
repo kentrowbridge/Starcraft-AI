@@ -16,7 +16,21 @@ public class BuildingManager extends ProductionManager{
 
 	private ArrayList<Unit> buildingList;
 	
+<<<<<<< Updated upstream
 	public BuildingManager(){ }
+=======
+	/**
+	 * c'tor
+	 * @param game
+	 * @param self
+	 */
+	public BuildingManager(Game game, Player self)
+	{
+		this.game = game;
+		this.self = self;
+		this.buildingList = new ArrayList<Unit>();
+	}
+>>>>>>> Stashed changes
 	
 	/**
 	 * addUnit
