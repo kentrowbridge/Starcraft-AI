@@ -57,6 +57,14 @@ public class WorkerManager{
 	 */
 	public Unit getWorker()
 	{
+		for(Unit u : workerList)
+		{
+			if(!u.isConstructing() && u.isInterruptible())
+			{
+				return u;
+			}
+		}
+		
 		return null;
 	}
 	

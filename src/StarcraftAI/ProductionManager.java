@@ -13,20 +13,20 @@ public class ProductionManager {
 	private Player self; 
 	
 	private ArrayList<List<UnitType>> productionQueue; 
-	private ArrayList<UnitType> goal;
+	private ArrayList<UnitType> goals;
 	private ArrayList<UnitType> newGoal;
 	private ArrayList<List<UnitType>> techDag; 
 	private ArrayList<List<UnitType>> paths;  
 	private BuildingManager buildingManager;
 	private WorkerManager workerManager;
 	
+	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
 	
 	public ProductionManager(Game game, Player self){
 		this.game = game;
 		this.self = self;
 		
 		this.buildingManager = new BuildingManager(game, self);
-		this.workerManager = new WorkerManager(game.getNeutralUnits());
 		
 		//add starting workers to worker list
 		for(Unit u : game.self().getUnits())
@@ -36,8 +36,10 @@ public class ProductionManager {
 				workerManager.addUnit(u);
 			}
 		}
+		
+		initBuildingsForUnits();
 	}
-	
+
 	/**
 	 * addUnit()
 	 * This checks the type of the given unit and then calls the appropriate 
@@ -45,7 +47,18 @@ public class ProductionManager {
 	 * 
 	 * @param unit - the specific unit that we are checking
 	 */
-	public void addUnit(Unit unit){			
+	public void addUnit(Unit unit)
+	{		if (unit == null)
+			return;
+		
+		if(unit.getType().isBuilding())
+		{
+			buildingManager.addUnit(unit);
+		}
+		else if(unit.getType() == UnitType.Terran_SCV)
+		{
+			workerManager.addUnit(unit);
+		}
 	}
 	
 	/**
@@ -54,8 +67,9 @@ public class ProductionManager {
 	 * 
 	 * @param newGoal - the new goal instance variable
 	 */
-	public void setGoal(ArrayList<UnitType> newGoal){
-		
+	public void setGoal(ArrayList<UnitType> newGoal)
+	{
+		this.newGoal = newGoal;
 	}
 	
 	/** 
@@ -64,10 +78,20 @@ public class ProductionManager {
 	 * then using that worker, issue a build command to the Building Manager to construct 
 	 * the building type specified.
 	 *  
-	 * @param unitType
+	 * @param unitType - type of building ot build
 	 */
-	public void buildBuilding(UnitType unitType){
-		
+	public void buildBuilding(UnitType unitType)
+	{
+		if(unitType.isBuilding())
+		{
+			Unit builder = workerManager.getWorker();
+			
+			//make sure the builder is not null
+			if(builder != null)
+			{
+				buildingManager.build(unitType, builder);
+			}
+		}
 	}
 	
 	/**
@@ -75,24 +99,53 @@ public class ProductionManager {
 	 * This method is responsible for issuing an order to train a unit, 
 	 * specified by the UnitType parameter, from a given building, provided by the Unit parameter.
 	 * 
-	 * @param unitType
-	 * @param building
+	 * @param unitType - unit type to train
+	 * @param building - building to train from
 	 */
-	public void training(UnitType unitType, Unit building){
+	public void training(UnitType unitType, Unit building)
+	{
+		if(unitType == null || building == null)
+			return;
 		
+		building.train(unitType);
 	}
 	
 	/**
 	 * update()
 	 * This method is responsible for calling the update methods in both the Building Manager 
-	 * and the Worker Manager. It checks if goal and newGoal are the same and if so,
+	 * and the Worker Manager. It checks if goal and newGoal are not the same and if so,
 	 * it sets goal to newGoal and updates the productionQueue. 
 	 * It then calls processQueue to initiate building construction, unit training, 
 	 * and technology research using the productionQueue.
 	 * 
 	 */
-	public void update(){
+	public void update()
+	{
+		buildingManager.update();
 		workerManager.update();
+		
+		//if goal and new goal are the same, 
+		if(!Arrays.deepEquals(goals.toArray(), newGoal.toArray()))
+		{
+			goals = newGoal;
+			
+			//find paths for all of the goals
+			//update production queue
+			for(UnitType u : goals)
+			{
+				//create paths for goals
+				List<UnitType> path = new ArrayList<UnitType>();
+				
+				//only add end goal for now
+				//THIS WILL BE CHANGED LATER ON IN IMPLEMENTATION
+				path.add(u);
+				
+				//add path to production q
+				productionQueue.add(path);
+			}
+		}
+		
+		processQueue();
 	}
 	
 	/**
@@ -104,8 +157,34 @@ public class ProductionManager {
 	 * that unit and the building type taken from the priority queue.
 	 * 
 	 */
-	public void processQueue(){
+	public void processQueue()
+	{
+		for(List<UnitType> buildPath : productionQueue)
+		{
+			//temporarily: build path is always going to be the next thing that needs to be built
+			// dependency conflicts are handled by strategy manager FOR NOW
+			UnitType item = buildPath.get(0);
 			
+			if(item != null)
+			{
+				if(item.isBuilding())
+				{
+					buildBuilding(item);
+				}
+				else
+				{
+					//find building type that builds the item
+					UnitType buildingType = buildingsForUnits.get(item);
+					//retrieve one of those buildings
+					Unit building = buildingManager.getBuilding(buildingType);
+					
+					if(building != null)
+					{
+						training(item, building);
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -114,10 +193,11 @@ public class ProductionManager {
 	 * dependency list based on the tech DAG. We will use Dijkstra’s shortest path algorithm 
 	 * in order to implement this. 
 	 * 
-	 * @param goalUnit
+	 * @param goalUnit - end point of the path
 	 * @return a dependency list of what to construct (in what order) for the specific unit
 	 */
-	public ArrayList<UnitType> findTechPath(UnitType goalUnit){
+	public ArrayList<UnitType> findTechPath(UnitType goalUnit)
+	{
 		return null;
 	}
 	
@@ -127,12 +207,39 @@ public class ProductionManager {
 	 * subsequence of the dependency list is already in the priority queue.
 	 * If there is a subsequence that is found, that sequence will be removed from the list.
 	 * 
-	 * @param path
+	 * @param path - path to examine
 	 * @return path of buildings that have not been constructed yet
 	 */
-	public ArrayList<UnitType> examinePath(ArrayList<UnitType> path){
+	public ArrayList<UnitType> examinePath(ArrayList<UnitType> path)
+	{
 		return null; 
 	}
 	
-	
+	/**
+	 * initBuildingsForUnits()
+	 * initializes the hashtable that determines what buildings builds a unit
+	 */
+	private void initBuildingsForUnits() 
+	{
+		//barracks
+		buildingsForUnits.put(UnitType.Terran_Marine, UnitType.Terran_Barracks);
+		buildingsForUnits.put(UnitType.Terran_Medic, UnitType.Terran_Barracks);
+		buildingsForUnits.put(UnitType.Terran_Firebat, UnitType.Terran_Barracks);
+		buildingsForUnits.put(UnitType.Terran_Ghost, UnitType.Terran_Barracks);
+		
+		//factory
+		buildingsForUnits.put(UnitType.Terran_Vulture, UnitType.Terran_Factory);
+		buildingsForUnits.put(UnitType.Terran_Siege_Tank_Tank_Mode, UnitType.Terran_Factory);
+		buildingsForUnits.put(UnitType.Terran_Goliath, UnitType.Terran_Factory);
+		
+		//starport
+		buildingsForUnits.put(UnitType.Terran_Wraith, UnitType.Terran_Starport);
+		buildingsForUnits.put(UnitType.Terran_Dropship, UnitType.Terran_Starport);
+		buildingsForUnits.put(UnitType.Terran_Valkyrie, UnitType.Terran_Starport);
+		buildingsForUnits.put(UnitType.Terran_Science_Vessel, UnitType.Terran_Starport);
+		buildingsForUnits.put(UnitType.Terran_Battlecruiser, UnitType.Terran_Starport);
+		
+		//command center
+		buildingsForUnits.put(UnitType.Terran_SCV, UnitType.Terran_Command_Center);
+	}
 }
