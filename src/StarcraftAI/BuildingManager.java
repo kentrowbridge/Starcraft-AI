@@ -28,6 +28,7 @@ public class BuildingManager{
 	{
 		this.game = game;
 		this.self = self;
+		this.buildingList = new ArrayList<Unit>();
 	}
 	
 	/**
@@ -131,8 +132,15 @@ public class BuildingManager{
 	 * @param building - type of building to find
 	 * @return - building
 	 */
-	public Unit getBuilding(UnitType building)
+	public Unit getBuilding(UnitType buildingType)
 	{
+		for(Unit building : buildingList)
+		{
+			if(building.getType() == buildingType)
+			{
+				return building;
+			}
+		}
 		return null;
 	}
 }
