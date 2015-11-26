@@ -114,8 +114,15 @@ public class BuildingManager extends ProductionManager{
 	 * @param building - type of building to find
 	 * @return - building
 	 */
-	public Unit getBuilding(UnitType building)
+	public Unit getBuilding(UnitType buildingType)
 	{
+		for(Unit building : buildingList)
+		{
+			if(building.getType() == buildingType)
+			{
+				return building;
+			}
+		}
 		return null;
 	}
 }
