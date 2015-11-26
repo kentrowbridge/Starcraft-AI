@@ -7,7 +7,10 @@ import bwapi.*;
  * ProductionManager uses the WorkerManager and the BuildingManager to handle build and research 
  * orders passed to it from the StrategyManager.
  */
-public class ProductionManager extends StrategyManager{
+public class ProductionManager {
+	
+	private Game game;
+	private Player self; 
 	
 	private ArrayList<List<UnitType>> productionQueue; 
 	private ArrayList<UnitType> goal;
@@ -17,8 +20,22 @@ public class ProductionManager extends StrategyManager{
 	private BuildingManager buildingManager;
 	private WorkerManager workerManager;
 	
-	public ProductionManager(){
+	
+	public ProductionManager(Game game, Player self){
+		this.game = game;
+		this.self = self;
 		
+		this.buildingManager = new BuildingManager(game, self);
+		this.workerManager = new WorkerManager(game.getNeutralUnits());
+		
+		//add starting workers to worker list
+		for(Unit u : game.self().getUnits())
+		{
+			if(u.getType() == UnitType.Terran_SCV)
+			{
+				workerManager.addUnit(u);
+			}
+		}
 	}
 	
 	/**
@@ -28,8 +45,7 @@ public class ProductionManager extends StrategyManager{
 	 * 
 	 * @param unit - the specific unit that we are checking
 	 */
-	public void addUnit(Unit unit){
-		
+	public void addUnit(Unit unit){			
 	}
 	
 	/**
@@ -76,7 +92,7 @@ public class ProductionManager extends StrategyManager{
 	 * 
 	 */
 	public void update(){
-		
+		workerManager.update();
 	}
 	
 	/**

@@ -1,5 +1,10 @@
 package StarcraftAI;
-import bwapi.*;
+import java.util.List;
+
+import bwapi.Position;
+import bwapi.TilePosition;
+import bwta.BWTA;
+import bwta.BaseLocation;
 
 /**
  * ArmyManager Class
@@ -9,8 +14,26 @@ import bwapi.*;
  * @author Casey Sigelmann
  *
  */
-public class ArmyManager extends MilitaryManager{
-
+public class ArmyManager{
+	
+	private Squad[] squads;
+	
+	/**
+	 * ctor
+	 * 
+	 */
+	public ArmyManager(){
+		
+	}
+	
+	/**
+	 * ctor
+	 * 
+	 */
+	public ArmyManager(Squad[] squads){
+		this.squads = squads;
+	}
+	
 	/**
 	 * defend()
 	 * Positions the defend squad in a defensive position around our base.
@@ -28,6 +51,12 @@ public class ArmyManager extends MilitaryManager{
 	 */
 	public void engage(Position position)
 	{
+		for(Squad squad : squads){
+			if(squad.getSquadType() == SquadType.Offense){
+				squad.attackMove(position);
+				break;
+			}
+		}
 		
 	}
 	
@@ -37,7 +66,21 @@ public class ArmyManager extends MilitaryManager{
 	 */
 	public void scout()
 	{
-		
+		for(Squad squad : squads){
+			if(squad.getSquadType() == SquadType.Offense){
+				List<BaseLocation> baseLocations = BWTA.getBaseLocations();
+				for(BaseLocation base : baseLocations){
+		    		TilePosition baseToP = new TilePosition(base.getX()/32, base.getY()/32);
+    				squad.move(base.getPosition());
+    				/*// For queueing moves...
+    				 * squad.addDestination(base.getPosition());
+    				 */
+		    	}
+			}
+		}
+		/*// For queueing moves...
+		 * squad.addDestination(base.getPosition());
+		 */
 	}
 	
 }
