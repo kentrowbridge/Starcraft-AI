@@ -126,24 +126,27 @@ public class StrategyManager extends DefaultBWListener {
 		
     	// If we are almost supply capped build a supply depot.
     	if(self.supplyTotal() - self.supplyUsed() <= 3){
-    		productionGoal.add(UnitType.Terran_Supply_Depot);
-    	}
-    	
-    	//if there's enough minerals, and not currently training an SCV, train an SCV
-    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 20) {
-            productionGoal.add(UnitType.Terran_SCV);
+    		if(self.minerals() >= 100)
+    			productionGoal.add(UnitType.Terran_Supply_Depot);
     	}
     	
     	// else if we don't have a barracks build a barracks. 
         else if(self.minerals() >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 2){
+        	System.out.println("BUILD BARRACKS!!!");
         	productionGoal.add(UnitType.Terran_Barracks);        	
         }
         
         // else build marines
-        else if(self.minerals() >= 100){
+        else if(self.minerals() >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
         	productionGoal.add(UnitType.Terran_Marine);
         }
-        
+    	
+    	//if there's enough minerals, and not currently training an SCV, train an SCV
+    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 12) {
+    		System.out.println("BUILD SCV");
+            productionGoal.add(UnitType.Terran_SCV);
+    	}
+    	
         //set goal for the prodution manager
     	productionManager.setGoal(productionGoal);
 		

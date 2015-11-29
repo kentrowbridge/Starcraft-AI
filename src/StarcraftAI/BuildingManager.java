@@ -28,6 +28,7 @@ public class BuildingManager{
 	{
 		this.game = game;
 		this.self = self;
+		buildingList = new ArrayList<Unit>();
 	}
 	
 	/**
@@ -133,6 +134,11 @@ public class BuildingManager{
 	 */
 	public Unit getBuilding(UnitType building)
 	{
+		for(Unit u : buildingList){
+			if(u.getType() == building)
+				return u;
+		}
+		
 		return null;
 	}
 }
