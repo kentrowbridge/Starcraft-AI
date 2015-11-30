@@ -43,7 +43,8 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onUnitCreate(Unit unit) {
 //        System.out.println("New unit " + unit.getType());
-        
+//        System.out.println(productionManager);
+    	
         if( unit.getType().isWorker() ){
         	productionManager.addUnit(unit);
         	scvCount++;

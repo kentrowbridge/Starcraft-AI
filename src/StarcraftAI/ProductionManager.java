@@ -6,19 +6,25 @@ import bwapi.*;
  * The production manager is responsible for building units that the strategy manager requests. 
  * ProductionManager uses the WorkerManager and the BuildingManager to handle build and research 
  * orders passed to it from the StrategyManager.
+ * 
+ * @author Kenny Trowbridge
+ * @author Alex Bowns
  */
 public class ProductionManager {
 	
 	private Game game;
 	private Player self; 
 	
-	private ArrayList<List<UnitType>> productionQueue; 
-	private ArrayList<UnitType> goals;
-	private ArrayList<UnitType> newGoal;
+	private ArrayList<List<UnitType>> productionQueue = new ArrayList<List<UnitType>>(); 
+	private ArrayList<UnitType> goals = new ArrayList<UnitType>();
+	private ArrayList<UnitType> newGoal = new ArrayList<UnitType>();
 	private ArrayList<List<UnitType>> techDag; 
 	private ArrayList<List<UnitType>> paths;  
 	private BuildingManager buildingManager;
 	private WorkerManager workerManager;
+	
+	//flag to make sure only one unit is building at a time
+	private boolean buildInProgress = false;
 	
 	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
 	
@@ -26,7 +32,8 @@ public class ProductionManager {
 		this.game = game;
 		this.self = self;
 		
-		this.buildingManager = new BuildingManager(game, self);
+		this.buildingManager = new BuildingManager(this.game, this.self);
+		this.workerManager = new WorkerManager(this.game.getNeutralUnits());
 		
 		//add starting workers to worker list
 		for(Unit u : game.self().getUnits())
@@ -82,7 +89,7 @@ public class ProductionManager {
 	 */
 	public void buildBuilding(UnitType unitType)
 	{
-		if(unitType.isBuilding())
+		if(!buildInProgress && unitType.isBuilding())
 		{
 			Unit builder = workerManager.getWorker();
 			
@@ -90,6 +97,7 @@ public class ProductionManager {
 			if(builder != null)
 			{
 				buildingManager.build(unitType, builder);
+				buildInProgress = true;
 			}
 		}
 	}
@@ -107,7 +115,17 @@ public class ProductionManager {
 		if(unitType == null || building == null)
 			return;
 		
-		building.train(unitType);
+		if(unitType == UnitType.Terran_SCV)
+		{
+			if(!building.isTraining())
+			{
+				building.train(unitType);
+			}
+		}
+		else
+		{
+			building.train(unitType);
+		}
 	}
 	
 	/**
@@ -165,10 +183,13 @@ public class ProductionManager {
 			// dependency conflicts are handled by strategy manager FOR NOW
 			UnitType item = buildPath.get(0);
 			
+			System.out.println("Attempting to make: " + item);
+			
 			if(item != null)
 			{
 				if(item.isBuilding())
 				{
+					System.out.print("building unit: " + item);
 					buildBuilding(item);
 				}
 				else
@@ -178,8 +199,11 @@ public class ProductionManager {
 					//retrieve one of those buildings
 					Unit building = buildingManager.getBuilding(buildingType);
 					
+					System.out.println(item + " : " + building);
+					
 					if(building != null)
 					{
+						System.out.println("training unit: " + item);
 						training(item, building);
 					}
 				}
