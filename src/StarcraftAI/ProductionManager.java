@@ -31,9 +31,15 @@ public class ProductionManager {
 	public ProductionManager(Game game, Player self){
 		this.game = game;
 		this.self = self;
+
+		this.buildingManager = new BuildingManager(game, self);
+		this.workerManager = new WorkerManager(game.getNeutralUnits());
 		
-		this.buildingManager = new BuildingManager(this.game, this.self);
-		this.workerManager = new WorkerManager(this.game.getNeutralUnits());
+		this.productionQueue = new ArrayList<List<UnitType>>();
+		this.goals = new ArrayList<UnitType>();
+		this.newGoal = new ArrayList<UnitType>();
+		this.techDag = new ArrayList<List<UnitType>>();
+		this.paths = new ArrayList<List<UnitType>>();
 		
 		//add starting workers to worker list
 		for(Unit u : game.self().getUnits())
