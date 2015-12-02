@@ -23,9 +23,6 @@ public class ProductionManager {
 	private BuildingManager buildingManager;
 	private WorkerManager workerManager;
 	
-	//flag to make sure only one unit is building at a time
-	private boolean buildInProgress = false;
-	
 	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
 	
 	public ProductionManager(Game game, Player self){
@@ -95,15 +92,14 @@ public class ProductionManager {
 	 */
 	public void buildBuilding(UnitType unitType)
 	{
-		if(!buildInProgress && unitType.isBuilding())
+		if(unitType.isBuilding())
 		{
 			Unit builder = workerManager.getWorker();
 			
 			//make sure the builder is not null
-			if(builder != null)
+			if(builder != null && game.canMake(builder, unitType))
 			{
 				buildingManager.build(unitType, builder);
-				buildInProgress = true;
 			}
 		}
 	}
@@ -189,13 +185,10 @@ public class ProductionManager {
 			// dependency conflicts are handled by strategy manager FOR NOW
 			UnitType item = buildPath.get(0);
 			
-			System.out.println("Attempting to make: " + item);
-			
 			if(item != null)
 			{
 				if(item.isBuilding())
 				{
-					System.out.print("building unit: " + item);
 					buildBuilding(item);
 				}
 				else
@@ -204,12 +197,9 @@ public class ProductionManager {
 					UnitType buildingType = buildingsForUnits.get(item);
 					//retrieve one of those buildings
 					Unit building = buildingManager.getBuilding(buildingType);
-					
-					System.out.println(item + " : " + building);
-					
+										
 					if(building != null)
 					{
-						System.out.println("training unit: " + item);
 						training(item, building);
 					}
 				}
