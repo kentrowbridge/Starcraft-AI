@@ -28,10 +28,7 @@ public class WorkerManager{
 	{ 
 		List<Unit> workersToRemove = new ArrayList<Unit>();
 		for(Unit u : workerList)
-		{
-			if(u.isConstructing())
-				System.out.println("Unit in transit " + u.isMoving());
-			
+		{			
 			if(u.isIdle())
 			{
 				//assign a task
@@ -64,7 +61,7 @@ public class WorkerManager{
 		for(Unit u : workerList)
 		{			
 			//make sure no workers are on there way to build at the same time
-			if(u.isConstructing() && u.isMoving())
+			if(u.isConstructing() && u.isMoving() && (u.getBuildUnit() == null))
 			{
 				return null;
 			}		

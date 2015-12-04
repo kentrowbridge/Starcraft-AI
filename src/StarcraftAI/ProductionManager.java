@@ -95,7 +95,6 @@ public class ProductionManager {
 		if(unitType.isBuilding())
 		{
 			Unit builder = workerManager.getWorker();
-			
 			//make sure the builder is not null
 			if(builder != null && game.canMake(builder, unitType))
 			{
