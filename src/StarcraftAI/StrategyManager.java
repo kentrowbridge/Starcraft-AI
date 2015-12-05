@@ -140,7 +140,7 @@ public class StrategyManager extends DefaultBWListener {
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
     	// If we are almost supply capped build a supply depot.
-    	if(self.supplyTotal() - self.supplyUsed() <= 3){
+    	if(self.supplyTotal() - self.supplyUsed() <= 6){
     		if(self.minerals() >= 100)
     			productionGoal.add(UnitType.Terran_Supply_Depot);
     	}
