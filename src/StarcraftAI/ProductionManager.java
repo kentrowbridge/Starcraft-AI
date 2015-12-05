@@ -183,7 +183,7 @@ public class ProductionManager {
 					//find building type that builds the item
 					UnitType buildingType = buildingsForUnits.get(item);
 					//retrieve one of those buildings
-					Unit building = buildingManager.getBuilding(buildingType);
+					Unit building = buildingManager.getBuilding(buildingType, true);
 					
 					if(building != null)
 					{
