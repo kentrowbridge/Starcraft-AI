@@ -26,9 +26,10 @@ public class Squad {
 	 * Squad()
 	 * Constructor for the Squad class.
 	 */
-	public Squad()
+	public Squad(SquadType squadType)
 	{
 		squad = new ArrayList<Unit>();
+		this.squadType = squadType;
 	}
 	
 	/**

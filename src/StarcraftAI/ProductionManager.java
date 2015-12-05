@@ -80,6 +80,10 @@ public class ProductionManager {
 	public void setGoal(ArrayList<UnitType> newGoal)
 	{
 		this.newGoal = newGoal;
+		if(!newGoal.isEmpty())
+			System.out.println("Production Goal: " + newGoal.get(0));
+		else
+			System.out.println("Production Goal: EMPTY");
 	}
 	
 	/** 
@@ -115,18 +119,8 @@ public class ProductionManager {
 	{
 		if(unitType == null || building == null)
 			return;
-		
-		if(unitType == UnitType.Terran_SCV)
-		{
-			if(!building.isTraining())
-			{
-				building.train(unitType);
-			}
-		}
-		else
-		{
+		if(!building.isTraining())
 			building.train(unitType);
-		}
 	}
 	
 	/**
@@ -143,11 +137,14 @@ public class ProductionManager {
 		buildingManager.update();
 		workerManager.update();
 		
+//		System.out.println("goals are the same?: " + Arrays.deepEquals(goals.toArray(), newGoal.toArray()));
+		
 		//if goal and new goal are the same, 
 		if(!Arrays.deepEquals(goals.toArray(), newGoal.toArray()))
 		{
 			goals = newGoal;
 			
+			productionQueue.clear();
 			//find paths for all of the goals
 			//update production queue
 			for(UnitType u : goals)
@@ -160,6 +157,7 @@ public class ProductionManager {
 				path.add(u);
 				
 				//add path to production q
+				
 				productionQueue.add(path);
 			}
 		}

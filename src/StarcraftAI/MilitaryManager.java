@@ -14,8 +14,8 @@ public class MilitaryManager{
 	private Game game;
 	private Player self;
 	
-	protected List<Unit> militaryUnits = new ArrayList<Unit>();
-	Squad[] squads = new Squad[SquadType.values().length];
+	protected List<Unit> militaryUnits;
+	protected Squad[] squads;
 //	List<Squad> squads = new ArrayList<Squad>();
 	private ArmyManager armyManager;
 	private BattleManager battleManager;
@@ -29,8 +29,20 @@ public class MilitaryManager{
 		this.game = game;
 		this.self = self;
 		
+		militaryUnits = new ArrayList<Unit>();
+		squads = new Squad[SquadType.values().length];
+		
+		initSquads();
+		
+		
 		armyManager = new ArmyManager();
 		battleManager = new BattleManager();
+	}
+	
+	public void initSquads(){
+		for(int i = 0; i < squads.length; i++){
+			squads[i] = new Squad(SquadType.values()[i]);
+		}
 	}
 	
 	/**
