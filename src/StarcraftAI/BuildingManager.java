@@ -130,15 +130,19 @@ public class BuildingManager{
 	 * Finds a building of the given building type
 	 * 
 	 * @param building - type of building to find
+	 * @param checkTraining - true if only a building that is not training should be returned
 	 * @return - building
 	 */
-	public Unit getBuilding(UnitType buildingType)
+	public Unit getBuilding(UnitType buildingType, boolean checkTraining)
 	{
 		for(Unit building : buildingList)
 		{
 			if(building.getType() == buildingType)
 			{
-				return building;
+				if((!checkTraining) || (!building.isTraining()))
+				{
+					return building;
+				}
 			}
 		}
 		return null;
