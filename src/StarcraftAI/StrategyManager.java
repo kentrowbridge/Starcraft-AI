@@ -71,8 +71,22 @@ public class StrategyManager extends DefaultBWListener {
         game = mirror.getGame();
         self = game.self();
         
+        // init production manager and military manager
         productionManager = new ProductionManager(game, self);
         militaryManager = new MilitaryManager(game, self);
+        
+        // Init variable our unit info
+        armyCount = 0;
+        scvCount = 0;
+        armyRatio = new Hashtable<UnitType, Double>();
+        buildingInfo = new Hashtable<UnitType, Integer>();
+        
+        // Init variables for enemy info
+        enemyArmyCount = 0;
+        enemyArmyRatio = new Hashtable<UnitType, Double>();
+        enemyBuildingInfo = new Hashtable<UnitType, Integer>();
+        enemyArmyPosition = new HashSet<Position>();
+        enemyBuildingLocation = new HashSet<Position>();
         
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
