@@ -26,9 +26,10 @@ public class Squad {
 	 * Squad()
 	 * Constructor for the Squad class.
 	 */
-	public Squad()
+	public Squad(SquadType squadType)
 	{
-		
+		squad = new ArrayList<Unit>();
+		this.squadType = squadType;
 	}
 	
 	/**
@@ -55,6 +56,7 @@ public class Squad {
 	 */
 	public boolean isInCombat()
 	{
+		// requires work! 
 		return false;
 	}
 	
@@ -66,7 +68,7 @@ public class Squad {
 	 */
 	public boolean isEmpty()
 	{
-		return false;
+		return squad.isEmpty();
 	}
 	
 	/**
@@ -77,7 +79,9 @@ public class Squad {
 	 */
 	public void move(Position position)
 	{
-		
+		for(Unit unit: squad){
+			unit.move(position);
+		}
 	}
 	
 	/**
@@ -88,7 +92,9 @@ public class Squad {
 	 */
 	public void attackMove(Position position)
 	{
-		
+		for(Unit unit: squad){
+			unit.attack(position);
+		}
 	}
 	
 	/**
@@ -99,7 +105,7 @@ public class Squad {
 	 */
 	public ArrayList<Unit> getUnits()
 	{
-		return null;
+		return squad;
 	}
 	
 	/**
@@ -110,7 +116,7 @@ public class Squad {
 	 */
 	public void setUnits(ArrayList<Unit> units)
 	{
-		
+		squad = units;
 	}
 	
 	/**
@@ -121,7 +127,7 @@ public class Squad {
 	 */
 	public void addUnit(Unit unit)
 	{
-		
+		squad.add(unit);
 	}
 	
 	/**
@@ -132,6 +138,6 @@ public class Squad {
 	 */
 	public void removeUnit(Unit unit)
 	{
-		
+		squad.remove(unit);
 	}
 }

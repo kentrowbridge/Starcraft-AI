@@ -43,16 +43,19 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onUnitCreate(Unit unit) {
 //        System.out.println("New unit " + unit.getType());
-        
+//        System.out.println(productionManager);
+    	
         if( unit.getType().isWorker() ){
         	productionManager.addUnit(unit);
+        	scvCount++;
         }
         else if(unit.getType().isBuilding()){
         	productionManager.addUnit(unit);
         }
         else if(!unit.getType().isNeutral()){
         	// Military Unit
-        	
+        	militaryManager.addUnit(unit);
+        	armyCount++;
         }
         	
     }
@@ -111,6 +114,7 @@ public class StrategyManager extends DefaultBWListener {
     	}
 
     	productionManager.update();
+    	militaryManager.update();
     }
     
     /**
@@ -123,27 +127,44 @@ public class StrategyManager extends DefaultBWListener {
 		
     	// If we are almost supply capped build a supply depot.
     	if(self.supplyTotal() - self.supplyUsed() <= 3){
-    		productionGoal.add(UnitType.Terran_Supply_Depot);
-    	}
-    	
-    	//if there's enough minerals, and not currently training an SCV, train an SCV
-    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 20) {
-            productionGoal.add(UnitType.Terran_SCV);
+    		if(self.minerals() >= 100)
+    			productionGoal.add(UnitType.Terran_Supply_Depot);
     	}
     	
     	// else if we don't have a barracks build a barracks. 
         else if(self.minerals() >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 2){
+        	System.out.println("BUILD BARRACKS!!!");
         	productionGoal.add(UnitType.Terran_Barracks);        	
         }
         
         // else build marines
-        else if(self.minerals() >= 100){
+        else if(self.minerals() >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
         	productionGoal.add(UnitType.Terran_Marine);
         }
-        
+    	
+    	//if there's enough minerals, and not currently training an SCV, train an SCV
+    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 12) {
+    		System.out.println("BUILD SCV");
+            productionGoal.add(UnitType.Terran_SCV);
+    	}
+    	
         //set goal for the prodution manager
     	productionManager.setGoal(productionGoal);
 		
+    	//Attack if we have enough units
+    	if(armyCount >= 20)
+    	{
+    		for(Position pos : enemyBuildingLocation)
+    		{
+    			militaryManager.command(Command.Attack, 1.0, pos);
+    			break;
+    		}
+    	}
+    	
+    	// see if we should be scouting;
+    	if(self.supplyUsed() == 7){
+    		militaryManager.command(Command.Scout, 1.0, null);
+    	}
     }
     
     /**
@@ -153,6 +174,47 @@ public class StrategyManager extends DefaultBWListener {
      */
     private void updateEnemyArmyPos(){
     	
+    }
+    
+    
+    /**
+     * updateEnemyBuildingLocations
+     * 
+     * 
+     */
+    private void updateEnemyBuildingLocations(){
+    	//Add any buildings we see to list.
+    	for(Unit u: game.enemy().getUnits()){
+    		//if this unit is a building add it to the hash
+    		if(u.getType().isBuilding()){
+    			//check if we have it's position in memory and add it if we don't
+    			if(!enemyBuildingLocation.contains(u.getPosition())){
+    				enemyBuildingLocation.add(u.getPosition());
+    			}
+    		}
+    	}
+    	
+    	//loop over the visible enemy units that we remember
+    	for(Position p : enemyBuildingLocation){
+    		TilePosition tileCorrespondingToP = new TilePosition(p.getX()/32, p.getY()/32);
+    		
+    		//if visible
+    		if(game.isVisible(tileCorrespondingToP)){
+    			//loop over the visible enemy buildings and find out if at least
+    			// one of them is still at the remembered position
+    			boolean buildingStillThere = false;
+    			for(Unit u: game.enemy().getUnits()){
+    				if(u.getType().isBuilding() && u.getPosition() == p){
+    					buildingStillThere = true;
+    					break;
+    				}
+    			}
+    			if(!buildingStillThere){
+    				enemyBuildingLocation.remove(p);
+    				break;
+    			}
+    		}
+    	}
     }
     
     /**

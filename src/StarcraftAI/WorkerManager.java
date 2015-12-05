@@ -28,7 +28,7 @@ public class WorkerManager{
 	{ 
 		List<Unit> workersToRemove = new ArrayList<Unit>();
 		for(Unit u : workerList)
-		{
+		{			
 			if(u.isIdle())
 			{
 				//assign a task
@@ -57,15 +57,23 @@ public class WorkerManager{
 	 */
 	public Unit getWorker()
 	{
+		Unit availableWorker = null;
 		for(Unit u : workerList)
-		{
-			if(!u.isConstructing() && u.isInterruptible())
+		{			
+			//make sure no workers are on there way to build at the same time
+			if(u.isConstructing() && u.isMoving() && (u.getBuildUnit() == null))
 			{
-				return u;
+				return null;
+			}		
+			
+			//find a free worker
+			if(!u.isConstructing() && u.isInterruptible())
+			{//save a valid worker
+				availableWorker = u;
 			}
 		}
 		
-		return null;
+		return availableWorker;
 	}
 	
 	/**

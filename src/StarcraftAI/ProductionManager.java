@@ -6,15 +6,18 @@ import bwapi.*;
  * The production manager is responsible for building units that the strategy manager requests. 
  * ProductionManager uses the WorkerManager and the BuildingManager to handle build and research 
  * orders passed to it from the StrategyManager.
+ * 
+ * @author Kenny Trowbridge
+ * @author Alex Bowns
  */
 public class ProductionManager {
 	
 	private Game game;
 	private Player self; 
 	
-	private ArrayList<List<UnitType>> productionQueue; 
-	private ArrayList<UnitType> goals;
-	private ArrayList<UnitType> newGoal;
+	private ArrayList<List<UnitType>> productionQueue = new ArrayList<List<UnitType>>(); 
+	private ArrayList<UnitType> goals = new ArrayList<UnitType>();
+	private ArrayList<UnitType> newGoal = new ArrayList<UnitType>();
 	private ArrayList<List<UnitType>> techDag; 
 	private ArrayList<List<UnitType>> paths;  
 	private BuildingManager buildingManager;
@@ -25,7 +28,7 @@ public class ProductionManager {
 	public ProductionManager(Game game, Player self){
 		this.game = game;
 		this.self = self;
-		
+
 		this.buildingManager = new BuildingManager(game, self);
 		this.workerManager = new WorkerManager(game.getNeutralUnits());
 		
@@ -77,6 +80,10 @@ public class ProductionManager {
 	public void setGoal(ArrayList<UnitType> newGoal)
 	{
 		this.newGoal = newGoal;
+		if(!newGoal.isEmpty())
+			System.out.println("Production Goal: " + newGoal.get(0));
+		else
+			System.out.println("Production Goal: EMPTY");
 	}
 	
 	/** 
@@ -92,9 +99,8 @@ public class ProductionManager {
 		if(unitType.isBuilding())
 		{
 			Unit builder = workerManager.getWorker();
-			
 			//make sure the builder is not null
-			if(builder != null)
+			if(builder != null && game.canMake(builder, unitType))
 			{
 				buildingManager.build(unitType, builder);
 			}
@@ -113,8 +119,8 @@ public class ProductionManager {
 	{
 		if(unitType == null || building == null)
 			return;
-		
-		building.train(unitType);
+		if(!building.isTraining())
+			building.train(unitType);
 	}
 	
 	/**
@@ -131,11 +137,14 @@ public class ProductionManager {
 		buildingManager.update();
 		workerManager.update();
 		
+//		System.out.println("goals are the same?: " + Arrays.deepEquals(goals.toArray(), newGoal.toArray()));
+		
 		//if goal and new goal are the same, 
 		if(!Arrays.deepEquals(goals.toArray(), newGoal.toArray()))
 		{
 			goals = newGoal;
 			
+			productionQueue.clear();
 			//find paths for all of the goals
 			//update production queue
 			for(UnitType u : goals)
@@ -148,6 +157,7 @@ public class ProductionManager {
 				path.add(u);
 				
 				//add path to production q
+				
 				productionQueue.add(path);
 			}
 		}
@@ -183,8 +193,9 @@ public class ProductionManager {
 					//find building type that builds the item
 					UnitType buildingType = buildingsForUnits.get(item);
 					//retrieve one of those buildings
+
 					Unit building = buildingManager.getBuilding(buildingType, true);
-					
+
 					if(building != null)
 					{
 						training(item, building);

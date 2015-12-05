@@ -14,11 +14,11 @@ public class MilitaryManager{
 	private Game game;
 	private Player self;
 	
-	protected List<Unit> militaryUnits = new ArrayList<Unit>();
-	//Squad[] squads = new Squad[SquadType.values().length];
-	List<Squad> squads = new ArrayList<Squad>();
-	private ArmyManager armyManager = new ArmyManager();
-	private BattleManager battleManager = new BattleManager();
+	protected List<Unit> militaryUnits;
+	protected Squad[] squads;
+//	List<Squad> squads = new ArrayList<Squad>();
+	private ArmyManager armyManager;
+	private BattleManager battleManager;
 
 	/**
 	 * ctor
@@ -29,8 +29,20 @@ public class MilitaryManager{
 		this.game = game;
 		this.self = self;
 		
+		militaryUnits = new ArrayList<Unit>();
+		squads = new Squad[SquadType.values().length];
+		
+		initSquads();
+		
+		
 		armyManager = new ArmyManager();
 		battleManager = new BattleManager();
+	}
+	
+	public void initSquads(){
+		for(int i = 0; i < squads.length; i++){
+			squads[i] = new Squad(SquadType.values()[i]);
+		}
 	}
 	
 	/**
@@ -41,7 +53,14 @@ public class MilitaryManager{
 	 * 
 	 * @param unit - unit to add
 	 */
-	public void addUnit(Unit unit){ }
+	public void addUnit(Unit unit){
+		// put unit in a squad. Default is Offense. 
+		for(Squad squad: squads){
+			if(squad.getSquadType() == SquadType.Offense){
+				squad.addUnit(unit);
+			}
+		}
+	}
 	
 	/**
 	 * update()
@@ -59,6 +78,19 @@ public class MilitaryManager{
 	 * @param command - command from the StrategyManager
 	 * @param percentCommit - percentage of units to commit to command
 	 */
-	public void command(Command command, Double percentCommit){ }
+	public void command(Command command, Double percentCommit, Position position)
+	{
+		switch(command){
+			case Attack:
+				armyManager.engage(position);
+				break;
+			case Defend:
+				armyManager.defend();
+				break;
+			case Scout:
+				armyManager.scout();
+				break;
+		}
+	}
 	
 }

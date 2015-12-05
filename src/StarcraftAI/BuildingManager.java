@@ -17,7 +17,7 @@ public class BuildingManager{
 	private Game game;
 	private Player self;
 	
-	private ArrayList<Unit> buildingList;
+	private ArrayList<Unit> buildingList = new ArrayList<Unit>();
 	
 	/**
 	 * c'tor
