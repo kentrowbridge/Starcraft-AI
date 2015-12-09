@@ -38,11 +38,12 @@ public class ArmyManager{
 	 * Create a list of base locations and add them to scoutQueue
 	 */
 	public void getBuildingLocations(){
-		this.baseLocations = BWTA.getStartLocations();
+		this.baseLocations = BWTA.getBaseLocations();
 		
 		for(BaseLocation base : this.baseLocations){
-			TilePosition baseToP = new TilePosition(base.getX()/32, base.getY()/32);
-			if (base.isStartLocation() && baseToP != self.getStartLocation()){
+			TilePosition baseToP = base.getTilePosition();
+			//TilePosition baseToP = new TilePosition(base.getX()/32, base.getY()/32);
+			if (baseToP != self.getStartLocation()){
 				this.scoutQueue.add(baseToP);
 			}			    
 		}
@@ -82,7 +83,6 @@ public class ArmyManager{
 				break;
 			}
 		}
-
 	}
 
 	/**
@@ -94,7 +94,6 @@ public class ArmyManager{
 		// have the scout squad travel to each untraveled base location
 		for(Squad squad : squads){
 			if(squad.getSquadType() == SquadType.Offense){
-				// move to the base until it is explored
 				queuedTile = scoutQueue.get(0);
 				Position queuedPosition = convertTilePositionToPosition(queuedTile);
 				squad.move(queuedPosition);

@@ -145,14 +145,15 @@ public class Squad {
 	 * squadPosition()
 	 * Check if a unit within the squad is at the determined position
 	 * 
+	 * @Param position - the destination we want to check if the unit is at the location
+	 * 
 	 * @return true if the first unit is at the position parameter
 	 */
-	public boolean squadPosition(Position position){
-		if (squad.get(0).getPosition() != null){
-			if (squad.get(0).getPosition() == position){
+	public boolean squadPosition(Position tilePosition){
+		Position myPos = squad.get(0).getPosition();
+			if (myPos.equals(tilePosition)){
 				return true;
 			}
-		}
 		return false;
 	}
 }
