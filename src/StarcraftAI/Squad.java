@@ -140,4 +140,19 @@ public class Squad {
 	{
 		squad.remove(unit);
 	}
+	
+	/**
+	 * squadPosition()
+	 * Check if a unit within the squad is at the determined position
+	 * 
+	 * @return true if the first unit is at the position parameter
+	 */
+	public boolean squadPosition(Position position){
+		if (squad.get(0).getPosition() != null){
+			if (squad.get(0).getPosition() == position){
+				return true;
+			}
+		}
+		return false;
+	}
 }

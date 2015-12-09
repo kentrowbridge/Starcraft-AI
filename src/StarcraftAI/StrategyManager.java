@@ -176,7 +176,7 @@ public class StrategyManager extends DefaultBWListener {
     	}
     	
     	// see if we should be scouting;
-    	if(self.supplyUsed() == 7){
+    	if(armyCount == 1){
     		militaryManager.command(Command.Scout, 1.0, null);
     	}
     }
