@@ -15,7 +15,7 @@ public class MilitaryManager{
 	private Player self;
 	
 	protected List<Unit> militaryUnits;
-	protected Squad[] squads;
+	protected HashMap<SquadType, Squad> squads;
 	private ArmyManager armyManager;
 	private BattleManager battleManager;
 	private boolean doScout = false;
@@ -28,7 +28,7 @@ public class MilitaryManager{
 		this.self = self;
 		
 		militaryUnits = new ArrayList<Unit>();
-		squads = new Squad[SquadType.values().length];
+		squads = new HashMap<SquadType, Squad>();
 		
 		initSquads();
 		
@@ -42,9 +42,14 @@ public class MilitaryManager{
 	 * Initialize all terran squads.
 	 */
 	public void initSquads(){
-		for(int i = 0; i < squads.length; i++){
-			squads[i] = new Squad(SquadType.values()[i]);
+		for(SquadType type : SquadType.values())
+		{
+			squads.put(type, new Squad(type));
 		}
+		
+//		for(int i = 0; i < squads.length; i++){
+//			squads[i] = new Squad(SquadType.values()[i]);
+//		}
 	}
 	
 	/**
@@ -57,11 +62,25 @@ public class MilitaryManager{
 	 */
 	public void addUnit(Unit unit){
 		// put unit in a squad. Default is Offense. 
-		for(Squad squad: squads){
-			if(squad.getSquadType() == SquadType.Offense){
-				squad.addUnit(unit);
-			}
+		if(squads.get(SquadType.Scout).isEmpty())
+		{//add only the first unit to the scout squad
+			squads.get(SquadType.Scout).addUnit(unit);
 		}
+		else
+		{//default, add to offense
+			squads.get(SquadType.Offense).addUnit(unit);
+		}
+		
+//		for(Squad squad: squads){
+//			if(squad.getSquadType() == SquadType.Scout && squad.isEmpty())
+//			{//add only one unit to scout squad
+//				squad.addUnit(unit);
+//				System.out.println("added unit to scout");
+//			}
+//			else if (squad.getSquadType() == SquadType.Offense){
+//				squad.addUnit(unit);
+//			}
+//		}
 	}
 	
 	/**
