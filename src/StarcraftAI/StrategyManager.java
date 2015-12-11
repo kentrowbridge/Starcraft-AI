@@ -13,7 +13,6 @@ public class StrategyManager extends DefaultBWListener {
     
     private int armyCount;
     private int scvCount;
-    private boolean isScouting = false;
     private Hashtable<UnitType, Double> armyRatio;
     private Hashtable<UnitType, Integer> buildingInfo;
     
@@ -183,9 +182,8 @@ public class StrategyManager extends DefaultBWListener {
     	}
     	
     	// see if we should be scouting;
-    	if(armyCount == 1 && isScouting == false){
+    	if(armyCount == 1){
     		militaryManager.command(Command.Scout, 1.0, null);
-    		isScouting = true;
     	}
     }
     

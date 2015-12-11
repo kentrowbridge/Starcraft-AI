@@ -90,9 +90,7 @@ public class MilitaryManager{
 	 * It also prunes units that no longer exist from both lists.
 	 */
 	public void update(){
-		if (doScout){
-			armyManager.scout();
-		}
+		
 	}
 
 	/**
