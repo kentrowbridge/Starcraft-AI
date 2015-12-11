@@ -16,15 +16,13 @@ public class MilitaryManager{
 	
 	protected List<Unit> militaryUnits;
 	protected Squad[] squads;
-//	List<Squad> squads = new ArrayList<Squad>();
 	private ArmyManager armyManager;
 	private BattleManager battleManager;
+	private boolean doScout = false;
 
 	/**
 	 * ctor
 	 */
-	public MilitaryManager(){ }
-	
 	public MilitaryManager(Game game, Player self){
 		this.game = game;
 		this.self = self;
@@ -35,10 +33,14 @@ public class MilitaryManager{
 		initSquads();
 		
 		
-		armyManager = new ArmyManager();
+		armyManager = new ArmyManager(squads, self);
 		battleManager = new BattleManager();
 	}
 	
+	/**
+	 * initSquads()
+	 * Initialize all terran squads.
+	 */
 	public void initSquads(){
 		for(int i = 0; i < squads.length; i++){
 			squads[i] = new Squad(SquadType.values()[i]);
@@ -68,7 +70,11 @@ public class MilitaryManager{
 	 * are in both the squads list and the militaryUnits list.
 	 * It also prunes units that no longer exist from both lists.
 	 */
-	public void update(){ }
+	public void update(){
+		if (doScout){
+			armyManager.scout();
+		}
+	}
 
 	/**
 	 * command()
@@ -77,6 +83,7 @@ public class MilitaryManager{
 	 * 
 	 * @param command - command from the StrategyManager
 	 * @param percentCommit - percentage of units to commit to command
+	 * @param position - the position of the commanded
 	 */
 	public void command(Command command, Double percentCommit, Position position)
 	{
@@ -88,7 +95,8 @@ public class MilitaryManager{
 				armyManager.defend();
 				break;
 			case Scout:
-				armyManager.scout();
+				this.doScout = true; 
+				armyManager.getBuildingLocations();
 				break;
 		}
 	}
