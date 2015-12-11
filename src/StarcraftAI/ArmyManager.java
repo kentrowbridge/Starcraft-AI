@@ -94,17 +94,35 @@ public class ArmyManager{
 	 */
 	public void scout()
 	{	
-		// have the scout squad travel to each untraveled base location
-		Squad squad = squads.get(SquadType.Scout);
+//		// have the scout squad travel to each untraveled base location
+//		Squad squad = squads.get(SquadType.Scout);
+//		
+//		queuedTile = scoutQueue.get(0);		
+//		Position queuedPosition = convertTilePositionToPosition(queuedTile);
+//		squad.move(queuedPosition);
+//		// check if the squad has reached the baselocation	
+//		if (squad.squadPosition(queuedPosition)){
+//			//remove the queuedTile
+//			scoutQueue.remove(queuedTile);
+//		}
 		
-		queuedTile = scoutQueue.get(0);		
-		Position queuedPosition = convertTilePositionToPosition(queuedTile);
-		squad.move(queuedPosition);
-		// check if the squad has reached the baselocation	
-		if (squad.squadPosition(queuedPosition)){
-			//remove the queuedTile
-			scoutQueue.remove(queuedTile);
-		}
+		// get base Locations
+		List<BaseLocation> baseLocations = BWTA.getBaseLocations();
+		ArrayList<Position> basePoss = new ArrayList<Position>();
+		for(BaseLocation base : baseLocations){
+			TilePosition baseToP = new TilePosition(base.getX()/32, base.getY()/32);
+			// if base location is not start location and a starting location add it
+			if (base.isStartLocation() && baseToP != self.getStartLocation()){
+				basePoss.add(base.getPosition());
+			}
+    	}
+		
+		//Add home as the last place to go
+    	Position homePosition = new Position(self.getStartLocation().getX(), self.getStartLocation().getY());
+		basePoss.add(homePosition);
+		
+		squads.get(SquadType.Scout).moveQueue(basePoss);
+		
 	}
 
 	/**

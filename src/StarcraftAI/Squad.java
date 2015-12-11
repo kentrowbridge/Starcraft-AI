@@ -85,6 +85,23 @@ public class Squad {
 	}
 	
 	/**
+	 * 
+	 * @param positions
+	 */
+	public void moveQueue(ArrayList<Position> positions){
+		for(Position pos : positions){	
+			for(Unit unit : squad){
+				if(unit.isIdle()){
+					unit.move(pos);
+				}
+				else{
+					unit.move(pos, true);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * attackMove()
 	 * Moves all units in this squad to the given position and attacks
 	 * along the way.

@@ -106,6 +106,7 @@ public class MilitaryManager{
 	 */
 	public void command(Command command, Double percentCommit, Position position)
 	{
+		System.out.println("Military Manager Command: " + command);
 		switch(command){
 			case Attack:
 				armyManager.engage(position);
@@ -114,8 +115,9 @@ public class MilitaryManager{
 				armyManager.defend();
 				break;
 			case Scout:
-				this.doScout = true; 
-				armyManager.getBuildingLocations();
+				armyManager.scout();
+//				this.doScout = true; 
+//				armyManager.getBuildingLocations();
 				break;
 		}
 	}
