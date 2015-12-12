@@ -89,8 +89,8 @@ public class Squad {
 	 * @param positions
 	 */
 	public void moveQueue(ArrayList<Position> positions){
-		for(Position pos : positions){	
-			for(Unit unit : squad){
+		for(Unit unit : squad){
+			for(Position pos : positions){
 				if(unit.isIdle()){
 					unit.move(pos);
 				}

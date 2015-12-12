@@ -24,6 +24,8 @@ public class StrategyManager extends DefaultBWListener {
     
     private ProductionManager productionManager;
     private MilitaryManager militaryManager;
+    
+    private boolean isScouting = false;
 
     /**
      * run()
@@ -182,8 +184,9 @@ public class StrategyManager extends DefaultBWListener {
     	}
     	
     	// see if we should be scouting;
-    	if(armyCount == 1){
+    	if(armyCount > 1 && !isScouting){
     		militaryManager.command(Command.Scout, 1.0, null);
+    		isScouting = true;
     	}
     }
     
