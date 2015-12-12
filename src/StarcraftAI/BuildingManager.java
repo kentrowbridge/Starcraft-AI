@@ -68,7 +68,7 @@ public class BuildingManager{
 	private TilePosition getPlacement(UnitType buildingType, Unit builder)
 	{
     	int maxDist = 8;
-    	int changeRate = 4;
+    	int changeRate = 2;
     	int stopDist = 40;
     	TilePosition aroundTile = self.getStartLocation();
     	
@@ -88,7 +88,7 @@ public class BuildingManager{
     				{
     					continue;
     				}
-    				if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, false))
+    				if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, true))
     				{
     					return new TilePosition(i,j);
     				}

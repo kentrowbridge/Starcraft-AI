@@ -1,5 +1,6 @@
 package StarcraftAI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import bwapi.Player;
@@ -20,7 +21,7 @@ import bwta.BaseLocation;
 public class ArmyManager{
 	private Player self;
 	private ArrayList<TilePosition> scoutQueue = new ArrayList<TilePosition>();
-	private Squad[] squads;
+	private HashMap<SquadType, Squad> squads;
 	private TilePosition queuedTile = null;
 	private List<BaseLocation> baseLocations = new ArrayList<BaseLocation>(); 
 
@@ -28,7 +29,7 @@ public class ArmyManager{
 	 * ctor
 	 * 
 	 */
-	public ArmyManager(Squad[] squads, Player self){
+	public ArmyManager(HashMap<SquadType, Squad> squads, Player self){
 		this.squads = squads;
 		this.self = self;
 	}
@@ -38,7 +39,7 @@ public class ArmyManager{
 	 * Create a list of base locations and add them to scoutQueue
 	 */
 	public void getBuildingLocations(){
-		this.baseLocations = BWTA.getBaseLocations();
+		this.baseLocations = BWTA.getStartLocations();
 		
 		for(BaseLocation base : this.baseLocations){
 			TilePosition baseToP = base.getTilePosition();
@@ -56,7 +57,7 @@ public class ArmyManager{
 	 * 
 	 * @param squads - a list of squads 
 	 */
-	public void setSquads(Squad[] squads){
+	public void setSquads(HashMap<SquadType, Squad> squads){
 		this.squads = squads;
 	}
 
@@ -77,12 +78,14 @@ public class ArmyManager{
 	 */
 	public void engage(Position position)
 	{
-		for(Squad squad : squads){
-			if(squad.getSquadType() == SquadType.Offense){
-				squad.attackMove(position);
-				break;
-			}
-		}
+		squads.get(SquadType.Offense).attackMove(position);
+		
+//		for(Squad squad : squads){
+//			if(squad.getSquadType() == SquadType.Offense){
+//				squad.attackMove(position);
+//				break;
+//			}
+//		}
 	}
 
 	/**
@@ -91,19 +94,36 @@ public class ArmyManager{
 	 */
 	public void scout()
 	{	
-		// have the scout squad travel to each untraveled base location
-		for(Squad squad : squads){
-			if(squad.getSquadType() == SquadType.Offense){
-				queuedTile = scoutQueue.get(0);
-				Position queuedPosition = convertTilePositionToPosition(queuedTile);
-				squad.move(queuedPosition);
-				// check if the squad has reached the baselocation	
-				if (squad.squadPosition(queuedPosition)){
-					//remove the queuedTile
-					scoutQueue.remove(queuedTile);
-				}		
+//		// have the scout squad travel to each untraveled base location
+//		Squad squad = squads.get(SquadType.Scout);
+//		
+//		queuedTile = scoutQueue.get(0);		
+//		Position queuedPosition = convertTilePositionToPosition(queuedTile);
+//		squad.move(queuedPosition);
+//		// check if the squad has reached the baselocation	
+//		if (squad.squadPosition(queuedPosition)){
+//			//remove the queuedTile
+//			scoutQueue.remove(queuedTile);
+//		}
+		
+		// get base Locations
+		List<BaseLocation> baseLocations = BWTA.getStartLocations();
+		ArrayList<Position> basePoss = new ArrayList<Position>();
+		
+		for(BaseLocation base : baseLocations){
+			System.out.println("BaseLocation: " + base.getPosition());
+			
+			// if base location is not start location and a starting location add it
+			if (!base.getPosition().equals(BWTA.getStartLocation(self).getPosition())){
+				basePoss.add(base.getPosition());
 			}
-		}
+    	}
+		
+		//Add home as the last place to go
+		basePoss.add(BWTA.getStartLocation(self).getPosition());
+		
+		squads.get(SquadType.Scout).moveQueue(basePoss);
+		
 	}
 
 	/**
