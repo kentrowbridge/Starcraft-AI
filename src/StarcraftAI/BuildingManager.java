@@ -70,10 +70,19 @@ public class BuildingManager{
 		{
 			List<Unit> geysers = game.getGeysers();
 			System.out.println("Available Geysers: " + geysers.size());
-			if(!geysers.isEmpty())
+			Unit closest = null;
+			Position position = builder.getPosition();
+			for(Unit geyser : geysers)
 			{
-				return geysers.get(0).getTilePosition();
+				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
+				{
+					if(closest == null || geyser.getDistance(position) < geyser.getDistance(position))
+					{
+						closest = geyser;
+					}
+				}
 			}
+			return closest.getTilePosition();
 		}
 		
     	int maxDist = 8;
