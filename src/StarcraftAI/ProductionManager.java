@@ -80,10 +80,10 @@ public class ProductionManager {
 	public void setGoal(ArrayList<UnitType> newGoal)
 	{
 		this.newGoal = newGoal;
-		if(!newGoal.isEmpty())
-			System.out.println("Production Goal: " + newGoal.get(0));
-		else
-			System.out.println("Production Goal: EMPTY");
+//		if(!newGoal.isEmpty())
+//			System.out.println("Production Goal: " + newGoal.get(0));
+//		else
+//			System.out.println("Production Goal: EMPTY");
 	}
 	
 	/** 

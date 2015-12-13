@@ -13,7 +13,6 @@ public class StrategyManager extends DefaultBWListener {
     
     private int armyCount;
     private int scvCount;
-    private boolean isScouting = false;
     private Hashtable<UnitType, Double> armyRatio;
     private Hashtable<UnitType, Integer> buildingInfo;
     
@@ -25,6 +24,8 @@ public class StrategyManager extends DefaultBWListener {
     
     private ProductionManager productionManager;
     private MilitaryManager militaryManager;
+    
+    private boolean isScouting = false;
 
     /**
      * run()
@@ -123,6 +124,7 @@ public class StrategyManager extends DefaultBWListener {
     private void update(){
     	try{
     		executeStrategy();
+    		updateEnemyBuildingLocations();
     	}
     	catch(Exception e){
     		e.printStackTrace();
@@ -141,9 +143,9 @@ public class StrategyManager extends DefaultBWListener {
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
     	// If we are almost supply capped build a supply depot.
-    	if(self.supplyTotal() - self.supplyUsed() <= 6){
-    		if(self.minerals() >= 100)
-    			productionGoal.add(UnitType.Terran_Supply_Depot);
+    	if(self.supplyTotal() - self.supplyUsed() <= 6 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 && self.minerals() >= 100){
+    		System.out.println("BUILD SUPPLY DEPOT!");
+			productionGoal.add(UnitType.Terran_Supply_Depot);
     	}
     	
     	// else if we don't have a barracks build a barracks. 
@@ -154,11 +156,12 @@ public class StrategyManager extends DefaultBWListener {
         
         // else build marines
         else if(self.minerals() >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
+        	System.out.println("BUILD Marine!!!");
         	productionGoal.add(UnitType.Terran_Marine);
         }
     	
     	//if there's enough minerals, and not currently training an SCV, train an SCV
-    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 12) {
+    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 15) {
     		System.out.println("BUILD SCV");
             productionGoal.add(UnitType.Terran_SCV);
     	}
@@ -167,17 +170,21 @@ public class StrategyManager extends DefaultBWListener {
     	productionManager.setGoal(productionGoal);
 		
     	//Attack if we have enough units
-    	if(armyCount >= 20)
+    	if(armyCount >= 5)
     	{
+    		System.out.println("ATTACK NOW!!!");
     		for(Position pos : enemyBuildingLocation)
     		{
-    			militaryManager.command(Command.Attack, 1.0, pos);
+    			Position closePos = new Position(pos.getX() - 75, pos.getY() - 30);
+    			System.out.println("ATTACK COMMAND");
+    			System.out.println(closePos.getX() + ", " + closePos.getY());
+    			militaryManager.command(Command.Attack, 1.0, closePos);
     			break;
     		}
     	}
     	
     	// see if we should be scouting;
-    	if(armyCount == 1 && isScouting == false){
+    	if(armyCount > 1 && !isScouting){
     		militaryManager.command(Command.Scout, 1.0, null);
     		isScouting = true;
     	}
