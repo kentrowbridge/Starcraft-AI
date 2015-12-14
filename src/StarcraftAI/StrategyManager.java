@@ -122,6 +122,11 @@ public class StrategyManager extends DefaultBWListener {
      */
 
     private void update(){
+    	for(Unit myUnit : self.getUnits()){
+	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
+	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrderTargetPosition().getX(), 
+	    			myUnit.getOrderTargetPosition().getY(), bwapi.Color.Black);
+    	}
     	try{
     		executeStrategy();
     		updateEnemyBuildingLocations();
@@ -142,40 +147,61 @@ public class StrategyManager extends DefaultBWListener {
     	
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
+    	int minerals = self.minerals();
+    	
     	// If we are almost supply capped build a supply depot.
-    	if(self.supplyTotal() - self.supplyUsed() <= 6 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 && self.minerals() >= 100){
+    	// Should supply cap - supplyused < = # of production buildings * 2
+    	if(self.supplyTotal() - self.supplyUsed() <= 6 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 && minerals >= 100){
     		System.out.println("BUILD SUPPLY DEPOT!");
 			productionGoal.add(UnitType.Terran_Supply_Depot);
+			minerals -= 100;
     	}
     	
+    	// build refinery 
+        if(minerals >= 100 && self.supplyTotal() > 12 && self.allUnitCount(UnitType.Terran_Refinery) < 1){
+        	System.out.println("BUILD Refinery!!!");
+        	productionGoal.add(UnitType.Terran_Refinery);
+        	minerals -= 100;
+        }
+    	
     	// else if we don't have a barracks build a barracks. 
-        else if(self.minerals() >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 2){
+        if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 3){
         	System.out.println("BUILD BARRACKS!!!");
-        	productionGoal.add(UnitType.Terran_Barracks);        	
+        	productionGoal.add(UnitType.Terran_Barracks);
+        	minerals -= 150;
+        }
+        
+        // build Academy
+        if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>0 && self.allUnitCount(UnitType.Terran_Academy) < 1){
+        	System.out.println("BUILD Marine!!!");
+        	productionGoal.add(UnitType.Terran_Academy);
+        	minerals -= 150;
         }
         
         // else build marines
-        else if(self.minerals() >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
+        if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
         	System.out.println("BUILD Marine!!!");
         	productionGoal.add(UnitType.Terran_Marine);
+        	minerals -= 100;
         }
     	
     	//if there's enough minerals, and not currently training an SCV, train an SCV
-    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 15) {
+    	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28) {
     		System.out.println("BUILD SCV");
             productionGoal.add(UnitType.Terran_SCV);
+            minerals -= 50;
     	}
     	
         //set goal for the prodution manager
     	productionManager.setGoal(productionGoal);
 		
     	//Attack if we have enough units
-    	if(armyCount >= 5)
+    	if(armyCount >= 20)
     	{
-    		System.out.println("ATTACK NOW!!!");
     		for(Position pos : enemyBuildingLocation)
     		{
-    			Position closePos = new Position(pos.getX() - 75, pos.getY() - 30);
+//    			Position closePos = new Position(pos.getX() - 75, pos.getY() - 30);
+    			Position closePos = BWTA.getNearestChokepoint(pos).getCenter(); 
     			System.out.println("ATTACK COMMAND");
     			System.out.println(closePos.getX() + ", " + closePos.getY());
     			militaryManager.command(Command.Attack, 1.0, closePos);
@@ -188,6 +214,13 @@ public class StrategyManager extends DefaultBWListener {
     		militaryManager.command(Command.Scout, 1.0, null);
     		isScouting = true;
     	}
+    	
+    	// scout if we we haven't seen enemy building and supply is over 30
+    	if(armyCount > 1 && enemyBuildingLocation.isEmpty() && self.supplyUsed() >= 60){
+    		militaryManager.command(Command.Scout, 1.0, null);
+    		isScouting = true;
+    	}
+    	
     }
     
     /**
