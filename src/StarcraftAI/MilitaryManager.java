@@ -33,7 +33,7 @@ public class MilitaryManager{
 		initSquads();
 		
 		
-		armyManager = new ArmyManager(squads, self);
+		armyManager = new ArmyManager(squads, self, game);
 		battleManager = new BattleManager();
 	}
 	

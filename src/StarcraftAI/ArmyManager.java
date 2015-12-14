@@ -3,9 +3,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import bwapi.Game;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
+import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
 
@@ -20,6 +22,8 @@ import bwta.BaseLocation;
  */
 public class ArmyManager{
 	private Player self;
+	private Game game;
+	
 	private ArrayList<TilePosition> scoutQueue = new ArrayList<TilePosition>();
 	private HashMap<SquadType, Squad> squads;
 	private TilePosition queuedTile = null;
@@ -29,9 +33,10 @@ public class ArmyManager{
 	 * ctor
 	 * 
 	 */
-	public ArmyManager(HashMap<SquadType, Squad> squads, Player self){
+	public ArmyManager(HashMap<SquadType, Squad> squads, Player self, Game game){
 		this.squads = squads;
 		this.self = self;
+		this.game = game;
 	}
 
 	/**
@@ -78,7 +83,20 @@ public class ArmyManager{
 	 */
 	public void engage(Position position)
 	{
-		squads.get(SquadType.Offense).attackMove(position);
+		boolean attackUnit = false;
+		System.out.println(game.enemy().getUnits());
+		for(Unit unit : game.enemy().getUnits()){
+			if(!unit.getType().isBuilding() && !unit.getType().isNeutral()){
+				System.out.println("ATTACK GUY!:  " + unit);
+				squads.get(SquadType.Offense).attackMove(unit.getPosition());
+				attackUnit = true;
+				break;
+			}
+		}
+		
+		if(!attackUnit){
+			squads.get(SquadType.Offense).attackMove(position);
+		}
 		
 //		for(Squad squad : squads){
 //			if(squad.getSquadType() == SquadType.Offense){

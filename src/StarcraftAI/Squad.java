@@ -110,7 +110,9 @@ public class Squad {
 	public void attackMove(Position position)
 	{
 		for(Unit unit: squad){
-			unit.attack(position);
+			if(!unit.getTargetPosition().equals(position)){
+				unit.attack(position);
+			}
 		}
 	}
 	
