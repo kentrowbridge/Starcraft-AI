@@ -88,7 +88,7 @@ public class ArmyManager{
 		for(Unit unit : game.enemy().getUnits()){
 			if(!unit.getType().isBuilding() && !unit.getType().isNeutral()){
 				System.out.println("ATTACK GUY!:  " + unit);
-				squads.get(SquadType.Offense).attackMove(unit.getPosition());
+				squads.get(SquadType.Offense).attackMove(unit);
 				attackUnit = true;
 				break;
 			}

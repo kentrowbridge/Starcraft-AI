@@ -125,7 +125,7 @@ public class StrategyManager extends DefaultBWListener {
     	for(Unit myUnit : self.getUnits()){
 	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
 	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrderTargetPosition().getX(), 
-	    			myUnit.getOrderTargetPosition().getY(), bwapi.Color.Black);
+	    			myUnit.getOrderTargetPosition().getY(), bwapi.Color.Green);
     	}
     	try{
     		executeStrategy();
@@ -201,7 +201,8 @@ public class StrategyManager extends DefaultBWListener {
     		for(Position pos : enemyBuildingLocation)
     		{
 //    			Position closePos = new Position(pos.getX() - 75, pos.getY() - 30);
-    			Position closePos = BWTA.getNearestChokepoint(pos).getCenter(); 
+//    			Position closePos = BWTA.getNearestChokepoint(pos).getCenter(); 
+    			Position closePos = pos;
     			System.out.println("ATTACK COMMAND");
     			System.out.println(closePos.getX() + ", " + closePos.getY());
     			militaryManager.command(Command.Attack, 1.0, closePos);

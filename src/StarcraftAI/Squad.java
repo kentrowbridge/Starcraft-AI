@@ -117,6 +117,21 @@ public class Squad {
 	}
 	
 	/**
+	 * attackMove()
+	 * Moves all units in this squad to the given position and attacks
+	 * along the way.
+	 * @param position
+	 */
+	public void attackMove(Unit targetUnit)
+	{
+		for(Unit unit: squad){
+			if(unit.getTarget() != null && !unit.getTarget().equals(targetUnit)){
+				unit.attack(targetUnit);
+			}
+		}
+	}
+	
+	/**
 	 * getUnits()
 	 * Returns the units that are in this squad.
 	 * 
