@@ -104,7 +104,7 @@ public class MilitaryManager{
 	 */
 	public void command(Command command, Double percentCommit, Position position)
 	{
-		System.out.println("Military Manager Command: " + command);
+//		System.out.println("Military Manager Command: " + command);
 		switch(command){
 			case Attack:
 				armyManager.engage(position);

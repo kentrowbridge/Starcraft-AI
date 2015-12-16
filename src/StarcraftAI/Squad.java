@@ -110,14 +110,23 @@ public class Squad {
 	public void attackMove(Position position)
 	{
 		for(Unit unit: squad){
-			if(!unit.getTargetPosition().equals(position)){
-				unit.attack(position);
+			
+			if(unit.getOrder().equals(Order.AttackUnit)){
+				return;
+			}
+			
+			if(unit != null && unit.exists() && !unit.isAttacking() && !unit.isStartingAttack() 
+					&& unit.isCompleted()){
+				if(unit.getTargetPosition() != null && !unit.getTargetPosition().equals(position)){
+					System.out.println("set: "+ unit+ "   Attack position " + position);
+					unit.attack(position);
+				}
 			}
 		}
 	}
 	
 	/**
-	 * attackMove()
+	 * attackMove() NOT BEING USED RIGHT NOW!
 	 * Moves all units in this squad to the given position and attacks
 	 * along the way.
 	 * @param position
@@ -125,8 +134,14 @@ public class Squad {
 	public void attackMove(Unit targetUnit)
 	{
 		for(Unit unit: squad){
-			if(unit.getTarget() != null && !unit.getTarget().equals(targetUnit)){
-				unit.attack(targetUnit);
+//			if(unit.getTarget() != null && !unit.getTarget().equals(targetUnit)){
+//			if(!unit.getOrder().equals(Order.AttackMove) || !unit.getOrder().equals(Order.AttackUnit)){
+			if(unit != null && unit.exists() && !unit.isAttacking() && !unit.isStartingAttack() 
+					&& unit.isCompleted()){
+				if(unit.getTarget() != null && !(unit.getTarget() == targetUnit)){
+					System.out.println("set: "+ unit+ "   Attack Unit: " + targetUnit.toString());
+					unit.attack(targetUnit);
+				}
 			}
 		}
 	}

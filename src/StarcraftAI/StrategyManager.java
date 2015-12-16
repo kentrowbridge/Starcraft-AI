@@ -144,6 +144,12 @@ public class StrategyManager extends DefaultBWListener {
      * Develops and executes the strategy that the AI will play with. 
      */
     private void executeStrategy(){
+    	int productionBuildings = 0;
+    	for(Unit u : self.getUnits()){
+    		if(u.getType().equals(UnitType.Terran_Command_Center) || u.getType().equals(UnitType.Terran_Barracks)){
+    			productionBuildings ++;
+    		}
+    	}
     	
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
@@ -151,43 +157,44 @@ public class StrategyManager extends DefaultBWListener {
     	
     	// If we are almost supply capped build a supply depot.
     	// Should supply cap - supplyused < = # of production buildings * 2
-    	if(self.supplyTotal() - self.supplyUsed() <= 6 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 && minerals >= 100){
-    		System.out.println("BUILD SUPPLY DEPOT!");
+    	if((self.supplyTotal() - self.supplyUsed() <= 6 || self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)  
+    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 && minerals >= 100){
+//    		System.out.println("BUILD SUPPLY DEPOT!");
 			productionGoal.add(UnitType.Terran_Supply_Depot);
 			minerals -= 100;
     	}
     	
     	// build refinery 
         if(minerals >= 100 && self.supplyTotal() > 12 && self.allUnitCount(UnitType.Terran_Refinery) < 1){
-        	System.out.println("BUILD Refinery!!!");
+//        	System.out.println("BUILD Refinery!!!");
         	productionGoal.add(UnitType.Terran_Refinery);
         	minerals -= 100;
         }
     	
     	// else if we don't have a barracks build a barracks. 
         if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 3){
-        	System.out.println("BUILD BARRACKS!!!");
+//        	System.out.println("BUILD BARRACKS!!!");
         	productionGoal.add(UnitType.Terran_Barracks);
         	minerals -= 150;
         }
         
         // build Academy
         if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>0 && self.allUnitCount(UnitType.Terran_Academy) < 1){
-        	System.out.println("BUILD Marine!!!");
+//        	System.out.println("BUILD Marine!!!");
         	productionGoal.add(UnitType.Terran_Academy);
         	minerals -= 150;
         }
         
         // else build marines
         if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
-        	System.out.println("BUILD Marine!!!");
+//        	System.out.println("BUILD Marine!!!");
         	productionGoal.add(UnitType.Terran_Marine);
         	minerals -= 100;
         }
     	
     	//if there's enough minerals, and not currently training an SCV, train an SCV
     	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28) {
-    		System.out.println("BUILD SCV");
+//    		System.out.println("BUILD SCV");
             productionGoal.add(UnitType.Terran_SCV);
             minerals -= 50;
     	}
@@ -200,11 +207,7 @@ public class StrategyManager extends DefaultBWListener {
     	{
     		for(Position pos : enemyBuildingLocation)
     		{
-//    			Position closePos = new Position(pos.getX() - 75, pos.getY() - 30);
-//    			Position closePos = BWTA.getNearestChokepoint(pos).getCenter(); 
     			Position closePos = pos;
-    			System.out.println("ATTACK COMMAND");
-    			System.out.println(closePos.getX() + ", " + closePos.getY());
     			militaryManager.command(Command.Attack, 1.0, closePos);
     			break;
     		}

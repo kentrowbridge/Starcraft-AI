@@ -83,27 +83,7 @@ public class ArmyManager{
 	 */
 	public void engage(Position position)
 	{
-		boolean attackUnit = false;
-		System.out.println(game.enemy().getUnits());
-		for(Unit unit : game.enemy().getUnits()){
-			if(!unit.getType().isBuilding() && !unit.getType().isNeutral()){
-				System.out.println("ATTACK GUY!:  " + unit);
-				squads.get(SquadType.Offense).attackMove(unit);
-				attackUnit = true;
-				break;
-			}
-		}
-		
-		if(!attackUnit){
-			squads.get(SquadType.Offense).attackMove(position);
-		}
-		
-//		for(Squad squad : squads){
-//			if(squad.getSquadType() == SquadType.Offense){
-//				squad.attackMove(position);
-//				break;
-//			}
-//		}
+		squads.get(SquadType.Offense).attackMove(position);
 	}
 
 	/**
@@ -129,7 +109,7 @@ public class ArmyManager{
 		ArrayList<Position> basePoss = new ArrayList<Position>();
 		
 		for(BaseLocation base : baseLocations){
-			System.out.println("BaseLocation: " + base.getPosition());
+//			System.out.println("BaseLocation: " + base.getPosition());
 			
 			// if base location is not start location and a starting location add it
 			if (!base.getPosition().equals(BWTA.getStartLocation(self).getPosition())){
