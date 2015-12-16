@@ -29,7 +29,7 @@ public class WorkerManager{
 		List<Unit> workersToRemove = new ArrayList<Unit>();
 		for(Unit u : workerList)
 		{			
-			if(u.isIdle())
+			if(u.isIdle() && u.isCompleted())
 			{
 				//assign a task
 				u.gather(findClosestMineral(u.getPosition()));
@@ -68,7 +68,7 @@ public class WorkerManager{
 			}		
 			
 			//find a free worker
-			if(!u.isConstructing() && u.isInterruptible())
+			if(!u.isConstructing() && u.isInterruptible() && u.isCompleted())
 			{//save a valid worker
 				availableWorker = u;
 			}
