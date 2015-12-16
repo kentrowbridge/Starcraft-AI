@@ -61,7 +61,8 @@ public class WorkerManager{
 		for(Unit u : workerList)
 		{			
 			//make sure no workers are on there way to build at the same time
-			if(u.isConstructing() && u.isMoving() && (u.getBuildUnit() == null))
+//			if(u.isConstructing() && u.isMoving() && (u.getBuildUnit() == null))
+			if(u.getOrder().equals(Order.PlaceBuilding))
 			{
 				return null;
 			}		
