@@ -128,8 +128,9 @@ public class StrategyManager extends DefaultBWListener {
 	    			myUnit.getOrderTargetPosition().getY(), bwapi.Color.Green);
     	}
     	try{
-    		executeStrategy();
     		updateEnemyBuildingLocations();
+    		updateArmyRatio();
+    		executeStrategy();
     	}
     	catch(Exception e){
     		e.printStackTrace();
@@ -154,6 +155,7 @@ public class StrategyManager extends DefaultBWListener {
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
     	int minerals = self.minerals();
+    	int gas = self.gas();
     	
     	// If we are almost supply capped build a supply depot.
     	// Should supply cap - supplyused < = # of production buildings * 2
@@ -188,8 +190,27 @@ public class StrategyManager extends DefaultBWListener {
         // else build marines
         if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
 //        	System.out.println("BUILD Marine!!!");
-        	productionGoal.add(UnitType.Terran_Marine);
-        	minerals -= 100;
+        	// If we have an academy and marines make up less than 75 percent of our army then build a marine
+        	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 && armyRatio.get(UnitType.Terran_Marine) <= .75 ){
+	        	productionGoal.add(UnitType.Terran_Marine);
+	        	minerals -= 100;
+        	}
+        	// else if there is no academy, just build the marine
+        	else if(self.completedUnitCount(UnitType.Terran_Academy) < 1){
+        		productionGoal.add(UnitType.Terran_Marine);
+	        	minerals -= 100;
+        	}
+        	//else don't build a marine. We have too many. 
+        }
+        
+        // else build Medics 
+        if(minerals >= 50 && gas >= 25 && self.allUnitCount(UnitType.Terran_Barracks)>0 && self.completedUnitCount(UnitType.Terran_Academy) >= 1){
+//        	System.out.println("BUILD Marine!!!");
+        	if(armyRatio.get(UnitType.Terran_Medic) != null && armyRatio.get(UnitType.Terran_Medic) <= .25){
+	        	productionGoal.add(UnitType.Terran_Medic);
+	        	minerals -= 50;
+	        	gas -= 25;
+        	}
         }
     	
     	//if there's enough minerals, and not currently training an SCV, train an SCV
@@ -281,6 +302,22 @@ public class StrategyManager extends DefaultBWListener {
     			}
     		}
     	}
+    }
+    
+    /**
+     * updateArmyRatio()
+     * 
+     * This is a very simple implementation of Army Ratio just for the tournament 
+     * Just cares about marines and medics. 
+     */
+    public void updateArmyRatio(){
+    	//update marine percentage 
+    	double marineCount = self.allUnitCount(UnitType.Terran_Marine);
+    	double medicCount = self.allUnitCount(UnitType.Terran_Medic);
+    	double total = marineCount + medicCount;
+    	
+    	armyRatio.put(UnitType.Terran_Marine, marineCount/total);
+    	armyRatio.put(UnitType.Terran_Medic, medicCount/total);
     }
     
     /**
