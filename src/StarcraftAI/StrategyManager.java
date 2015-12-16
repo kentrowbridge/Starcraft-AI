@@ -199,6 +199,12 @@ public class StrategyManager extends DefaultBWListener {
             minerals -= 50;
     	}
     	
+    	//Contingincy to build more barracks over time. 
+    	if (minerals >= 150*3) {
+    		productionGoal.add(UnitType.Terran_Barracks);
+        	minerals -= 150;
+    	}
+    	
         //set goal for the prodution manager
     	productionManager.setGoal(productionGoal);
 		
