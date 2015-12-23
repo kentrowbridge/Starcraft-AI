@@ -124,8 +124,10 @@ public class StrategyManager extends DefaultBWListener {
     private void update(){
     	for(Unit myUnit : self.getUnits()){
 	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
-	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrderTargetPosition().getX(), 
-	    			myUnit.getOrderTargetPosition().getY(), bwapi.Color.Green);
+	    	int x = myUnit.getOrderTargetPosition().getX() == 0 ? myUnit.getPosition().getX() : myUnit.getOrderTargetPosition().getX();
+	    	int y = myUnit.getOrderTargetPosition().getY() == 0 ? myUnit.getPosition().getY() : myUnit.getOrderTargetPosition().getY();
+	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
+	    			y, bwapi.Color.Green);
     	}
     	try{
     		updateEnemyBuildingLocations();
@@ -213,11 +215,22 @@ public class StrategyManager extends DefaultBWListener {
         	}
         }
     	
-    	//if there's enough minerals, and not currently training an SCV, train an SCV
-    	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28) {
+    	//if there's enough minerals, and not currently training an SCV, and we don't infringe on building a supply depot
+        //train an SCV
+    	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28){
+    		if(self.supplyTotal() - self.supplyUsed() != 6 ||
+    			(self.supplyTotal() - self.supplyUsed() == 6 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot)>=1)){
+    			productionGoal.add(UnitType.Terran_SCV);
+                minerals -= 50;
+    		}
+//    		else if(self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 ||
+//        			(self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot)>=1)){
+//    			productionGoal.add(UnitType.Terran_SCV);
+//                minerals -= 50;
+//        	}
 //    		System.out.println("BUILD SCV");
-            productionGoal.add(UnitType.Terran_SCV);
-            minerals -= 50;
+//            productionGoal.add(UnitType.Terran_SCV);
+//            minerals -= 50;
     	}
     	
     	//Contingincy to build more barracks over time. 
@@ -241,10 +254,10 @@ public class StrategyManager extends DefaultBWListener {
     	}
     	
     	// see if we should be scouting;
-    	if(armyCount > 1 && !isScouting){
-    		militaryManager.command(Command.Scout, 1.0, null);
-    		isScouting = true;
-    	}
+//    	if(armyCount > 1 && !isScouting){
+//    		militaryManager.command(Command.Scout, 1.0, null);
+//    		isScouting = true;
+//    	}
     	
     	// scout if we we haven't seen enemy building and supply is over 30
     	if(armyCount > 1 && enemyBuildingLocation.isEmpty() && self.supplyUsed() >= 60){
@@ -252,6 +265,10 @@ public class StrategyManager extends DefaultBWListener {
     		isScouting = true;
     	}
     	
+    	if(!isScouting){
+    		militaryManager.command(Command.Scout, 1.0, null);
+    		isScouting = true;
+    	}
     }
     
     /**
