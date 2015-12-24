@@ -3,9 +3,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import bwapi.Game;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
+import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
 
@@ -20,6 +22,8 @@ import bwta.BaseLocation;
  */
 public class ArmyManager{
 	private Player self;
+	private Game game;
+	
 	private ArrayList<TilePosition> scoutQueue = new ArrayList<TilePosition>();
 	private HashMap<SquadType, Squad> squads;
 	private TilePosition queuedTile = null;
@@ -29,9 +33,10 @@ public class ArmyManager{
 	 * ctor
 	 * 
 	 */
-	public ArmyManager(HashMap<SquadType, Squad> squads, Player self){
+	public ArmyManager(HashMap<SquadType, Squad> squads, Player self, Game game){
 		this.squads = squads;
 		this.self = self;
+		this.game = game;
 	}
 
 	/**
@@ -79,13 +84,6 @@ public class ArmyManager{
 	public void engage(Position position)
 	{
 		squads.get(SquadType.Offense).attackMove(position);
-		
-//		for(Squad squad : squads){
-//			if(squad.getSquadType() == SquadType.Offense){
-//				squad.attackMove(position);
-//				break;
-//			}
-//		}
 	}
 
 	/**
@@ -111,7 +109,7 @@ public class ArmyManager{
 		ArrayList<Position> basePoss = new ArrayList<Position>();
 		
 		for(BaseLocation base : baseLocations){
-			System.out.println("BaseLocation: " + base.getPosition());
+//			System.out.println("BaseLocation: " + base.getPosition());
 			
 			// if base location is not start location and a starting location add it
 			if (!base.getPosition().equals(BWTA.getStartLocation(self).getPosition())){

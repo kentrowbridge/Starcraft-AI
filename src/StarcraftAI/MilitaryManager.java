@@ -33,7 +33,7 @@ public class MilitaryManager{
 		initSquads();
 		
 		
-		armyManager = new ArmyManager(squads, self);
+		armyManager = new ArmyManager(squads, self, game);
 		battleManager = new BattleManager();
 	}
 	
@@ -90,7 +90,14 @@ public class MilitaryManager{
 	 * It also prunes units that no longer exist from both lists.
 	 */
 	public void update(){
-		
+		ArrayList<Unit> milUnits = new ArrayList<Unit>();
+		for(Unit u : self.getUnits()){
+			if(u.getType().equals(UnitType.Terran_Marine) ||
+				u.getType().equals(UnitType.Terran_Medic)){
+				milUnits.add(u);
+			}
+		}
+		squads.get(SquadType.Offense).setUnits(milUnits);
 	}
 
 	/**
@@ -104,7 +111,7 @@ public class MilitaryManager{
 	 */
 	public void command(Command command, Double percentCommit, Position position)
 	{
-		System.out.println("Military Manager Command: " + command);
+//		System.out.println("Military Manager Command: " + command);
 		switch(command){
 			case Attack:
 				armyManager.engage(position);
@@ -113,6 +120,14 @@ public class MilitaryManager{
 				armyManager.defend();
 				break;
 			case Scout:
+				for(Unit u : self.getUnits()){
+					if(u.getType().equals(UnitType.Terran_SCV)){
+						ArrayList<Unit> units = new ArrayList<Unit>();
+						units.add(u);
+						squads.get(SquadType.Scout).setUnits(units);
+					}
+				}
+				
 				armyManager.scout();
 //				this.doScout = true; 
 //				armyManager.getBuildingLocations();

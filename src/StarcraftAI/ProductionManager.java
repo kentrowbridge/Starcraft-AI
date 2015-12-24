@@ -30,7 +30,7 @@ public class ProductionManager {
 		this.self = self;
 
 		this.buildingManager = new BuildingManager(game, self);
-		this.workerManager = new WorkerManager(game.getNeutralUnits());
+		this.workerManager = new WorkerManager(self, game.getNeutralUnits());
 		
 		this.productionQueue = new ArrayList<List<UnitType>>();
 		this.goals = new ArrayList<UnitType>();
