@@ -127,16 +127,17 @@ public class StrategyManager extends DefaultBWListener {
      */
 
     private void update(){
-    	for(Unit myUnit : self.getUnits()){
-	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
-	    	int x = myUnit.getOrderTargetPosition().getX() == 0 ? myUnit.getPosition().getX() : myUnit.getOrderTargetPosition().getX();
-	    	int y = myUnit.getOrderTargetPosition().getY() == 0 ? myUnit.getPosition().getY() : myUnit.getOrderTargetPosition().getY();
-	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
-	    			y, bwapi.Color.Green);
-    	}
+//    	for(Unit myUnit : self.getUnits()){
+//	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
+//	    	int x = myUnit.getOrderTargetPosition().getX() == 0 ? myUnit.getPosition().getX() : myUnit.getOrderTargetPosition().getX();
+//	    	int y = myUnit.getOrderTargetPosition().getY() == 0 ? myUnit.getPosition().getY() : myUnit.getOrderTargetPosition().getY();
+//	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
+//	    			y, bwapi.Color.Green);
+//    	}
     	try{
     		updateEnemyBuildingLocations();
     		updateArmyRatio();
+    		updateArmyCount();
     		executeStrategy();
     	}
     	catch(Exception e){
@@ -262,7 +263,7 @@ public class StrategyManager extends DefaultBWListener {
     	productionManager.setGoal(productionGoal);
 		
     	//Attack if we have enough units
-    	if(armyCount >= 20)
+    	if(armyCount >= 20 && armyCount >= (productionBuildings-1)*3)
     	{
     		for(Position pos : enemyBuildingLocation)
     		{
@@ -361,6 +362,10 @@ public class StrategyManager extends DefaultBWListener {
     	
     	armyRatio.put(UnitType.Terran_Marine, marineCount/total);
     	armyRatio.put(UnitType.Terran_Medic, medicCount/total);
+    }
+    
+    private void updateArmyCount(){
+    	armyCount = self.completedUnitCount(UnitType.Terran_Marine) + self.completedUnitCount(UnitType.Terran_Medic);
     }
     
     /**
