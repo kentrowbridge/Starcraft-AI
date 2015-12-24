@@ -1,6 +1,7 @@
 package StarcraftAI;
 import java.util.*;
 import bwapi.*;
+import bwta.BWTA;
 
 /**
  * This class tracks and manages all of the worker units 
@@ -37,7 +38,12 @@ public class WorkerManager{
 			if(u.isIdle() && u.isCompleted())
 			{
 				//assign a task
-				u.gather(findClosestMineral(u.getPosition()));
+				// protect against not finding any closest minerals. 
+				// -- ie. don't pass null to u.gather(); that is a bad thing. 
+				Unit closestMineral = findClosestMineral(BWTA.getStartLocation(self).getPosition());
+				if(closestMineral != null){
+					u.gather(closestMineral);
+				}
 			}
 			
 			//save dead units for deletion	
@@ -55,7 +61,7 @@ public class WorkerManager{
 		{
 			Unit worker = getWorker();
 			if(worker != null){
-				worker.gather(findClosestRefinery(worker.getPosition()));
+				worker.gather(findClosestRefinery(BWTA.getStartLocation(self).getPosition()));
 			}
 		}
 		
