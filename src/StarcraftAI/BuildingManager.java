@@ -69,7 +69,7 @@ public class BuildingManager{
 		if(buildingType == UnitType.Terran_Refinery)
 		{
 			List<Unit> geysers = game.getGeysers();
-			System.out.println("Available Geysers: " + geysers.size());
+//			System.out.println("Available Geysers: " + geysers.size());
 			Unit closest = null;
 			Position position = builder.getPosition();
 			for(Unit geyser : geysers)

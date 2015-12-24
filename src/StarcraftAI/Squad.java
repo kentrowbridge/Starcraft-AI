@@ -118,7 +118,7 @@ public class Squad {
 			if(unit != null && unit.exists() && !unit.isAttacking() && !unit.isStartingAttack() 
 					&& unit.isCompleted()){
 				if(unit.getTargetPosition() != null && !unit.getTargetPosition().equals(position)){
-					System.out.println("set: "+ unit+ "   Attack position " + position);
+//					System.out.println("set: "+ unit+ "   Attack position " + position);
 					unit.attack(position);
 				}
 			}
