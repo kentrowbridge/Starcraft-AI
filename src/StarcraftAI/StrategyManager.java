@@ -26,6 +26,8 @@ public class StrategyManager extends DefaultBWListener {
     private MilitaryManager militaryManager;
     
     private boolean isScouting = false;
+    
+    private boolean hasExtendedRange = false;
 
     /**
      * run()
@@ -89,6 +91,9 @@ public class StrategyManager extends DefaultBWListener {
         enemyBuildingInfo = new Hashtable<UnitType, Integer>();
         enemyArmyPosition = new HashSet<Position>();
         enemyBuildingLocation = new HashSet<Position>();
+        
+        isScouting = false;
+        hasExtendedRange = false;
         
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -168,24 +173,38 @@ public class StrategyManager extends DefaultBWListener {
 			minerals -= 100;
     	}
     	
+    	// Upgrade Marine attack range. 
+    	if(minerals >= 150 && gas >= 150 && self.completedUnitCount(UnitType.Terran_Academy)>=1 && !hasExtendedRange){
+//        	System.out.println("BUILD Marine!!!");
+    		for(Unit u : self.getUnits()){
+    			if(u.getType().equals(UnitType.Terran_Academy)){
+    				u.upgrade(UpgradeType.U_238_Shells);
+    				hasExtendedRange = true;
+    			}
+    		}
+    		minerals -= 150;
+    		gas -= 150;
+    	}
+    	
+    	// build Academy
+    	if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>1 && self.allUnitCount(UnitType.Terran_Academy) < 1){
+//        	System.out.println("BUILD Marine!!!");
+    		productionGoal.add(UnitType.Terran_Academy);
+    		minerals -= 150;
+    	}
+    	
     	// build refinery 
-        if(minerals >= 100 && self.supplyTotal() > 12 && self.allUnitCount(UnitType.Terran_Refinery) < 1){
+    	if(minerals >= 100 && self.supplyTotal() > 12 && self.allUnitCount(UnitType.Terran_Refinery) < 1
+    			&& self.allUnitCount(UnitType.Terran_Barracks) >= 1){
 //        	System.out.println("BUILD Refinery!!!");
-        	productionGoal.add(UnitType.Terran_Refinery);
-        	minerals -= 100;
-        }
+    		productionGoal.add(UnitType.Terran_Refinery);
+    		minerals -= 100;
+    	}
     	
     	// else if we don't have a barracks build a barracks. 
         if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 3){
 //        	System.out.println("BUILD BARRACKS!!!");
         	productionGoal.add(UnitType.Terran_Barracks);
-        	minerals -= 150;
-        }
-        
-        // build Academy
-        if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>0 && self.allUnitCount(UnitType.Terran_Academy) < 1){
-//        	System.out.println("BUILD Marine!!!");
-        	productionGoal.add(UnitType.Terran_Academy);
         	minerals -= 150;
         }
         
@@ -260,10 +279,10 @@ public class StrategyManager extends DefaultBWListener {
 //    	}
     	
     	// scout if we we haven't seen enemy building and supply is over 30
-    	if(armyCount > 1 && enemyBuildingLocation.isEmpty() && self.supplyUsed() >= 60){
-    		militaryManager.command(Command.Scout, 1.0, null);
-    		isScouting = true;
-    	}
+//    	if(armyCount > 1 && enemyBuildingLocation.isEmpty() && self.supplyUsed() >= 60){
+//    		militaryManager.command(Command.Scout, 1.0, null);
+//    		isScouting = true;
+//    	}
     	
     	if(!isScouting){
     		militaryManager.command(Command.Scout, 1.0, null);
@@ -298,6 +317,8 @@ public class StrategyManager extends DefaultBWListener {
     		}
     	}
     	
+    	ArrayList<Position> toRemove = new ArrayList<Position>();
+    	
     	//loop over the visible enemy units that we remember
     	for(Position p : enemyBuildingLocation){
     		TilePosition tileCorrespondingToP = new TilePosition(p.getX()/32, p.getY()/32);
@@ -308,16 +329,21 @@ public class StrategyManager extends DefaultBWListener {
     			// one of them is still at the remembered position
     			boolean buildingStillThere = false;
     			for(Unit u: game.enemy().getUnits()){
-    				if(u.getType().isBuilding() && u.getPosition() == p){
+    				if(u.getType().isBuilding() && u.getPosition().equals(p) && u.exists()){
     					buildingStillThere = true;
     					break;
     				}
     			}
     			if(!buildingStillThere){
-    				enemyBuildingLocation.remove(p);
+    				toRemove.add(p);
     				break;
     			}
     		}
+    	}
+    	
+    	//remove
+    	for(Position p : toRemove){
+    		enemyBuildingLocation.remove(p);
     	}
     }
     

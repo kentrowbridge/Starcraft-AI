@@ -90,7 +90,14 @@ public class MilitaryManager{
 	 * It also prunes units that no longer exist from both lists.
 	 */
 	public void update(){
-		
+		ArrayList<Unit> milUnits = new ArrayList<Unit>();
+		for(Unit u : self.getUnits()){
+			if(u.getType().equals(UnitType.Terran_Marine) ||
+				u.getType().equals(UnitType.Terran_Medic)){
+				milUnits.add(u);
+			}
+		}
+		squads.get(SquadType.Offense).setUnits(milUnits);
 	}
 
 	/**

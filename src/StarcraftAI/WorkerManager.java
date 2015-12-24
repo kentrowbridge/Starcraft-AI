@@ -11,11 +11,13 @@ import bwapi.*;
  */
 public class WorkerManager{
 	
+	private Player self = null;
 	private List<Unit> neutralUnits = new ArrayList<Unit>();
 	private List<Unit> workerList = new ArrayList<Unit>();
 	
-	public WorkerManager(List<Unit> neutralUnits)
+	public WorkerManager(Player self, List<Unit> neutralUnits)
 	{
+		this.self = self;
 		this.neutralUnits = neutralUnits;
 	}
 	
@@ -27,6 +29,9 @@ public class WorkerManager{
 	public void update()
 	{ 
 		List<Unit> workersToRemove = new ArrayList<Unit>();
+		
+		boolean gatheringGas = false;
+		
 		for(Unit u : workerList)
 		{			
 			if(u.isIdle() && u.isCompleted())
@@ -39,6 +44,18 @@ public class WorkerManager{
 			if(!u.exists())
 			{
 				workersToRemove.add(u);
+			}
+			
+			if(u.isGatheringGas()){
+				gatheringGas = true;
+			}
+		}
+		
+		if(!gatheringGas && self.completedUnitCount(UnitType.Terran_Refinery)>=1)
+		{
+			Unit worker = getWorker();
+			if(worker != null){
+				worker.gather(findClosestRefinery(worker.getPosition()));
 			}
 		}
 		
@@ -114,6 +131,29 @@ public class WorkerManager{
 				if(closest == null || neutral.getDistance(pos) < closest.getDistance(pos))
 				{
 					closest = neutral;
+				}
+			}
+		}
+		
+		return closest;
+	}
+	
+	
+	private Unit findClosestRefinery(Position pos){
+		if(pos == null)
+			return null;
+		//init closest to first in list
+		Unit closest = null;
+		
+		//find closest mineral
+		for(Unit unit : self.getUnits())
+		{
+			//only check mineral fields
+			if(unit.getType() == UnitType.Terran_Refinery)
+			{
+				if(closest == null || unit.getDistance(pos) < closest.getDistance(pos))
+				{
+					closest = unit;
 				}
 			}
 		}
