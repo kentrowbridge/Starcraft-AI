@@ -1,8 +1,8 @@
 package StarcraftAI;
-import java.awt.List;
-import java.util.ArrayList;
+import java.util.*;
 
 import bwapi.*;
+import bwta.BWTA;
 
 /**
  * BuildingManager Class
@@ -67,6 +67,26 @@ public class BuildingManager{
 	 */
 	private TilePosition getPlacement(UnitType buildingType, Unit builder)
 	{
+		if(buildingType == UnitType.Terran_Refinery)
+		{
+			List<Unit> geysers = game.getGeysers();
+//			System.out.println("Available Geysers: " + geysers.size());
+			Unit closest = null;
+//			Position position = builder.getPosition();
+			Position position = BWTA.getStartLocation(self).getPosition();
+			for(Unit geyser : geysers)
+			{
+				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
+				{
+					if(closest == null || geyser.getDistance(position) < geyser.getDistance(position))
+					{
+						closest = geyser;
+					}
+				}
+			}
+			return closest.getTilePosition();
+		}
+		
     	int maxDist = 8;
     	int changeRate = 2;
     	int stopDist = 40;

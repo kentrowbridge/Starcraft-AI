@@ -26,6 +26,8 @@ public class StrategyManager extends DefaultBWListener {
     private MilitaryManager militaryManager;
     
     private boolean isScouting = false;
+    
+    private boolean hasExtendedRange = false;
 
     /**
      * run()
@@ -90,6 +92,9 @@ public class StrategyManager extends DefaultBWListener {
         enemyArmyPosition = new HashSet<Position>();
         enemyBuildingLocation = new HashSet<Position>();
         
+        isScouting = false;
+        hasExtendedRange = false;
+        
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
         System.out.println("Analyzing map...");
@@ -122,9 +127,18 @@ public class StrategyManager extends DefaultBWListener {
      */
 
     private void update(){
+//    	for(Unit myUnit : self.getUnits()){
+//	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
+//	    	int x = myUnit.getOrderTargetPosition().getX() == 0 ? myUnit.getPosition().getX() : myUnit.getOrderTargetPosition().getX();
+//	    	int y = myUnit.getOrderTargetPosition().getY() == 0 ? myUnit.getPosition().getY() : myUnit.getOrderTargetPosition().getY();
+//	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
+//	    			y, bwapi.Color.Green);
+//    	}
     	try{
-    		executeStrategy();
     		updateEnemyBuildingLocations();
+    		updateArmyRatio();
+    		updateArmyCount();
+    		executeStrategy();
     	}
     	catch(Exception e){
     		e.printStackTrace();
@@ -139,52 +153,139 @@ public class StrategyManager extends DefaultBWListener {
      * Develops and executes the strategy that the AI will play with. 
      */
     private void executeStrategy(){
+    	int productionBuildings = 0;
+    	for(Unit u : self.getUnits()){
+    		if(u.getType().equals(UnitType.Terran_Command_Center) || u.getType().equals(UnitType.Terran_Barracks)){
+    			productionBuildings ++;
+    		}
+    	}
     	
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
+    	int minerals = self.minerals();
+    	int gas = self.gas();
+    	
     	// If we are almost supply capped build a supply depot.
-    	if(self.supplyTotal() - self.supplyUsed() <= 6 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 && self.minerals() >= 100){
-    		System.out.println("BUILD SUPPLY DEPOT!");
+    	// Should supply cap - supplyused < = # of production buildings * 2
+    	if((self.supplyTotal() - self.supplyUsed() <= 6 || self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)  
+    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 && minerals >= 100){
+//    		System.out.println("BUILD SUPPLY DEPOT!");
 			productionGoal.add(UnitType.Terran_Supply_Depot);
+			minerals -= 100;
+    	}
+    	
+    	// Upgrade Marine attack range. 
+    	if(minerals >= 150 && gas >= 150 && self.completedUnitCount(UnitType.Terran_Academy)>=1 && !hasExtendedRange){
+//        	System.out.println("BUILD Marine!!!");
+    		for(Unit u : self.getUnits()){
+    			if(u.getType().equals(UnitType.Terran_Academy)){
+    				u.upgrade(UpgradeType.U_238_Shells);
+    				hasExtendedRange = true;
+    			}
+    		}
+    		minerals -= 150;
+    		gas -= 150;
+    	}
+    	
+    	// build Academy
+    	if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>1 && self.allUnitCount(UnitType.Terran_Academy) < 1){
+//        	System.out.println("BUILD Marine!!!");
+    		productionGoal.add(UnitType.Terran_Academy);
+    		minerals -= 150;
+    	}
+    	
+    	// build refinery 
+    	if(minerals >= 100 && self.supplyTotal() > 12 && self.allUnitCount(UnitType.Terran_Refinery) < 1
+    			&& self.allUnitCount(UnitType.Terran_Barracks) >= 1){
+//        	System.out.println("BUILD Refinery!!!");
+    		productionGoal.add(UnitType.Terran_Refinery);
+    		minerals -= 100;
     	}
     	
     	// else if we don't have a barracks build a barracks. 
-        else if(self.minerals() >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 2){
-        	System.out.println("BUILD BARRACKS!!!");
-        	productionGoal.add(UnitType.Terran_Barracks);        	
+        if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 3){
+//        	System.out.println("BUILD BARRACKS!!!");
+        	productionGoal.add(UnitType.Terran_Barracks);
+        	minerals -= 150;
         }
         
         // else build marines
-        else if(self.minerals() >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
-        	System.out.println("BUILD Marine!!!");
-        	productionGoal.add(UnitType.Terran_Marine);
+        if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
+//        	System.out.println("BUILD Marine!!!");
+        	// If we have an academy and marines make up less than 75 percent of our army then build a marine
+        	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 && armyRatio.get(UnitType.Terran_Marine) <= .75 ){
+	        	productionGoal.add(UnitType.Terran_Marine);
+	        	minerals -= 100;
+        	}
+        	// else if there is no academy, just build the marine
+        	else if(self.completedUnitCount(UnitType.Terran_Academy) < 1){
+        		productionGoal.add(UnitType.Terran_Marine);
+	        	minerals -= 100;
+        	}
+        	//else don't build a marine. We have too many. 
+        }
+        
+        // else build Medics 
+        if(minerals >= 50 && gas >= 25 && self.allUnitCount(UnitType.Terran_Barracks)>0 && self.completedUnitCount(UnitType.Terran_Academy) >= 1){
+//        	System.out.println("BUILD Marine!!!");
+        	if(armyRatio.get(UnitType.Terran_Medic) != null && armyRatio.get(UnitType.Terran_Medic) <= .25){
+	        	productionGoal.add(UnitType.Terran_Medic);
+	        	minerals -= 50;
+	        	gas -= 25;
+        	}
         }
     	
-    	//if there's enough minerals, and not currently training an SCV, train an SCV
-    	else if (self.minerals() >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 15) {
-    		System.out.println("BUILD SCV");
-            productionGoal.add(UnitType.Terran_SCV);
+    	//if there's enough minerals, and not currently training an SCV, and we don't infringe on building a supply depot
+        //train an SCV
+    	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28){
+    		if(self.supplyTotal() - self.supplyUsed() != 6 ||
+    			(self.supplyTotal() - self.supplyUsed() == 6 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot)>=1)){
+    			productionGoal.add(UnitType.Terran_SCV);
+                minerals -= 50;
+    		}
+//    		else if(self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 ||
+//        			(self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot)>=1)){
+//    			productionGoal.add(UnitType.Terran_SCV);
+//                minerals -= 50;
+//        	}
+//    		System.out.println("BUILD SCV");
+//            productionGoal.add(UnitType.Terran_SCV);
+//            minerals -= 50;
+    	}
+    	
+    	//Contingincy to build more barracks over time. 
+    	if (minerals >= 150*3) {
+    		productionGoal.add(UnitType.Terran_Barracks);
+        	minerals -= 150;
     	}
     	
         //set goal for the prodution manager
     	productionManager.setGoal(productionGoal);
 		
     	//Attack if we have enough units
-    	if(armyCount >= 5)
+    	if(armyCount >= 20 && armyCount >= (productionBuildings-1)*3)
     	{
-    		System.out.println("ATTACK NOW!!!");
     		for(Position pos : enemyBuildingLocation)
     		{
-    			Position closePos = new Position(pos.getX() - 75, pos.getY() - 30);
-    			System.out.println("ATTACK COMMAND");
-    			System.out.println(closePos.getX() + ", " + closePos.getY());
+    			Position closePos = pos;
     			militaryManager.command(Command.Attack, 1.0, closePos);
     			break;
     		}
     	}
     	
     	// see if we should be scouting;
-    	if(armyCount > 1 && !isScouting){
+//    	if(armyCount > 1 && !isScouting){
+//    		militaryManager.command(Command.Scout, 1.0, null);
+//    		isScouting = true;
+//    	}
+    	
+    	// scout if we we haven't seen enemy building and supply is over 30
+//    	if(armyCount > 1 && enemyBuildingLocation.isEmpty() && self.supplyUsed() >= 60){
+//    		militaryManager.command(Command.Scout, 1.0, null);
+//    		isScouting = true;
+//    	}
+    	
+    	if(!isScouting){
     		militaryManager.command(Command.Scout, 1.0, null);
     		isScouting = true;
     	}
@@ -217,6 +318,8 @@ public class StrategyManager extends DefaultBWListener {
     		}
     	}
     	
+    	ArrayList<Position> toRemove = new ArrayList<Position>();
+    	
     	//loop over the visible enemy units that we remember
     	for(Position p : enemyBuildingLocation){
     		TilePosition tileCorrespondingToP = new TilePosition(p.getX()/32, p.getY()/32);
@@ -227,17 +330,42 @@ public class StrategyManager extends DefaultBWListener {
     			// one of them is still at the remembered position
     			boolean buildingStillThere = false;
     			for(Unit u: game.enemy().getUnits()){
-    				if(u.getType().isBuilding() && u.getPosition() == p){
+    				if(u.getType().isBuilding() && u.getPosition().equals(p) && u.exists()){
     					buildingStillThere = true;
     					break;
     				}
     			}
     			if(!buildingStillThere){
-    				enemyBuildingLocation.remove(p);
+    				toRemove.add(p);
     				break;
     			}
     		}
     	}
+    	
+    	//remove
+    	for(Position p : toRemove){
+    		enemyBuildingLocation.remove(p);
+    	}
+    }
+    
+    /**
+     * updateArmyRatio()
+     * 
+     * This is a very simple implementation of Army Ratio just for the tournament 
+     * Just cares about marines and medics. 
+     */
+    public void updateArmyRatio(){
+    	//update marine percentage 
+    	double marineCount = self.allUnitCount(UnitType.Terran_Marine);
+    	double medicCount = self.allUnitCount(UnitType.Terran_Medic);
+    	double total = marineCount + medicCount;
+    	
+    	armyRatio.put(UnitType.Terran_Marine, marineCount/total);
+    	armyRatio.put(UnitType.Terran_Medic, medicCount/total);
+    }
+    
+    private void updateArmyCount(){
+    	armyCount = self.completedUnitCount(UnitType.Terran_Marine) + self.completedUnitCount(UnitType.Terran_Medic);
     }
     
     /**

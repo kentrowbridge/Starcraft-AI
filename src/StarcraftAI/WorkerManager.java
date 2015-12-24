@@ -1,6 +1,7 @@
 package StarcraftAI;
 import java.util.*;
 import bwapi.*;
+import bwta.BWTA;
 
 /**
  * This class tracks and manages all of the worker units 
@@ -11,11 +12,13 @@ import bwapi.*;
  */
 public class WorkerManager{
 	
+	private Player self = null;
 	private List<Unit> neutralUnits = new ArrayList<Unit>();
 	private List<Unit> workerList = new ArrayList<Unit>();
 	
-	public WorkerManager(List<Unit> neutralUnits)
+	public WorkerManager(Player self, List<Unit> neutralUnits)
 	{
+		this.self = self;
 		this.neutralUnits = neutralUnits;
 	}
 	
@@ -27,18 +30,38 @@ public class WorkerManager{
 	public void update()
 	{ 
 		List<Unit> workersToRemove = new ArrayList<Unit>();
+		
+		boolean gatheringGas = false;
+		
 		for(Unit u : workerList)
 		{			
-			if(u.isIdle())
+			if(u.isIdle() && u.isCompleted())
 			{
 				//assign a task
-				u.gather(findClosestMineral(u.getPosition()));
+				// protect against not finding any closest minerals. 
+				// -- ie. don't pass null to u.gather(); that is a bad thing. 
+				Unit closestMineral = findClosestMineral(BWTA.getStartLocation(self).getPosition());
+				if(closestMineral != null){
+					u.gather(closestMineral);
+				}
 			}
 			
 			//save dead units for deletion	
 			if(!u.exists())
 			{
 				workersToRemove.add(u);
+			}
+			
+			if(u.isGatheringGas()){
+				gatheringGas = true;
+			}
+		}
+		
+		if(!gatheringGas && self.completedUnitCount(UnitType.Terran_Refinery)>=1)
+		{
+			Unit worker = getWorker();
+			if(worker != null){
+				worker.gather(findClosestRefinery(BWTA.getStartLocation(self).getPosition()));
 			}
 		}
 		
@@ -61,13 +84,14 @@ public class WorkerManager{
 		for(Unit u : workerList)
 		{			
 			//make sure no workers are on there way to build at the same time
-			if(u.isConstructing() && u.isMoving() && (u.getBuildUnit() == null))
+//			if(u.isConstructing() && u.isMoving() && (u.getBuildUnit() == null))
+			if(u.getOrder().equals(Order.PlaceBuilding))
 			{
 				return null;
 			}		
 			
 			//find a free worker
-			if(!u.isConstructing() && u.isInterruptible())
+			if(!u.isConstructing() && u.isInterruptible() && u.isCompleted())
 			{//save a valid worker
 				availableWorker = u;
 			}
@@ -113,6 +137,29 @@ public class WorkerManager{
 				if(closest == null || neutral.getDistance(pos) < closest.getDistance(pos))
 				{
 					closest = neutral;
+				}
+			}
+		}
+		
+		return closest;
+	}
+	
+	
+	private Unit findClosestRefinery(Position pos){
+		if(pos == null)
+			return null;
+		//init closest to first in list
+		Unit closest = null;
+		
+		//find closest mineral
+		for(Unit unit : self.getUnits())
+		{
+			//only check mineral fields
+			if(unit.getType() == UnitType.Terran_Refinery)
+			{
+				if(closest == null || unit.getDistance(pos) < closest.getDistance(pos))
+				{
+					closest = unit;
 				}
 			}
 		}
