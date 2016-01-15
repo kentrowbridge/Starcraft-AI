@@ -1,6 +1,7 @@
 package StarcraftAI;
 import java.util.*;
 import bwapi.*;
+
 /**
  * MilitaryManager
  * Maintains and manages all military units under the
@@ -9,7 +10,6 @@ import bwapi.*;
  * @author Kenny Trowbridge
  *
  */
-
 public class MilitaryManager{
 	private Game game;
 	private Player self;
@@ -21,9 +21,11 @@ public class MilitaryManager{
 	private boolean doScout = false;
 
 	/**
-	 * ctor
+	 * MilitaryManager()
+	 * Constructor for the MilitaryManager class.
 	 */
-	public MilitaryManager(Game game, Player self){
+	public MilitaryManager(Game game, Player self)
+	{
 		this.game = game;
 		this.self = self;
 		
@@ -32,24 +34,20 @@ public class MilitaryManager{
 		
 		initSquads();
 		
-		
 		armyManager = new ArmyManager(squads, self, game);
 		battleManager = new BattleManager();
 	}
 	
 	/**
 	 * initSquads()
-	 * Initialize all terran squads.
+	 * Initialize all Terran squads.
 	 */
-	public void initSquads(){
+	public void initSquads()
+	{
 		for(SquadType type : SquadType.values())
 		{
 			squads.put(type, new Squad(type));
 		}
-		
-//		for(int i = 0; i < squads.length; i++){
-//			squads[i] = new Squad(SquadType.values()[i]);
-//		}
 	}
 	
 	/**
@@ -60,27 +58,19 @@ public class MilitaryManager{
 	 * 
 	 * @param unit - unit to add
 	 */
-	public void addUnit(Unit unit){
+	public void addUnit(Unit unit)
+	{
 		// put unit in a squad. Default is Offense. 
 		if(squads.get(SquadType.Scout).isEmpty())
-		{//add only the first unit to the scout squad
+		{
+			//add only the first unit to the scout squad
 			squads.get(SquadType.Scout).addUnit(unit);
 		}
 		else
-		{//default, add to offense
+		{
+			//default, add to offense
 			squads.get(SquadType.Offense).addUnit(unit);
 		}
-		
-//		for(Squad squad: squads){
-//			if(squad.getSquadType() == SquadType.Scout && squad.isEmpty())
-//			{//add only one unit to scout squad
-//				squad.addUnit(unit);
-//				System.out.println("added unit to scout");
-//			}
-//			else if (squad.getSquadType() == SquadType.Offense){
-//				squad.addUnit(unit);
-//			}
-//		}
 	}
 	
 	/**
@@ -89,11 +79,14 @@ public class MilitaryManager{
 	 * are in both the squads list and the militaryUnits list.
 	 * It also prunes units that no longer exist from both lists.
 	 */
-	public void update(){
+	public void update()
+	{
 		ArrayList<Unit> milUnits = new ArrayList<Unit>();
-		for(Unit u : self.getUnits()){
+		for(Unit u : self.getUnits())
+		{
 			if(u.getType().equals(UnitType.Terran_Marine) ||
-				u.getType().equals(UnitType.Terran_Medic)){
+				u.getType().equals(UnitType.Terran_Medic))
+			{
 				milUnits.add(u);
 			}
 		}
@@ -111,8 +104,8 @@ public class MilitaryManager{
 	 */
 	public void command(Command command, Double percentCommit, Position position)
 	{
-//		System.out.println("Military Manager Command: " + command);
-		switch(command){
+		switch(command)
+		{
 			case Attack:
 				armyManager.engage(position);
 				break;
@@ -120,8 +113,10 @@ public class MilitaryManager{
 				armyManager.defend();
 				break;
 			case Scout:
-				for(Unit u : self.getUnits()){
-					if(u.getType().equals(UnitType.Terran_SCV)){
+				for(Unit u : self.getUnits())
+				{
+					if(u.getType().equals(UnitType.Terran_SCV))
+					{
 						ArrayList<Unit> units = new ArrayList<Unit>();
 						units.add(u);
 						squads.get(SquadType.Scout).setUnits(units);
@@ -129,8 +124,6 @@ public class MilitaryManager{
 				}
 				
 				armyManager.scout();
-//				this.doScout = true; 
-//				armyManager.getBuildingLocations();
 				break;
 		}
 	}
