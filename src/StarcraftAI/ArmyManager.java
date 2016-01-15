@@ -31,28 +31,14 @@ public class ArmyManager{
 
 	/**
 	 * ctor
-	 * 
+	 * Set up the game, player and squads for the Army Manager. 
+	 * These will be given to the Army manager by the Military Manager
 	 */
-	public ArmyManager(HashMap<SquadType, Squad> squads, Player self, Game game){
+	public ArmyManager(HashMap<SquadType, Squad> squads, Player self, Game game)
+	{
 		this.squads = squads;
 		this.self = self;
 		this.game = game;
-	}
-
-	/**
-	 * getBuildingLocations()
-	 * Create a list of base locations and add them to scoutQueue
-	 */
-	public void getBuildingLocations(){
-		this.baseLocations = BWTA.getStartLocations();
-		
-		for(BaseLocation base : this.baseLocations){
-			TilePosition baseToP = base.getTilePosition();
-			//TilePosition baseToP = new TilePosition(base.getX()/32, base.getY()/32);
-			if (baseToP != self.getStartLocation()){
-				this.scoutQueue.add(baseToP);
-			}			    
-		}
 	}
 
 	/**
@@ -62,7 +48,8 @@ public class ArmyManager{
 	 * 
 	 * @param squads - a list of squads 
 	 */
-	public void setSquads(HashMap<SquadType, Squad> squads){
+	public void setSquads(HashMap<SquadType, Squad> squads)
+	{
 		this.squads = squads;
 	}
 
@@ -92,27 +79,15 @@ public class ArmyManager{
 	 */
 	public void scout()
 	{	
-//		// have the scout squad travel to each untraveled base location
-//		Squad squad = squads.get(SquadType.Scout);
-//		
-//		queuedTile = scoutQueue.get(0);		
-//		Position queuedPosition = convertTilePositionToPosition(queuedTile);
-//		squad.move(queuedPosition);
-//		// check if the squad has reached the baselocation	
-//		if (squad.squadPosition(queuedPosition)){
-//			//remove the queuedTile
-//			scoutQueue.remove(queuedTile);
-//		}
-		
 		// get base Locations
 		List<BaseLocation> baseLocations = BWTA.getStartLocations();
 		ArrayList<Position> basePoss = new ArrayList<Position>();
 		
-		for(BaseLocation base : baseLocations){
-//			System.out.println("BaseLocation: " + base.getPosition());
-			
+		for(BaseLocation base : baseLocations)
+		{			
 			// if base location is not start location and a starting location add it
-			if (!base.getPosition().equals(BWTA.getStartLocation(self).getPosition())){
+			if (!base.getPosition().equals(BWTA.getStartLocation(self).getPosition()))
+			{
 				basePoss.add(base.getPosition());
 			}
     	}
@@ -121,19 +96,5 @@ public class ArmyManager{
 		basePoss.add(BWTA.getStartLocation(self).getPosition());
 		
 		squads.get(SquadType.Scout).moveQueue(basePoss);
-		
-	}
-
-	/**
-	 * convertTilePositionToPosition:
-	 * Takes a tile position and turns it into a position object
-	 * 
-	 * @param tilePosition a tile position object
-	 * @return the pixel position or the Position object corresponding to 
-	 * 		a given tile position
-	 */
-	private Position convertTilePositionToPosition(TilePosition tilePosition){
-		Position position = new Position(tilePosition.getX()*32, tilePosition.getY()*32);
-		return position;
 	}
 }
