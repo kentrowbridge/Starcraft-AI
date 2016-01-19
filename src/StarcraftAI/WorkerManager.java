@@ -41,7 +41,8 @@ public class WorkerManager{
 				// protect against not finding any closest minerals. 
 				// -- ie. don't pass null to u.gather(); that is a bad thing. 
 				Unit closestMineral = findClosestMineral(BWTA.getStartLocation(self).getPosition());
-				if(closestMineral != null){
+				if(closestMineral != null)
+				{
 					u.gather(closestMineral);
 				}
 			}
@@ -52,7 +53,8 @@ public class WorkerManager{
 				workersToRemove.add(u);
 			}
 			
-			if(u.isGatheringGas()){
+			if(u.isGatheringGas())
+			{
 				gatheringGas = true;
 			}
 		}
@@ -60,7 +62,8 @@ public class WorkerManager{
 		if(!gatheringGas && self.completedUnitCount(UnitType.Terran_Refinery)>=1)
 		{
 			Unit worker = getWorker();
-			if(worker != null){
+			if(worker != null)
+			{
 				worker.gather(findClosestRefinery(BWTA.getStartLocation(self).getPosition()));
 			}
 		}
@@ -124,12 +127,14 @@ public class WorkerManager{
 	private Unit findClosestMineral(Position pos) 
 	{
 		if(pos == null)
+		{
 			return null;
+		}
 		//init closest to first in list
 		Unit closest = null;
 		
 		//find closest mineral
-		for(Unit neutral : this.neutralUnits)
+		for(Unit neutral : neutralUnits)
 		{
 			//only check mineral fields
 			if(neutral.getType() == UnitType.Resource_Mineral_Field)
@@ -147,7 +152,9 @@ public class WorkerManager{
 	
 	private Unit findClosestRefinery(Position pos){
 		if(pos == null)
+		{
 			return null;
+		}
 		//init closest to first in list
 		Unit closest = null;
 		
