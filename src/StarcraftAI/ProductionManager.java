@@ -25,6 +25,14 @@ public class ProductionManager {
 	
 	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
 	
+	/**
+	 * Ctor
+	 * Sets up the needed instance variables for the class and sets up the game and player objects needed 
+	 * to reference the game.
+	 * 
+	 * @param game
+	 * @param self
+	 */
 	public ProductionManager(Game game, Player self){
 		this.game = game;
 		this.self = self;
@@ -80,10 +88,6 @@ public class ProductionManager {
 	public void setGoal(ArrayList<UnitType> newGoal)
 	{
 		this.newGoal = newGoal;
-//		if(!newGoal.isEmpty())
-//			System.out.println("Production Goal: " + newGoal.get(0));
-//		else
-//			System.out.println("Production Goal: EMPTY");
 	}
 	
 	/** 
@@ -99,7 +103,8 @@ public class ProductionManager {
 		if(unitType.isBuilding())
 		{
 			Unit builder = workerManager.getWorker();
-			//make sure the builder is not null
+			
+			// make sure the builder is not null
 			if(builder != null && game.canMake(builder, unitType))
 			{
 				buildingManager.build(unitType, builder);
@@ -118,9 +123,14 @@ public class ProductionManager {
 	public void training(UnitType unitType, Unit building)
 	{
 		if(unitType == null || building == null)
+		{
 			return;
+		}
+		
 		if(!building.isTraining())
+		{
 			building.train(unitType);
+		}
 	}
 	
 	/**
@@ -137,14 +147,13 @@ public class ProductionManager {
 		buildingManager.update();
 		workerManager.update();
 		
-//		System.out.println("goals are the same?: " + Arrays.deepEquals(goals.toArray(), newGoal.toArray()));
-		
 		//if goal and new goal are the same, 
 		if(!Arrays.deepEquals(goals.toArray(), newGoal.toArray()))
 		{
 			goals = newGoal;
 			
 			productionQueue.clear();
+			
 			//find paths for all of the goals
 			//update production queue
 			for(UnitType u : goals)
@@ -157,7 +166,6 @@ public class ProductionManager {
 				path.add(u);
 				
 				//add path to production q
-				
 				productionQueue.add(path);
 			}
 		}

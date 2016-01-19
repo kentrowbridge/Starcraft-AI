@@ -4,6 +4,8 @@ import java.util.*;
 import bwapi.*;
 
 /**
+ * BattleManager
+ * Manages military units that are currently in a combat situation.
  * 
  * @author Max Robinson
  * @author Alex Bowns
@@ -22,11 +24,10 @@ public class BattleManager{
 	 * BattleManager()
 	 * Constructor for the battle Manager class. 
 	 */
-	public BattleManager(){
-		
-	}
+	public BattleManager(){}
 	
-	public BattleManager(Squad[] squads){
+	public BattleManager(Squad[] squads)
+	{
 		this.squads = squads;
 	}
 	
@@ -35,12 +36,14 @@ public class BattleManager{
 	 * updates needed information, and calls the correct methods
 	 * to take any actions, should they be needed. 
 	 */
-	public void update(){
+	public void update()
+	{
 		//look at each squad that is in battle
 		ArrayList<Squad> squadsInBattle = checkSquadIsEngaged();
 		
 		//manage the battle for every squad in combat
-		for (Squad squad : squadsInBattle){
+		for (Squad squad : squadsInBattle)
+		{
 			manageBattle(squad);
 		}
 		
@@ -52,12 +55,16 @@ public class BattleManager{
 	 * @return a list of all the squads that are currently 
 	 * 		engaged in battle
 	 */
-	public ArrayList<Squad> checkSquadIsEngaged(){
+	public ArrayList<Squad> checkSquadIsEngaged()
+	{
 		//this list will be returned, holding all of the squads that are in battle
 		ArrayList<Squad> squadsInBattle = null; 
+		
 		//add all squads in battle to the list
-		for (Squad squad : squads){
-			if (squad.isInCombat()){
+		for (Squad squad : squads)
+		{
+			if (squad.isInCombat())
+			{
 				squadsInBattle.add(squad);
 			}
 		}
@@ -71,13 +78,16 @@ public class BattleManager{
 	 * 
 	 * @param squad
 	 */
-	public void manageBattle(Squad squad){
+	public void manageBattle(Squad squad)
+	{
 		ArrayList<Unit> allSquadUnits = squad.getUnits();
 		Position attackedUnitPosition = null; 
 		
 		//record the location of one of the units from the squad that is in battle 
-		for (Unit unit : allSquadUnits){
-			if (unit.isUnderAttack()){
+		for (Unit unit : allSquadUnits)
+		{
+			if (unit.isUnderAttack())
+			{
 				attackedUnitPosition = unit.getPosition();
 				break;
 			}
@@ -85,10 +95,13 @@ public class BattleManager{
 		
 		//for all units of a squad: if it is far away from the unit under attack,
 		//send it to the position of the unit under attack.
-		for (Unit unit : allSquadUnits){
+		for (Unit unit : allSquadUnits)
+		{
 			Position unitPosition = unit.getPosition();
+			
 			//the unit is too far away from the attacked unit, send it to the battle
-			if (unitPosition.distanceTo(attackedUnitPosition) > FARAWAY){
+			if (unitPosition.distanceTo(attackedUnitPosition) > FARAWAY)
+			{
 				unit.attack(attackedUnitPosition);
 			}
 		}
