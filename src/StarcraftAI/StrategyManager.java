@@ -11,6 +11,7 @@ public class StrategyManager extends DefaultBWListener {
     protected Game game;
     private Player self;
     
+    // TODO Move these counts to lower level classes to avoid doing all the work in this class
     private int armyCount;
     private int scvCount;
     private Hashtable<UnitType, Double> armyRatio;
@@ -122,15 +123,12 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onFrame() 
     {
-    	displayUnitOrders();
-    	
-        game.setTextSize(10);
-        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
+    	displayGameInfo();
         
         try
         {
         	//update game info for this and subsequent classes
-        	this.update();
+        	update();
         }
         catch(Exception e)
         {
@@ -145,23 +143,15 @@ public class StrategyManager extends DefaultBWListener {
      * Runs the necessary methods to update the AI's information as well as
      * execute the strategy of the AI.    
      */
-
     private void update()
     {
-    	try
-    	{
-    		//update game information
-    		updateEnemyBuildingLocations();
-    		updateArmyRatio();
-    		updateArmyCount();
-    		
-    		//give orders to lower tier classes
-    		executeStrategy();
-    	}
-    	catch(Exception e)
-    	{
-    		e.printStackTrace();
-    	}
+		//update game information
+		updateEnemyBuildingLocations();
+		updateArmyRatio();
+		updateArmyCount();
+		
+		//give orders to lower tier classes
+		executeStrategy();
 
 		//update lower tier classes with new information from game
     	productionManager.update();
@@ -187,6 +177,7 @@ public class StrategyManager extends DefaultBWListener {
     	
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
+    	//grab the current resource count
     	int minerals = self.minerals();
     	int gas = self.gas();
     	
@@ -207,7 +198,7 @@ public class StrategyManager extends DefaultBWListener {
     			&& self.completedUnitCount(UnitType.Terran_Academy)>=1 
     			&& !hasExtendedRange)
     	{
-//        	System.out.println("BUILD Marine!!!");
+    		
     		for(Unit u : self.getUnits())
     		{
     			if(u.getType().equals(UnitType.Terran_Academy))
@@ -316,28 +307,15 @@ public class StrategyManager extends DefaultBWListener {
     	//Attack if we have enough units
     	if(armyCount >= 20 && armyCount >= (productionBuildings-1)*3)
     	{
+    		//pick a building to attack and order an attack
     		for(Position pos : enemyBuildingLocation)
     		{
-    			Position closePos = pos;
-    			militaryManager.command(Command.Attack, 1.0, closePos);
+    			militaryManager.command(Command.Attack, 1.0, pos);
     			break;
     		}
     	}
     	
-    	// see if we should be scouting;
-//    	if(armyCount > 1 && !isScouting)
-//    	{
-//    		militaryManager.command(Command.Scout, 1.0, null);
-//    		isScouting = true;
-//    	}
-    	
-    	// scout if we we haven't seen enemy building and supply is over 30
-//    	if(armyCount > 1 && enemyBuildingLocation.isEmpty() && self.supplyUsed() >= 60)
-//    	{
-//    		militaryManager.command(Command.Scout, 1.0, null);
-//    		isScouting = true;
-//    	}
-    	
+    	//make sure we are scouting  	
     	if(!isScouting)
     	{
     		militaryManager.command(Command.Scout, 1.0, null);
@@ -402,7 +380,7 @@ public class StrategyManager extends DefaultBWListener {
     			if(!buildingStillThere)
     			{
     				toRemove.add(p);
-    				break;
+    				break;//TODO check if this is necessary
     			}
     		}
     	}
@@ -475,7 +453,7 @@ public class StrategyManager extends DefaultBWListener {
      * Debugging method that disiplays the units order near the unit itself and also
      * displays a green line to its destination, if it has one.
      */
-    private void displayUnitOrders()
+    private void displayGameInfo()
     {
     	//Unit destination lines and orders
     	for(Unit myUnit : self.getUnits())
@@ -489,6 +467,10 @@ public class StrategyManager extends DefaultBWListener {
 	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
 	    			y, bwapi.Color.Green);
     	}
+    	
+    	//Race identifier
+        game.setTextSize(10);
+        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
     }
 
     public static void main(String[] args) 
