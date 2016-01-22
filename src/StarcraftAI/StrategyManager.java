@@ -57,7 +57,14 @@ public class StrategyManager extends DefaultBWListener {
     	//assign unit to appropriate manager
         if(unit.getType().isWorker())
         {
-        	productionManager.addUnit(unit);
+        	if (militaryManager.hasScout())
+        	{
+        		productionManager.addUnit(unit);	
+        	}
+        	else
+        	{
+        		militaryManager.addUnit(unit);
+        	}
         	scvCount++;
         }
         else if(unit.getType().isBuilding())
