@@ -9,13 +9,7 @@ public class StrategyManager extends DefaultBWListener {
 
     private Mirror mirror = new Mirror();
     protected Game game;
-    private Player self;
-    
-    // TODO Move these counts to lower level classes to avoid doing all the work in this class
-    private int armyCount;
-    private int scvCount;
-    private Hashtable<UnitType, Double> armyRatio;
-    private Hashtable<UnitType, Integer> buildingInfo;
+    private Player self;    
     
     private int enemyArmyCount;
     private Hashtable<UnitType, Double> enemyArmyRatio;
@@ -58,7 +52,6 @@ public class StrategyManager extends DefaultBWListener {
         if(unit.getType().isWorker())
         {
         	productionManager.addUnit(unit);
-        	scvCount++;
         }
         else if(unit.getType().isBuilding())
         {
@@ -68,7 +61,6 @@ public class StrategyManager extends DefaultBWListener {
         {
         	// Military Unit
         	militaryManager.addUnit(unit);
-        	armyCount++;
         }
         	
     }
@@ -89,12 +81,6 @@ public class StrategyManager extends DefaultBWListener {
         // init production manager and military manager
         productionManager = new ProductionManager(game, self);
         militaryManager = new MilitaryManager(game, self);
-        
-        // Init variable our unit info
-        armyCount = 0;
-        scvCount = 0;
-        armyRatio = new Hashtable<UnitType, Double>();
-        buildingInfo = new Hashtable<UnitType, Integer>();
         
         // Init variables for enemy info
         enemyArmyCount = 0;
@@ -147,8 +133,6 @@ public class StrategyManager extends DefaultBWListener {
     {
 		//update game information
 		updateEnemyBuildingLocations();
-		updateArmyRatio();
-		updateArmyCount();
 		
 		//give orders to lower tier classes
 		executeStrategy();
@@ -165,15 +149,12 @@ public class StrategyManager extends DefaultBWListener {
      */
     private void executeStrategy()
     {
-    	int productionBuildings = 0;
-    	for(Unit u : self.getUnits())
-    	{
-    		if(u.getType().equals(UnitType.Terran_Command_Center) 
-    				|| u.getType().equals(UnitType.Terran_Barracks))
-    		{
-    			productionBuildings++;
-    		}
-    	}
+    	//KT - not sure how i feel about this, I would prefer to move basically all of
+    	//	this logic into the production manager but im not sure how, or how well it 
+    	//	would work. Since we plan on using AI for some of the building thresholds
+    	//	we may not even need this since it will learn the best supply level.
+    	int productionBuildings = productionManager.getProdBuildingCount();
+    	int armyCount = militaryManager.getArmyCount();
     	
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
@@ -216,7 +197,6 @@ public class StrategyManager extends DefaultBWListener {
     	if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>1 
     			&& self.allUnitCount(UnitType.Terran_Academy) < 1)
     	{
-//        	System.out.println("BUILD Marine!!!");
     		productionGoal.add(UnitType.Terran_Academy);
     		minerals -= 150;
     	}
@@ -244,7 +224,7 @@ public class StrategyManager extends DefaultBWListener {
 //        	System.out.println("BUILD Marine!!!");
         	// If we have an academy and marines make up less than 75 percent of our army then build a marine
         	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 
-        			&& armyRatio.get(UnitType.Terran_Marine) <= .75 )
+        			&& militaryManager.getUnitRatio(UnitType.Terran_Marine) <= .75 )
         	{
 	        	productionGoal.add(UnitType.Terran_Marine);
 	        	minerals -= 100;
@@ -263,7 +243,8 @@ public class StrategyManager extends DefaultBWListener {
         		&& self.completedUnitCount(UnitType.Terran_Academy) >= 1)
         {
 //        	System.out.println("BUILD Marine!!!");
-        	if(armyRatio.get(UnitType.Terran_Medic) != null && armyRatio.get(UnitType.Terran_Medic) <= .25){
+        	if(militaryManager.getUnitRatio(UnitType.Terran_Medic) != null 
+        			&& militaryManager.getUnitRatio(UnitType.Terran_Medic) <= .25){
 	        	productionGoal.add(UnitType.Terran_Medic);
 	        	minerals -= 50;
 	        	gas -= 25;
@@ -390,33 +371,6 @@ public class StrategyManager extends DefaultBWListener {
     	{
     		enemyBuildingLocation.remove(p);
     	}
-    }
-    
-    /**
-     * updateArmyRatio()
-     * 
-     * This is a very simple implementation of Army Ratio just for the tournament 
-     * Just cares about marines and medics. 
-     */
-    public void updateArmyRatio()
-    {
-    	//update marine percentage 
-    	double marineCount = self.allUnitCount(UnitType.Terran_Marine);
-    	double medicCount = self.allUnitCount(UnitType.Terran_Medic);
-    	double total = marineCount + medicCount;
-    	
-    	armyRatio.put(UnitType.Terran_Marine, marineCount/total);
-    	armyRatio.put(UnitType.Terran_Medic, medicCount/total);
-    }
-    
-    /**
-     * updateArmyCount()
-     * 
-     * Update the number of military units the bot controls
-     */
-    private void updateArmyCount()
-    {
-    	armyCount = self.completedUnitCount(UnitType.Terran_Marine) + self.completedUnitCount(UnitType.Terran_Medic);
     }
     
     /**
