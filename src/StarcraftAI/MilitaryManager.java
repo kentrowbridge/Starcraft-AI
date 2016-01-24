@@ -19,6 +19,8 @@ public class MilitaryManager{
 	private ArmyManager armyManager;
 	private BattleManager battleManager;
 	private boolean doScout = false;
+	private int armyCount;
+    private Hashtable<UnitType, Double> armyRatio;
 
 	/**
 	 * MilitaryManager()
@@ -31,6 +33,8 @@ public class MilitaryManager{
 		
 		militaryUnits = new ArrayList<Unit>();
 		squads = new HashMap<SquadType, Squad>();
+		armyCount = 0;
+		armyRatio = new Hashtable<UnitType, Double>();
 		
 		initSquads();
 		
@@ -95,16 +99,15 @@ public class MilitaryManager{
 	 */
 	public void update()
 	{
-		ArrayList<Unit> milUnits = new ArrayList<Unit>();
-		for(Unit u : self.getUnits())
+		try
 		{
-			if(u.getType().equals(UnitType.Terran_Marine) ||
-				u.getType().equals(UnitType.Terran_Medic))
-			{
-				milUnits.add(u);
-			}
+			updateArmyRatio();
+			updateArmyCount();
 		}
-		squads.get(SquadType.Offense).setUnits(milUnits);
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -131,5 +134,41 @@ public class MilitaryManager{
 				break;
 		}
 	}
-	
+    
+    /**
+     * updateArmyCount()
+     * 
+     * Update the number of military units the bot controls
+     */
+    private void updateArmyCount()
+    {
+    	armyCount = self.completedUnitCount(UnitType.Terran_Marine) + self.completedUnitCount(UnitType.Terran_Medic);
+    }
+    
+    /**
+     * updateArmyRatio()
+     * 
+     * This is a very simple implementation of Army Ratio just for the tournament 
+     * Just cares about marines and medics. 
+     */
+    public void updateArmyRatio()
+    {
+    	//update marine percentage 
+    	double marineCount = self.allUnitCount(UnitType.Terran_Marine);
+    	double medicCount = self.allUnitCount(UnitType.Terran_Medic);
+    	double total = marineCount + medicCount;
+    	
+    	armyRatio.put(UnitType.Terran_Marine, marineCount/total);
+    	armyRatio.put(UnitType.Terran_Medic, medicCount/total);
+    }
+    
+    public int getArmyCount()
+    {
+    	return armyCount;
+    }
+    
+    public Double getUnitRatio(UnitType type)
+    {
+    	return armyRatio.get(type);
+    }
 }

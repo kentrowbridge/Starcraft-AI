@@ -104,6 +104,16 @@ public class WorkerManager{
 	}
 	
 	/**
+	 * getSCVCount()
+	 * 
+	 * @return the number of SCVs controlled by the player
+	 */
+	public int getSCVCount()
+	{
+		return workerList.size();
+	}
+	
+	/**
 	 * addUnit
 	 * Adds a unit to the workerList
 	 * 

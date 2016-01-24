@@ -9,6 +9,7 @@ import bwapi.*;
  * 
  * @author Kenny Trowbridge
  * @author Alex Bowns
+ * @author Max Robinson
  */
 public class ProductionManager {
 	
@@ -144,33 +145,49 @@ public class ProductionManager {
 	 */
 	public void update()
 	{
-		buildingManager.update();
-		workerManager.update();
-		
-		//if goal and new goal are the same, 
-		if(!Arrays.deepEquals(goals.toArray(), newGoal.toArray()))
+		try
 		{
-			goals = newGoal;
+			buildingManager.update();
+			workerManager.update();
 			
-			productionQueue.clear();
-			
-			//find paths for all of the goals
-			//update production queue
-			for(UnitType u : goals)
+			//if goal and new goal are the same, 
+			if(!Arrays.deepEquals(goals.toArray(), newGoal.toArray()))
 			{
-				//create paths for goals
-				List<UnitType> path = new ArrayList<UnitType>();
+				goals = newGoal;
 				
-				//only add end goal for now
-				//THIS WILL BE CHANGED LATER ON IN IMPLEMENTATION
-				path.add(u);
+				productionQueue.clear();
 				
-				//add path to production q
-				productionQueue.add(path);
+				//find paths for all of the goals
+				//update production queue
+				for(UnitType u : goals)
+				{
+					//create paths for goals
+					List<UnitType> path = new ArrayList<UnitType>();
+					
+					//only add end goal for now
+					//THIS WILL BE CHANGED LATER ON IN IMPLEMENTATION
+					path.add(u);
+					
+					//add path to production q
+					productionQueue.add(path);
+				}
 			}
+			
+			processQueue();
 		}
-		
-		processQueue();
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Temporary method until we move the building restrictions logic into this class
+	 * @return
+	 */
+	public int getProdBuildingCount()
+	{
+		return buildingManager.productionBuildingCount();
 	}
 	
 	/**

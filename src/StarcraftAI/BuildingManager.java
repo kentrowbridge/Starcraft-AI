@@ -174,4 +174,19 @@ public class BuildingManager{
 		}
 		return null;
 	}
+	
+	public int productionBuildingCount()
+	{
+		int count = 0;
+		for (Unit building : buildingList)
+		{
+			if(building.getType() == UnitType.Terran_Barracks 
+					|| building.getType() == UnitType.Terran_Command_Center)
+			{
+				count++;
+			}
+		}
+		
+		return count;
+	}
 }
