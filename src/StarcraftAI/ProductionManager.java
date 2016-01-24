@@ -16,6 +16,8 @@ public class ProductionManager {
 	private Game game;
 	private Player self; 
 	
+	private Hashtable<UnitType, ArrayList<UnitType>> techPaths; 
+	
 	private ArrayList<List<UnitType>> productionQueue = new ArrayList<List<UnitType>>(); 
 	private ArrayList<UnitType> goals = new ArrayList<UnitType>();
 	private ArrayList<UnitType> newGoal = new ArrayList<UnitType>();
@@ -256,6 +258,115 @@ public class ProductionManager {
 	public ArrayList<UnitType> examinePath(ArrayList<UnitType> path)
 	{
 		return null; 
+	}
+	
+	public void initTechPaths(){
+		
+		// command center
+		ArrayList<UnitType> cc = new ArrayList<UnitType>();
+		cc.add(UnitType.Terran_Command_Center);
+		techPaths.put(UnitType.Terran_Command_Center, cc);
+		
+		// Supply Depot
+		ArrayList<UnitType> supply = new ArrayList<UnitType>();
+		supply.add(UnitType.Terran_Supply_Depot);
+		techPaths.put(UnitType.Terran_Supply_Depot, supply);
+		
+		// Refinery
+		ArrayList<UnitType> refinery = new ArrayList<UnitType>();
+		refinery.add(UnitType.Terran_Refinery);
+		techPaths.put(UnitType.Terran_Refinery, refinery);
+		
+		/* Branch ONE */
+		// Engineering bay
+		ArrayList<UnitType> ebay = new ArrayList<UnitType>(cc);
+		ebay.add(UnitType.Terran_Engineering_Bay);
+		techPaths.put(UnitType.Terran_Engineering_Bay, ebay);
+		
+		// Missile turret 
+		ArrayList<UnitType> turret = new ArrayList<UnitType>(ebay);
+		turret.add(UnitType.Terran_Missile_Turret);
+		techPaths.put(UnitType.Terran_Missile_Turret, turret);
+		
+		/* Branch TWO */
+		// Barracks
+		ArrayList<UnitType> racks = new ArrayList<UnitType>(cc);
+		racks.add(UnitType.Terran_Barracks);
+		techPaths.put(UnitType.Terran_Barracks, racks);
+		
+		// bunker
+		ArrayList<UnitType> bunker = new ArrayList<UnitType>(racks);
+		bunker.add(UnitType.Terran_Bunker);
+		techPaths.put(UnitType.Terran_Bunker, bunker);
+		
+		// academy
+		ArrayList<UnitType> academy = new ArrayList<UnitType>(racks);
+		academy.add(UnitType.Terran_Academy);
+		techPaths.put(UnitType.Terran_Academy, academy);
+		
+		// Factory
+		ArrayList<UnitType> factory = new ArrayList<UnitType>(racks);
+		factory.add(UnitType.Terran_Factory);
+		techPaths.put(UnitType.Terran_Factory, factory);
+		
+		// Armory 
+		ArrayList<UnitType> armory = new ArrayList<UnitType>(factory);
+		armory.add(UnitType.Terran_Armory);		
+		techPaths.put(UnitType.Terran_Armory, armory);
+		
+		// Starport	
+		ArrayList<UnitType> starport = new ArrayList<UnitType>(factory);
+		starport.add(UnitType.Terran_Starport);		
+		techPaths.put(UnitType.Terran_Starport, starport);
+		
+		// Science facility
+		ArrayList<UnitType> science = new ArrayList<UnitType>(starport);
+		science.add(UnitType.Terran_Science_Facility);		
+		techPaths.put(UnitType.Terran_Starport, starport);
+		
+		/* Add-ons */ 
+		
+		// ComSat --> Dependent, academy
+		ArrayList<UnitType> comSat = new ArrayList<UnitType>(academy);
+		comSat.add(UnitType.Terran_Comsat_Station);		
+		techPaths.put(UnitType.Terran_Comsat_Station, comSat);
+		
+		// Machine Shop --> Dependent, factory
+		ArrayList<UnitType> machineShop = new ArrayList<UnitType>(factory);
+		machineShop.add(UnitType.Terran_Machine_Shop);		
+		techPaths.put(UnitType.Terran_Machine_Shop, machineShop);
+		
+		// Control Tower --> Dependent, starport
+		ArrayList<UnitType> tower = new ArrayList<UnitType>(starport);
+		tower.add(UnitType.Terran_Control_Tower);		
+		techPaths.put(UnitType.Terran_Control_Tower, tower);
+		
+		// Physics Lab --> Dependent, Science Facility
+		ArrayList<UnitType> physics = new ArrayList<UnitType>(science);
+		physics.add(UnitType.Terran_Physics_Lab);		
+		techPaths.put(UnitType.Terran_Physics_Lab, physics);
+		
+		// Covert Ops --> Dependent, Science Facility
+		ArrayList<UnitType> ops = new ArrayList<UnitType>(science);
+		ops.add(UnitType.Terran_Covert_Ops);		
+		techPaths.put(UnitType.Terran_Covert_Ops, ops);
+		
+		// nuclear Silo --> Dependent, Covert Ops
+		ArrayList<UnitType> nuke = new ArrayList<UnitType>(ops);
+		nuke.add(UnitType.Terran_Nuclear_Silo);		
+		techPaths.put(UnitType.Terran_Nuclear_Silo, nuke);
+		
+		
+		/* Non-Building Units */
+		// SCV 
+		ArrayList<UnitType> scv = new ArrayList<UnitType>(cc);
+		scv.add(UnitType.Terran_SCV);		
+		techPaths.put(UnitType.Terran_SCV, scv);
+		
+		// Marine
+		ArrayList<UnitType> marine = new ArrayList<UnitType>(racks);
+		marine.add(UnitType.Terran_Marine);		
+		techPaths.put(UnitType.Terran_Marine, marine);
 	}
 	
 	/**
