@@ -1,6 +1,7 @@
 package StarcraftAI;
 import java.util.*;
 import bwapi.*;
+
 /**
  * MilitaryManager
  * Maintains and manages all military units under the
@@ -9,7 +10,6 @@ import bwapi.*;
  * @author Kenny Trowbridge
  *
  */
-
 public class MilitaryManager{
 	private Game game;
 	private Player self;
@@ -19,19 +19,24 @@ public class MilitaryManager{
 	private ArmyManager armyManager;
 	private BattleManager battleManager;
 	private boolean doScout = false;
+	private int armyCount;
+    private Hashtable<UnitType, Double> armyRatio;
 
 	/**
-	 * ctor
+	 * MilitaryManager()
+	 * Constructor for the MilitaryManager class.
 	 */
-	public MilitaryManager(Game game, Player self){
+	public MilitaryManager(Game game, Player self)
+	{
 		this.game = game;
 		this.self = self;
 		
 		militaryUnits = new ArrayList<Unit>();
 		squads = new HashMap<SquadType, Squad>();
+		armyCount = 0;
+		armyRatio = new Hashtable<UnitType, Double>();
 		
 		initSquads();
-		
 		
 		armyManager = new ArmyManager(squads, self, game);
 		battleManager = new BattleManager();
@@ -39,17 +44,14 @@ public class MilitaryManager{
 	
 	/**
 	 * initSquads()
-	 * Initialize all terran squads.
+	 * Initialize all Terran squads.
 	 */
-	public void initSquads(){
+	public void initSquads()
+	{
 		for(SquadType type : SquadType.values())
 		{
 			squads.put(type, new Squad(type));
 		}
-		
-//		for(int i = 0; i < squads.length; i++){
-//			squads[i] = new Squad(SquadType.values()[i]);
-//		}
 	}
 	
 	/**
@@ -60,27 +62,33 @@ public class MilitaryManager{
 	 * 
 	 * @param unit - unit to add
 	 */
-	public void addUnit(Unit unit){
+	public void addUnit(Unit unit)
+	{
 		// put unit in a squad. Default is Offense. 
 		if(squads.get(SquadType.Scout).isEmpty())
-		{//add only the first unit to the scout squad
+		{
+			//add only the first unit to the scout squad
 			squads.get(SquadType.Scout).addUnit(unit);
 		}
 		else
-		{//default, add to offense
+		{
+			//default, add to offense
 			squads.get(SquadType.Offense).addUnit(unit);
 		}
-		
-//		for(Squad squad: squads){
-//			if(squad.getSquadType() == SquadType.Scout && squad.isEmpty())
-//			{//add only one unit to scout squad
-//				squad.addUnit(unit);
-//				System.out.println("added unit to scout");
-//			}
-//			else if (squad.getSquadType() == SquadType.Offense){
-//				squad.addUnit(unit);
-//			}
-//		}
+	}
+	
+	/**
+	 * hasScout()
+	 * Check if there is a unit within the scout squad. 
+	 * 
+	 * @return true if there is a scout, false if not
+	 */
+	public boolean hasScout()
+	{
+		if (squads.get(SquadType.Scout).isEmpty()){
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -89,15 +97,17 @@ public class MilitaryManager{
 	 * are in both the squads list and the militaryUnits list.
 	 * It also prunes units that no longer exist from both lists.
 	 */
-	public void update(){
-		ArrayList<Unit> milUnits = new ArrayList<Unit>();
-		for(Unit u : self.getUnits()){
-			if(u.getType().equals(UnitType.Terran_Marine) ||
-				u.getType().equals(UnitType.Terran_Medic)){
-				milUnits.add(u);
-			}
+	public void update()
+	{
+		try
+		{
+			updateArmyRatio();
+			updateArmyCount();
 		}
-		squads.get(SquadType.Offense).setUnits(milUnits);
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -111,8 +121,8 @@ public class MilitaryManager{
 	 */
 	public void command(Command command, Double percentCommit, Position position)
 	{
-//		System.out.println("Military Manager Command: " + command);
-		switch(command){
+		switch(command)
+		{
 			case Attack:
 				armyManager.engage(position);
 				break;
@@ -120,19 +130,45 @@ public class MilitaryManager{
 				armyManager.defend();
 				break;
 			case Scout:
-				for(Unit u : self.getUnits()){
-					if(u.getType().equals(UnitType.Terran_SCV)){
-						ArrayList<Unit> units = new ArrayList<Unit>();
-						units.add(u);
-						squads.get(SquadType.Scout).setUnits(units);
-					}
-				}
-				
 				armyManager.scout();
-//				this.doScout = true; 
-//				armyManager.getBuildingLocations();
 				break;
 		}
 	}
-	
+    
+    /**
+     * updateArmyCount()
+     * 
+     * Update the number of military units the bot controls
+     */
+    private void updateArmyCount()
+    {
+    	armyCount = self.completedUnitCount(UnitType.Terran_Marine) + self.completedUnitCount(UnitType.Terran_Medic);
+    }
+    
+    /**
+     * updateArmyRatio()
+     * 
+     * This is a very simple implementation of Army Ratio just for the tournament 
+     * Just cares about marines and medics. 
+     */
+    public void updateArmyRatio()
+    {
+    	//update marine percentage 
+    	double marineCount = self.allUnitCount(UnitType.Terran_Marine);
+    	double medicCount = self.allUnitCount(UnitType.Terran_Medic);
+    	double total = marineCount + medicCount;
+    	
+    	armyRatio.put(UnitType.Terran_Marine, marineCount/total);
+    	armyRatio.put(UnitType.Terran_Medic, medicCount/total);
+    }
+    
+    public int getArmyCount()
+    {
+    	return armyCount;
+    }
+    
+    public Double getUnitRatio(UnitType type)
+    {
+    	return armyRatio.get(type);
+    }
 }

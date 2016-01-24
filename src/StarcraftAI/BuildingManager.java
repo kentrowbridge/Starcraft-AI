@@ -5,7 +5,7 @@ import bwapi.*;
 import bwta.BWTA;
 
 /**
- * BuildingManager Class
+ *  BuildingManager Class
  * 	Responsible for managing all the buildings under the agent’s control
  *  
  * @author Kenny Trowbridge
@@ -13,16 +13,15 @@ import bwta.BWTA;
  *
  */
 public class BuildingManager{
-
 	private Game game;
 	private Player self;
-	
+
 	private ArrayList<Unit> buildingList = new ArrayList<Unit>();
-	
+
 	/**
 	 * c'tor
-	 * @param game
-	 * @param self
+	 * @param game - a reference to the game match
+	 * @param self - a reference to our player of the game
 	 */
 	public BuildingManager(Game game, Player self)
 	{
@@ -30,7 +29,7 @@ public class BuildingManager{
 		this.self = self;
 		this.buildingList = new ArrayList<Unit>();
 	}
-	
+
 	/**
 	 * addUnit
 	 * Adds a given unit the list of buildings if it does not already exist.
@@ -41,7 +40,7 @@ public class BuildingManager{
 	{
 		buildingList.add(unit);
 	}
-	
+
 	/**
 	 * build
 	 * Builds a unit of the given type with the builder unit
@@ -57,7 +56,7 @@ public class BuildingManager{
 			builder.build(placement, buildingType);
 		}
 	}
-	
+
 	/**
 	 * getPlacement()
 	 * Finds the best location to place a given type of building
@@ -67,12 +66,17 @@ public class BuildingManager{
 	 */
 	private TilePosition getPlacement(UnitType buildingType, Unit builder)
 	{
+		// values to help determine the search radius of where to build different constructs
+		int maxDist = 8;
+		int changeRate = 2;
+		int stopDist = 40;
+		TilePosition aroundTile = self.getStartLocation();
+
+		// build a refinery at the nearest geyser location to the starting point
 		if(buildingType == UnitType.Terran_Refinery)
 		{
 			List<Unit> geysers = game.getGeysers();
-//			System.out.println("Available Geysers: " + geysers.size());
 			Unit closest = null;
-//			Position position = builder.getPosition();
 			Position position = BWTA.getStartLocation(self).getPosition();
 			for(Unit geyser : geysers)
 			{
@@ -86,42 +90,36 @@ public class BuildingManager{
 			}
 			return closest.getTilePosition();
 		}
-		
-    	int maxDist = 8;
-    	int changeRate = 2;
-    	int stopDist = 40;
-    	TilePosition aroundTile = self.getStartLocation();
-    	
-    	// loop until we find the thing
-    	while((maxDist < stopDist))
-    	{
-    		int minX = aroundTile.getX()-maxDist;
-    		int maxX = aroundTile.getX()+maxDist;
-    		int minY = aroundTile.getY()-maxDist;
-    		int maxY = aroundTile.getY()+maxDist;
-    		// loop through the defined area
-    		for(int i = minX; i <= maxX; i++)
-    		{
-    			for(int j = minY; j <= maxY; j++)
-    			{
-    				if(i < maxX && i > minX && j < maxY && j > minY)
-    				{
-    					continue;
-    				}
-    				if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, true))
-    				{
-    					return new TilePosition(i,j);
-    				}
-    			}
-    		}
-    		// we didn't find a valid tile, so increase max distance
-    		maxDist+=changeRate;
-    	}
-    	
-    	game.printf("Unable to find suitable build position for "+buildingType.toString());
-    	return null;
+
+		// search for a an empty tile position that can build a given building type
+		while((maxDist < stopDist))
+		{
+			int minX = aroundTile.getX()-maxDist;
+			int maxX = aroundTile.getX()+maxDist;
+			int minY = aroundTile.getY()-maxDist;
+			int maxY = aroundTile.getY()+maxDist;
+			// loop through the defined area
+			for(int i = minX; i <= maxX; i++)
+			{
+				for(int j = minY; j <= maxY; j++)
+				{
+					if(i < maxX && i > minX && j < maxY && j > minY)
+					{
+						continue;
+					}
+					if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, true))
+					{
+						return new TilePosition(i,j);
+					}
+				}
+			}
+			// we didn't find a valid tile, so increase max distance
+			maxDist+=changeRate;
+		}
+		game.printf("Unable to find suitable build position for "+buildingType.toString());
+		return null;
 	}
-	
+
 	/**
 	 * update()
 	 * This updates the building list in order to prune dead units
@@ -141,7 +139,7 @@ public class BuildingManager{
 			buildingList.remove(building);
 		}
 	}
-	
+
 	/**
 	 * checkBuildings()
 	 * Checks the buildings list and returns a list of buildings that are 
@@ -153,7 +151,7 @@ public class BuildingManager{
 	{
 		return null;
 	}
-	
+
 	/**
 	 * getBuilding()
 	 * Finds a building of the given building type
@@ -175,5 +173,20 @@ public class BuildingManager{
 			}
 		}
 		return null;
+	}
+	
+	public int productionBuildingCount()
+	{
+		int count = 0;
+		for (Unit building : buildingList)
+		{
+			if(building.getType() == UnitType.Terran_Barracks 
+					|| building.getType() == UnitType.Terran_Command_Center)
+			{
+				count++;
+			}
+		}
+		
+		return count;
 	}
 }

@@ -8,20 +8,20 @@ import bwapi.*;
  * Represents a group of units with the same assigned duty.
  * 
  * @author Casey Sigelmann
- *
  */
+
 public class Squad {
 
 	/**
 	 * A list containing all the units that are members of this Squad.
 	 */
 	private ArrayList<Unit> squad;
-	
+
 	/**
 	 * The type of this squad, representing its assigned duty.
 	 */
 	private SquadType squadType;
-	
+
 	/**
 	 * Squad()
 	 * Constructor for the Squad class.
@@ -31,7 +31,7 @@ public class Squad {
 		squad = new ArrayList<Unit>();
 		this.squadType = squadType;
 	}
-	
+
 	/**
 	 * getSquadType
 	 * @return squadType
@@ -59,7 +59,7 @@ public class Squad {
 		// requires work! 
 		return false;
 	}
-	
+
 	/**
 	 * isEmpty()
 	 * Determines if this squad is empty.
@@ -70,7 +70,7 @@ public class Squad {
 	{
 		return squad.isEmpty();
 	}
-	
+
 	/**
 	 * move()
 	 * Moves all units in this squad to the given position.
@@ -83,7 +83,7 @@ public class Squad {
 			unit.move(position);
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param positions
@@ -100,7 +100,7 @@ public class Squad {
 			}
 		}
 	}
-	
+
 	/**
 	 * attackMove()
 	 * Moves all units in this squad to the given position and attacks
@@ -110,21 +110,21 @@ public class Squad {
 	public void attackMove(Position position)
 	{
 		for(Unit unit: squad){
-			
+
 			if(unit.getOrder().equals(Order.AttackUnit)){
 				return;
 			}
-			
+
 			if(unit != null && unit.exists() && !unit.isAttacking() && !unit.isStartingAttack() 
 					&& unit.isCompleted()){
 				if(unit.getTargetPosition() != null && !unit.getTargetPosition().equals(position)){
-//					System.out.println("set: "+ unit+ "   Attack position " + position);
+					//					System.out.println("set: "+ unit+ "   Attack position " + position);
 					unit.attack(position);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * attackMove() NOT BEING USED RIGHT NOW!
 	 * Moves all units in this squad to the given position and attacks
@@ -134,8 +134,8 @@ public class Squad {
 	public void attackMove(Unit targetUnit)
 	{
 		for(Unit unit: squad){
-//			if(unit.getTarget() != null && !unit.getTarget().equals(targetUnit)){
-//			if(!unit.getOrder().equals(Order.AttackMove) || !unit.getOrder().equals(Order.AttackUnit)){
+			//			if(unit.getTarget() != null && !unit.getTarget().equals(targetUnit)){
+			//			if(!unit.getOrder().equals(Order.AttackMove) || !unit.getOrder().equals(Order.AttackUnit)){
 			if(unit != null && unit.exists() && !unit.isAttacking() && !unit.isStartingAttack() 
 					&& unit.isCompleted()){
 				if(unit.getTarget() != null && !(unit.getTarget() == targetUnit)){
@@ -145,7 +145,7 @@ public class Squad {
 			}
 		}
 	}
-	
+
 	/**
 	 * getUnits()
 	 * Returns the units that are in this squad.
@@ -156,7 +156,7 @@ public class Squad {
 	{
 		return squad;
 	}
-	
+
 	/**
 	 * setUnits()
 	 * Sets the units in this squad to be the given units.
@@ -167,7 +167,7 @@ public class Squad {
 	{
 		squad = units;
 	}
-	
+
 	/**
 	 * addUnit()
 	 * Adds the given unit to this squad.
@@ -178,7 +178,7 @@ public class Squad {
 	{
 		squad.add(unit);
 	}
-	
+
 	/**
 	 * removeUnit()
 	 * Removes the given unit from this squad.
@@ -188,21 +188,5 @@ public class Squad {
 	public void removeUnit(Unit unit)
 	{
 		squad.remove(unit);
-	}
-	
-	/**
-	 * squadPosition()
-	 * Check if a unit within the squad is at the determined position
-	 * 
-	 * @Param position - the destination we want to check if the unit is at the location
-	 * 
-	 * @return true if the first unit is at the position parameter
-	 */
-	public boolean squadPosition(Position tilePosition){
-		Position myPos = squad.get(0).getPosition();
-			if (myPos.equals(tilePosition)){
-				return true;
-			}
-		return false;
 	}
 }

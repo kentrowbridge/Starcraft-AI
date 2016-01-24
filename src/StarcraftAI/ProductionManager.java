@@ -9,6 +9,7 @@ import bwapi.*;
  * 
  * @author Kenny Trowbridge
  * @author Alex Bowns
+ * @author Max Robinson
  */
 public class ProductionManager {
 	
@@ -25,6 +26,14 @@ public class ProductionManager {
 	
 	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
 	
+	/**
+	 * Ctor
+	 * Sets up the needed instance variables for the class and sets up the game and player objects needed 
+	 * to reference the game.
+	 * 
+	 * @param game
+	 * @param self
+	 */
 	public ProductionManager(Game game, Player self){
 		this.game = game;
 		this.self = self;
@@ -80,10 +89,6 @@ public class ProductionManager {
 	public void setGoal(ArrayList<UnitType> newGoal)
 	{
 		this.newGoal = newGoal;
-//		if(!newGoal.isEmpty())
-//			System.out.println("Production Goal: " + newGoal.get(0));
-//		else
-//			System.out.println("Production Goal: EMPTY");
 	}
 	
 	/** 
@@ -99,7 +104,8 @@ public class ProductionManager {
 		if(unitType.isBuilding())
 		{
 			Unit builder = workerManager.getWorker();
-			//make sure the builder is not null
+			
+			// make sure the builder is not null
 			if(builder != null && game.canMake(builder, unitType))
 			{
 				buildingManager.build(unitType, builder);
@@ -118,9 +124,14 @@ public class ProductionManager {
 	public void training(UnitType unitType, Unit building)
 	{
 		if(unitType == null || building == null)
+		{
 			return;
+		}
+		
 		if(!building.isTraining())
+		{
 			building.train(unitType);
+		}
 	}
 	
 	/**
@@ -134,35 +145,49 @@ public class ProductionManager {
 	 */
 	public void update()
 	{
-		buildingManager.update();
-		workerManager.update();
-		
-//		System.out.println("goals are the same?: " + Arrays.deepEquals(goals.toArray(), newGoal.toArray()));
-		
-		//if goal and new goal are the same, 
-		if(!Arrays.deepEquals(goals.toArray(), newGoal.toArray()))
+		try
 		{
-			goals = newGoal;
+			buildingManager.update();
+			workerManager.update();
 			
-			productionQueue.clear();
-			//find paths for all of the goals
-			//update production queue
-			for(UnitType u : goals)
+			//if goal and new goal are the same, 
+			if(!Arrays.deepEquals(goals.toArray(), newGoal.toArray()))
 			{
-				//create paths for goals
-				List<UnitType> path = new ArrayList<UnitType>();
+				goals = newGoal;
 				
-				//only add end goal for now
-				//THIS WILL BE CHANGED LATER ON IN IMPLEMENTATION
-				path.add(u);
+				productionQueue.clear();
 				
-				//add path to production q
-				
-				productionQueue.add(path);
+				//find paths for all of the goals
+				//update production queue
+				for(UnitType u : goals)
+				{
+					//create paths for goals
+					List<UnitType> path = new ArrayList<UnitType>();
+					
+					//only add end goal for now
+					//THIS WILL BE CHANGED LATER ON IN IMPLEMENTATION
+					path.add(u);
+					
+					//add path to production q
+					productionQueue.add(path);
+				}
 			}
+			
+			processQueue();
 		}
-		
-		processQueue();
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Temporary method until we move the building restrictions logic into this class
+	 * @return
+	 */
+	public int getProdBuildingCount()
+	{
+		return buildingManager.productionBuildingCount();
 	}
 	
 	/**

@@ -9,12 +9,7 @@ public class StrategyManager extends DefaultBWListener {
 
     private Mirror mirror = new Mirror();
     protected Game game;
-    private Player self;
-    
-    private int armyCount;
-    private int scvCount;
-    private Hashtable<UnitType, Double> armyRatio;
-    private Hashtable<UnitType, Integer> buildingInfo;
+    private Player self;    
     
     private int enemyArmyCount;
     private Hashtable<UnitType, Double> enemyArmyRatio;
@@ -31,59 +26,68 @@ public class StrategyManager extends DefaultBWListener {
 
     /**
      * run()
+     * 
      * Called when running our bot so that it may connect to a game
      * using the BWMirror api. 
      */
-    public void run() {
+    public void run() 
+    {
         mirror.getModule().setEventListener(this);
         mirror.startGame();
     }
     
     /**
-     * onUnitCreate:
+     * onUnitCreate()
+     * 
      * Called by the game framework when a unit is done being created.  
      * Units will then be processed based on what the unit type is. 
      */
     @Override
-    public void onUnitCreate(Unit unit) {
+    public void onUnitCreate(Unit unit) 
+    {
 //        System.out.println("New unit " + unit.getType());
 //        System.out.println(productionManager);
     	
-        if( unit.getType().isWorker() ){
-        	productionManager.addUnit(unit);
-        	scvCount++;
+    	//assign unit to appropriate manager
+        if(unit.getType().isWorker())
+        {
+        	if (militaryManager.hasScout())
+        	{
+        		productionManager.addUnit(unit);	
+        	}
+        	else
+        	{
+        		militaryManager.addUnit(unit);
+        	}
         }
-        else if(unit.getType().isBuilding()){
+        else if(unit.getType().isBuilding())
+        {
         	productionManager.addUnit(unit);
         }
-        else if(!unit.getType().isNeutral()){
+        else if(!unit.getType().isNeutral())
+        {
         	// Military Unit
         	militaryManager.addUnit(unit);
-        	armyCount++;
         }
         	
     }
     
     /**
-     * onStart:
+     * onStart()
+     * 
      * Effectively the constructor for the class. 
      * It is called when a game first starts and is used to initialize 
      * information needed by the AI. 
      */
     @Override
-    public void onStart() {
+    public void onStart() 
+    {
         game = mirror.getGame();
         self = game.self();
         
         // init production manager and military manager
         productionManager = new ProductionManager(game, self);
         militaryManager = new MilitaryManager(game, self);
-        
-        // Init variable our unit info
-        armyCount = 0;
-        scvCount = 0;
-        armyRatio = new Hashtable<UnitType, Double>();
-        buildingInfo = new Hashtable<UnitType, Integer>();
         
         // Init variables for enemy info
         enemyArmyCount = 0;
@@ -104,121 +108,137 @@ public class StrategyManager extends DefaultBWListener {
     }
     
     /**
-     * onFrame:
+     * onFrame()
+     * 
      * Gets called every time the frame changes in the game.  
      * This is called from the game BWAPI framework. 
      */
     @Override
-    public void onFrame() {
-        game.setTextSize(10);
-        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
-        try{
-        	this.update();
+    public void onFrame() 
+    {
+    	displayGameInfo();
+        
+        try
+        {
+        	//update game info for this and subsequent classes
+        	update();
         }
-        catch(Exception e){
+        catch(Exception e)
+        {
+        	//catches any errors we may get, Brood War does nothing to let us know
         	e.printStackTrace();
         }
     }
     
     /**
-     * update:
-     * runs the necessary methods to update the AI's information as well as
+     * update()
+     * 
+     * Runs the necessary methods to update the AI's information as well as
      * execute the strategy of the AI.    
      */
+    private void update()
+    {
+		//update game information
+		updateEnemyBuildingLocations();
+		
+		//give orders to lower tier classes
+		executeStrategy();
 
-    private void update(){
-//    	for(Unit myUnit : self.getUnits()){
-//	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
-//	    	int x = myUnit.getOrderTargetPosition().getX() == 0 ? myUnit.getPosition().getX() : myUnit.getOrderTargetPosition().getX();
-//	    	int y = myUnit.getOrderTargetPosition().getY() == 0 ? myUnit.getPosition().getY() : myUnit.getOrderTargetPosition().getY();
-//	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
-//	    			y, bwapi.Color.Green);
-//    	}
-    	try{
-    		updateEnemyBuildingLocations();
-    		updateArmyRatio();
-    		updateArmyCount();
-    		executeStrategy();
-    	}
-    	catch(Exception e){
-    		e.printStackTrace();
-    	}
-
+		//update lower tier classes with new information from game
     	productionManager.update();
     	militaryManager.update();
     }
     
     /**
-     * executeStrategy:
+     * executeStrategy()
+     * 
      * Develops and executes the strategy that the AI will play with. 
      */
-    private void executeStrategy(){
-    	int productionBuildings = 0;
-    	for(Unit u : self.getUnits()){
-    		if(u.getType().equals(UnitType.Terran_Command_Center) || u.getType().equals(UnitType.Terran_Barracks)){
-    			productionBuildings ++;
-    		}
-    	}
+    private void executeStrategy()
+    {
+    	//KT - not sure how i feel about this, I would prefer to move basically all of
+    	//	this logic into the production manager but im not sure how, or how well it 
+    	//	would work. Since we plan on using AI for some of the building thresholds
+    	//	we may not even need this since it will learn the best supply level.
+    	int productionBuildings = productionManager.getProdBuildingCount();
+    	int armyCount = militaryManager.getArmyCount();
     	
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
 		
+    	//grab the current resource count
     	int minerals = self.minerals();
     	int gas = self.gas();
     	
     	// If we are almost supply capped build a supply depot.
     	// Should supply cap - supplyused < = # of production buildings * 2
-    	if((self.supplyTotal() - self.supplyUsed() <= 6 || self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)  
-    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 && minerals >= 100){
+    	if((self.supplyTotal() - self.supplyUsed() <= 6 
+    			|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)  
+    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 
+    			&& minerals >= 100)
+    	{
 //    		System.out.println("BUILD SUPPLY DEPOT!");
 			productionGoal.add(UnitType.Terran_Supply_Depot);
 			minerals -= 100;
     	}
     	
     	// Upgrade Marine attack range. 
-    	if(minerals >= 150 && gas >= 150 && self.completedUnitCount(UnitType.Terran_Academy)>=1 && !hasExtendedRange){
-//        	System.out.println("BUILD Marine!!!");
-    		for(Unit u : self.getUnits()){
-    			if(u.getType().equals(UnitType.Terran_Academy)){
+    	if(minerals >= 150 && gas >= 150 
+    			&& self.completedUnitCount(UnitType.Terran_Academy)>=1 
+    			&& !hasExtendedRange)
+    	{
+    		
+    		for(Unit u : self.getUnits())
+    		{
+    			if(u.getType().equals(UnitType.Terran_Academy))
+    			{
     				u.upgrade(UpgradeType.U_238_Shells);
     				hasExtendedRange = true;
     			}
     		}
+    		
     		minerals -= 150;
     		gas -= 150;
     	}
     	
     	// build Academy
-    	if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>1 && self.allUnitCount(UnitType.Terran_Academy) < 1){
-//        	System.out.println("BUILD Marine!!!");
+    	if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>1 
+    			&& self.allUnitCount(UnitType.Terran_Academy) < 1)
+    	{
     		productionGoal.add(UnitType.Terran_Academy);
     		minerals -= 150;
     	}
     	
     	// build refinery 
     	if(minerals >= 100 && self.supplyTotal() > 12 && self.allUnitCount(UnitType.Terran_Refinery) < 1
-    			&& self.allUnitCount(UnitType.Terran_Barracks) >= 1){
+    			&& self.allUnitCount(UnitType.Terran_Barracks) >= 1)
+    	{
 //        	System.out.println("BUILD Refinery!!!");
     		productionGoal.add(UnitType.Terran_Refinery);
     		minerals -= 100;
     	}
     	
     	// else if we don't have a barracks build a barracks. 
-        if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 3){
+        if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 3)
+        {
 //        	System.out.println("BUILD BARRACKS!!!");
         	productionGoal.add(UnitType.Terran_Barracks);
         	minerals -= 150;
         }
         
         // else build marines
-        if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0){
+        if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0)
+        {
 //        	System.out.println("BUILD Marine!!!");
         	// If we have an academy and marines make up less than 75 percent of our army then build a marine
-        	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 && armyRatio.get(UnitType.Terran_Marine) <= .75 ){
+        	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 
+        			&& militaryManager.getUnitRatio(UnitType.Terran_Marine) <= .75 )
+        	{
 	        	productionGoal.add(UnitType.Terran_Marine);
 	        	minerals -= 100;
         	}
         	// else if there is no academy, just build the marine
-        	else if(self.completedUnitCount(UnitType.Terran_Academy) < 1){
+        	else if(self.completedUnitCount(UnitType.Terran_Academy) < 1)
+        	{
         		productionGoal.add(UnitType.Terran_Marine);
 	        	minerals -= 100;
         	}
@@ -226,9 +246,12 @@ public class StrategyManager extends DefaultBWListener {
         }
         
         // else build Medics 
-        if(minerals >= 50 && gas >= 25 && self.allUnitCount(UnitType.Terran_Barracks)>0 && self.completedUnitCount(UnitType.Terran_Academy) >= 1){
+        if(minerals >= 50 && gas >= 25 && self.allUnitCount(UnitType.Terran_Barracks)>0 
+        		&& self.completedUnitCount(UnitType.Terran_Academy) >= 1)
+        {
 //        	System.out.println("BUILD Marine!!!");
-        	if(armyRatio.get(UnitType.Terran_Medic) != null && armyRatio.get(UnitType.Terran_Medic) <= .25){
+        	if(militaryManager.getUnitRatio(UnitType.Terran_Medic) != null 
+        			&& militaryManager.getUnitRatio(UnitType.Terran_Medic) <= .25){
 	        	productionGoal.add(UnitType.Terran_Medic);
 	        	minerals -= 50;
 	        	gas -= 25;
@@ -237,55 +260,52 @@ public class StrategyManager extends DefaultBWListener {
     	
     	//if there's enough minerals, and not currently training an SCV, and we don't infringe on building a supply depot
         //train an SCV
-    	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28){
-    		if(self.supplyTotal() - self.supplyUsed() != 6 ||
-    			(self.supplyTotal() - self.supplyUsed() == 6 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot)>=1)){
+    	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28)
+    	{
+    		//check the amount of supply available
+    		if(self.supplyTotal() - self.supplyUsed() != 6 
+    				|| (self.supplyTotal() - self.supplyUsed() == 6 
+    				&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) >= 1))
+    		{
     			productionGoal.add(UnitType.Terran_SCV);
                 minerals -= 50;
     		}
-//    		else if(self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 ||
-//        			(self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 && self.incompleteUnitCount(UnitType.Terran_Supply_Depot)>=1)){
+//    		else if(self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 
+//    				|| (self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 
+//    				&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot)>=1))
+//    		{
 //    			productionGoal.add(UnitType.Terran_SCV);
 //                minerals -= 50;
 //        	}
 //    		System.out.println("BUILD SCV");
-//            productionGoal.add(UnitType.Terran_SCV);
-//            minerals -= 50;
+//          productionGoal.add(UnitType.Terran_SCV);
+//          minerals -= 50;
     	}
     	
-    	//Contingincy to build more barracks over time. 
-    	if (minerals >= 150*3) {
+    	//Contingency to build more barracks over time. 
+    	if (minerals >= 150*3) 
+    	{
     		productionGoal.add(UnitType.Terran_Barracks);
         	minerals -= 150;
     	}
     	
-        //set goal for the prodution manager
+        //set goal for the production manager
     	productionManager.setGoal(productionGoal);
 		
     	//Attack if we have enough units
     	if(armyCount >= 20 && armyCount >= (productionBuildings-1)*3)
     	{
+    		//pick a building to attack and order an attack
     		for(Position pos : enemyBuildingLocation)
     		{
-    			Position closePos = pos;
-    			militaryManager.command(Command.Attack, 1.0, closePos);
+    			militaryManager.command(Command.Attack, 1.0, pos);
     			break;
     		}
     	}
     	
-    	// see if we should be scouting;
-//    	if(armyCount > 1 && !isScouting){
-//    		militaryManager.command(Command.Scout, 1.0, null);
-//    		isScouting = true;
-//    	}
-    	
-    	// scout if we we haven't seen enemy building and supply is over 30
-//    	if(armyCount > 1 && enemyBuildingLocation.isEmpty() && self.supplyUsed() >= 60){
-//    		militaryManager.command(Command.Scout, 1.0, null);
-//    		isScouting = true;
-//    	}
-    	
-    	if(!isScouting){
+    	//make sure we are scouting  	
+    	if(!isScouting)
+    	{
     		militaryManager.command(Command.Scout, 1.0, null);
     		isScouting = true;
     	}
@@ -296,7 +316,8 @@ public class StrategyManager extends DefaultBWListener {
      * updates the enemy Army Position based on information that is
      * known in the game. 
      */
-    private void updateEnemyArmyPos(){
+    private void updateEnemyArmyPos()
+    {
     	
     }
     
@@ -304,15 +325,19 @@ public class StrategyManager extends DefaultBWListener {
     /**
      * updateEnemyBuildingLocations
      * 
-     * 
+     * TODO
      */
-    private void updateEnemyBuildingLocations(){
+    private void updateEnemyBuildingLocations()
+    {
     	//Add any buildings we see to list.
-    	for(Unit u: game.enemy().getUnits()){
+    	for(Unit u: game.enemy().getUnits())
+    	{
     		//if this unit is a building add it to the hash
-    		if(u.getType().isBuilding()){
+    		if(u.getType().isBuilding())
+    		{
     			//check if we have it's position in memory and add it if we don't
-    			if(!enemyBuildingLocation.contains(u.getPosition())){
+    			if(!enemyBuildingLocation.contains(u.getPosition()))
+    			{
     				enemyBuildingLocation.add(u.getPosition());
     			}
     		}
@@ -321,51 +346,38 @@ public class StrategyManager extends DefaultBWListener {
     	ArrayList<Position> toRemove = new ArrayList<Position>();
     	
     	//loop over the visible enemy units that we remember
-    	for(Position p : enemyBuildingLocation){
+    	for(Position p : enemyBuildingLocation)
+    	{
     		TilePosition tileCorrespondingToP = new TilePosition(p.getX()/32, p.getY()/32);
     		
     		//if visible
-    		if(game.isVisible(tileCorrespondingToP)){
+    		if(game.isVisible(tileCorrespondingToP))
+    		{
     			//loop over the visible enemy buildings and find out if at least
     			// one of them is still at the remembered position
     			boolean buildingStillThere = false;
-    			for(Unit u: game.enemy().getUnits()){
-    				if(u.getType().isBuilding() && u.getPosition().equals(p) && u.exists()){
+    			for(Unit u: game.enemy().getUnits())
+    			{
+    				if(u.getType().isBuilding() && u.getPosition().equals(p) && u.exists())
+    				{
     					buildingStillThere = true;
     					break;
     				}
     			}
-    			if(!buildingStillThere){
+    			
+    			if(!buildingStillThere)
+    			{
     				toRemove.add(p);
-    				break;
+    				break;//TODO check if this is necessary
     			}
     		}
     	}
     	
     	//remove
-    	for(Position p : toRemove){
+    	for(Position p : toRemove)
+    	{
     		enemyBuildingLocation.remove(p);
     	}
-    }
-    
-    /**
-     * updateArmyRatio()
-     * 
-     * This is a very simple implementation of Army Ratio just for the tournament 
-     * Just cares about marines and medics. 
-     */
-    public void updateArmyRatio(){
-    	//update marine percentage 
-    	double marineCount = self.allUnitCount(UnitType.Terran_Marine);
-    	double medicCount = self.allUnitCount(UnitType.Terran_Medic);
-    	double total = marineCount + medicCount;
-    	
-    	armyRatio.put(UnitType.Terran_Marine, marineCount/total);
-    	armyRatio.put(UnitType.Terran_Medic, medicCount/total);
-    }
-    
-    private void updateArmyCount(){
-    	armyCount = self.completedUnitCount(UnitType.Terran_Marine) + self.completedUnitCount(UnitType.Terran_Medic);
     }
     
     /**
@@ -376,7 +388,8 @@ public class StrategyManager extends DefaultBWListener {
      * @param pos a position object, pixel precise. 
      * @return A tilePosition object corresponding to a given position
      */
-    private TilePosition convertPositionToTilePosition(Position pos){
+    private TilePosition convertPositionToTilePosition(Position pos)
+    {
     	TilePosition tileCorrespondingToP = new TilePosition(pos.getX()/32, pos.getY()/32);
     	return tileCorrespondingToP;
     }
@@ -389,12 +402,40 @@ public class StrategyManager extends DefaultBWListener {
      * @return the pixel position or the Position object corresponding to 
      * 		a given tile position
      */
-    private Position convertTilePositionToPosition(TilePosition tilePosition){
+    private Position convertTilePositionToPosition(TilePosition tilePosition)
+    {
     	Position position = new Position(tilePosition.getX()*32, tilePosition.getY()*32);
     	return position;
     }
+    
+    /**
+     * displayUnitOrders()
+     * 
+     * Debugging method that disiplays the units order near the unit itself and also
+     * displays a green line to its destination, if it has one.
+     */
+    private void displayGameInfo()
+    {
+    	//Unit destination lines and orders
+    	for(Unit myUnit : self.getUnits())
+    	{
+    		//display units order
+	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
+	    	
+	    	int x = myUnit.getOrderTargetPosition().getX() == 0 ? myUnit.getPosition().getX() : myUnit.getOrderTargetPosition().getX();
+	    	int y = myUnit.getOrderTargetPosition().getY() == 0 ? myUnit.getPosition().getY() : myUnit.getOrderTargetPosition().getY();
+	    	//draw line to unit destination
+	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
+	    			y, bwapi.Color.Green);
+    	}
+    	
+    	//Race identifier
+        game.setTextSize(10);
+        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
+    }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         new StrategyManager().run();
     }
 }
