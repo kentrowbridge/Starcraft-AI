@@ -127,16 +127,6 @@ public class MilitaryManager{
 				armyManager.defend();
 				break;
 			case Scout:
-//				for(Unit u : self.getUnits())
-//				{
-//					if(u.getType().equals(UnitType.Terran_SCV))
-//					{
-//						ArrayList<Unit> units = new ArrayList<Unit>();
-//						units.add(u);
-//						squads.get(SquadType.Scout).setUnits(units);
-//					}
-//				}
-				
 				armyManager.scout();
 				break;
 		}
