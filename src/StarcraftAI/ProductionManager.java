@@ -251,7 +251,8 @@ public class ProductionManager {
 	 */
 	public ArrayList<UnitType> findTechPath(UnitType goalUnit)
 	{
-		return null;
+		ArrayList<UnitType> path = new ArrayList<UnitType>(techPaths.get(goalUnit));
+		return path;
 	}
 	
 	/**
@@ -265,9 +266,34 @@ public class ProductionManager {
 	 */
 	public ArrayList<UnitType> examinePath(ArrayList<UnitType> path)
 	{
+		//remove units from path that we already have. 
+		ArrayList<UnitType> toRemove = new ArrayList<UnitType>();
+		for(UnitType ut : path)
+		{
+			if(buildingManager.getBuilding(ut, false) != null)
+			{
+				toRemove.add(ut);
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		for(UnitType ut : toRemove)
+		{
+			path.remove(ut);
+		}
+		
 		return null; 
 	}
 	
+	/**
+	 * initTechPaths()
+	 * creates a Hashtable of all of the tech paths needed to get to a given unit.  
+	 * This runs once at the instantiation of the class and never again. 
+	 * 
+	 */
 	public void initTechPaths()
 	{
 		
