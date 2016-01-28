@@ -39,7 +39,9 @@ public class ProductionManager {
 	public ProductionManager(Game game, Player self){
 		this.game = game;
 		this.self = self;
-
+		
+		this.techPaths = new Hashtable<UnitType, ArrayList<UnitType>>();
+		
 		this.buildingManager = new BuildingManager(game, self);
 		this.workerManager = new WorkerManager(self, game.getNeutralUnits());
 		
@@ -59,6 +61,12 @@ public class ProductionManager {
 		}
 		
 		initBuildingsForUnits();
+		
+		this.initTechPaths();
+		for(UnitType key : techPaths.keySet()){
+			System.out.println(techPaths.get(key).toString());
+		}
+		
 	}
 
 	/**
@@ -260,7 +268,8 @@ public class ProductionManager {
 		return null; 
 	}
 	
-	public void initTechPaths(){
+	public void initTechPaths()
+	{
 		
 		// command center
 		ArrayList<UnitType> cc = new ArrayList<UnitType>();
@@ -356,17 +365,50 @@ public class ProductionManager {
 		nuke.add(UnitType.Terran_Nuclear_Silo);		
 		techPaths.put(UnitType.Terran_Nuclear_Silo, nuke);
 		
-		
 		/* Non-Building Units */
 		// SCV 
-		ArrayList<UnitType> scv = new ArrayList<UnitType>(cc);
-		scv.add(UnitType.Terran_SCV);		
-		techPaths.put(UnitType.Terran_SCV, scv);
+//		ArrayList<UnitType> scv = new ArrayList<UnitType>(cc);
+//		scv.add(UnitType.Terran_SCV);		
+//		techPaths.put(UnitType.Terran_SCV, scv);
 		
 		// Marine
-		ArrayList<UnitType> marine = new ArrayList<UnitType>(racks);
-		marine.add(UnitType.Terran_Marine);		
-		techPaths.put(UnitType.Terran_Marine, marine);
+//		ArrayList<UnitType> marine = new ArrayList<UnitType>(racks);
+//		marine.add(UnitType.Terran_Marine);		
+//		techPaths.put(UnitType.Terran_Marine, marine);
+		
+		// for army units
+		for(UnitType key : buildingsForUnits.keySet())
+		{
+//			ArrayList<UnitType> temp = new ArrayList<UnitType>(techPaths.get(buildingsForUnits.get(key)));
+//			temp.add(key);
+			ArrayList<UnitType> temp = buildDependecies(key, techPaths.get(buildingsForUnits.get(key)));
+			techPaths.put(key, temp);
+		}	
+	}
+	
+	/**
+	 * buildDependecies
+	 * given a list of prerequisite unit types, this adds the new unit to the dependent list 
+	 * in a new list after the preReqs. 
+	 *  
+	 * @param ut - The Unit Type to be added to the list
+	 * @param preReqs - The list of Prerequisite unitTypes that are needed to build ut. 
+	 * @return - a new list with the new Unit Type added to the prerequisites. 
+	 */
+	public ArrayList<UnitType> buildDependecies(UnitType ut, ArrayList<UnitType> preReqs)
+	{
+		ArrayList<UnitType> temp;
+		if(preReqs != null)
+		{
+			temp = new ArrayList<UnitType>(preReqs);
+		}
+		else
+		{
+			temp = new ArrayList<UnitType>();
+		}
+		temp.add(ut);
+		
+		return temp;
 	}
 	
 	/**
@@ -395,5 +437,9 @@ public class ProductionManager {
 		
 		//command center
 		buildingsForUnits.put(UnitType.Terran_SCV, UnitType.Terran_Command_Center);
+	}
+	
+	public Hashtable<UnitType, ArrayList<UnitType>> getTechPaths(){
+		return techPaths;
 	}
 }
