@@ -26,7 +26,7 @@ public class ProductionManager {
 	private BuildingManager buildingManager;
 	private WorkerManager workerManager;
 	
-	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
+	private static Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
 	
 	/**
 	 * Ctor
@@ -62,7 +62,7 @@ public class ProductionManager {
 		
 		initBuildingsForUnits();
 		
-		this.initTechPaths();
+		techPaths = ProductionManager.initTechPaths();
 		for(UnitType key : techPaths.keySet()){
 			System.out.println(techPaths.get(key).toString());
 		}
@@ -172,11 +172,15 @@ public class ProductionManager {
 				for(UnitType u : goals)
 				{
 					//create paths for goals
-					List<UnitType> path = new ArrayList<UnitType>();
+//					List<UnitType> path = new ArrayList<UnitType>();
+					ArrayList<UnitType> path = findTechPath(u);
 					
 					//only add end goal for now
 					//THIS WILL BE CHANGED LATER ON IN IMPLEMENTATION
-					path.add(u);
+//					path.add(u);
+					
+					path = examinePath(path);
+					System.out.println("Path changed to: " + path.toString());
 					
 					//add path to production q
 					productionQueue.add(path);
@@ -237,6 +241,12 @@ public class ProductionManager {
 					}
 				}
 			}
+			
+			// build the thing in the front of the queue, not pop it off it is not the last thing
+			if( buildPath.size() > 1)
+			{
+				buildPath.remove(0);
+			}
 		}
 	}
 	
@@ -272,6 +282,10 @@ public class ProductionManager {
 		{
 			if(buildingManager.getBuilding(ut, false) != null)
 			{
+				// If it is the last element, don't remove it. 
+				if(path.lastIndexOf(ut) == path.size()-1){
+					break;
+				}
 				toRemove.add(ut);
 			}
 			else
@@ -285,7 +299,7 @@ public class ProductionManager {
 			path.remove(ut);
 		}
 		
-		return null; 
+		return path; 
 	}
 	
 	/**
@@ -294,9 +308,9 @@ public class ProductionManager {
 	 * This runs once at the instantiation of the class and never again. 
 	 * 
 	 */
-	public void initTechPaths()
+	public static Hashtable<UnitType, ArrayList<UnitType>> initTechPaths()
 	{
-		
+		Hashtable<UnitType, ArrayList<UnitType>> techPaths = new Hashtable<UnitType, ArrayList<UnitType>>();
 		// command center
 		ArrayList<UnitType> cc = new ArrayList<UnitType>();
 		cc.add(UnitType.Terran_Command_Center);
@@ -392,17 +406,8 @@ public class ProductionManager {
 		techPaths.put(UnitType.Terran_Nuclear_Silo, nuke);
 		
 		/* Non-Building Units */
-		// SCV 
-//		ArrayList<UnitType> scv = new ArrayList<UnitType>(cc);
-//		scv.add(UnitType.Terran_SCV);		
-//		techPaths.put(UnitType.Terran_SCV, scv);
 		
-		// Marine
-//		ArrayList<UnitType> marine = new ArrayList<UnitType>(racks);
-//		marine.add(UnitType.Terran_Marine);		
-//		techPaths.put(UnitType.Terran_Marine, marine);
-		
-		// for army units
+		// For each army unit
 		for(UnitType key : buildingsForUnits.keySet())
 		{
 //			ArrayList<UnitType> temp = new ArrayList<UnitType>(techPaths.get(buildingsForUnits.get(key)));
@@ -410,6 +415,8 @@ public class ProductionManager {
 			ArrayList<UnitType> temp = buildDependecies(key, techPaths.get(buildingsForUnits.get(key)));
 			techPaths.put(key, temp);
 		}	
+		
+		return techPaths;
 	}
 	
 	/**
@@ -421,17 +428,21 @@ public class ProductionManager {
 	 * @param preReqs - The list of Prerequisite unitTypes that are needed to build ut. 
 	 * @return - a new list with the new Unit Type added to the prerequisites. 
 	 */
-	public ArrayList<UnitType> buildDependecies(UnitType ut, ArrayList<UnitType> preReqs)
+	public static ArrayList<UnitType> buildDependecies(UnitType ut, ArrayList<UnitType> preReqs)
 	{
 		ArrayList<UnitType> temp;
+		
+		// if we have prereqs
 		if(preReqs != null)
 		{
 			temp = new ArrayList<UnitType>(preReqs);
 		}
+		// if not, new arrayList.
 		else
 		{
 			temp = new ArrayList<UnitType>();
 		}
+		
 		temp.add(ut);
 		
 		return temp;
@@ -465,6 +476,11 @@ public class ProductionManager {
 		buildingsForUnits.put(UnitType.Terran_SCV, UnitType.Terran_Command_Center);
 	}
 	
+	/**
+	 * getTechPaths()
+	 * Getter method for Tech paths. 
+	 * @return Hashtable of tech paths. 1 path for each unit type. 
+	 */
 	public Hashtable<UnitType, ArrayList<UnitType>> getTechPaths(){
 		return techPaths;
 	}
