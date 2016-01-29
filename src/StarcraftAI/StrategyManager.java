@@ -85,8 +85,10 @@ public class StrategyManager extends DefaultBWListener {
         game = mirror.getGame();
         self = game.self();
         
+        String mapName = game.mapFileName(); 
+        
         // init production manager and military manager
-        productionManager = new ProductionManager(game, self);
+        productionManager = new ProductionManager(game, self, mapName);
         militaryManager = new MilitaryManager(game, self);
         
         // Init variables for enemy info

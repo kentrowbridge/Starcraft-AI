@@ -34,7 +34,7 @@ public class ProductionManager {
 	 * @param game
 	 * @param self
 	 */
-	public ProductionManager(Game game, Player self){
+	public ProductionManager(Game game, Player self, String mapName){
 		this.game = game;
 		this.self = self;
 
