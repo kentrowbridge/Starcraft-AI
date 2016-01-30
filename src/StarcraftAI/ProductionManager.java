@@ -77,7 +77,8 @@ public class ProductionManager {
 	 * @param unit - the specific unit that we are checking
 	 */
 	public void addUnit(Unit unit)
-	{		if (unit == null)
+	{
+		//dont add null or units that do not belong to the agent		if (unit == null || unit.getPlayer() != self)
 			return;
 		
 		if(unit.getType().isBuilding())
@@ -183,6 +184,8 @@ public class ProductionManager {
 				}
 			}
 			
+			repairBuildings();
+			
 			processQueue();
 		}
 		catch(Exception e)
@@ -198,6 +201,27 @@ public class ProductionManager {
 	public int getProdBuildingCount()
 	{
 		return buildingManager.productionBuildingCount();
+	}
+	
+	/**
+	 * repairBuildings()
+	 * 
+	 * Find which buildings require repair and task workers to fix them
+	 */
+	private void repairBuildings()
+	{
+		List<Unit> toFix = buildingManager.checkBuildings();
+		int margin = 40;
+		for(Unit b : toFix)
+		{
+			game.drawTextScreen(10, margin, "Repairs for " + b.getType() + "needed at " + b.getPosition());
+			Unit worker = workerManager.getWorker();
+			if(worker != null)
+			{
+				worker.repair(b);
+			}
+			margin += 40;
+		}
 	}
 	
 	/**
