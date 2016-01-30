@@ -15,25 +15,31 @@ import bwta.*;
 public class BuildingManager{
 	private Game game;
 	private Player self;
-	private String mapName; 
 	
-
-	private BWTA bwta = new BWTA();
-
+	private final boolean IS_TRAINING = true;
+	private final int POPULATION_SIZE = 20;
 	
-	private ArrayList<Unit> buildingList = new ArrayList<Unit>();
+	private BWTA bwta;
+
+	// hash table where key is "map-name" concatenated with the starting base coordinates,
+	// value is the population of genes
+	private Hashtable<String, ArrayList<ArrayList<Integer>>> populations;
+	private ArrayList<ArrayList<Integer>> population;
+	private ArrayList<Integer> gene;
+	
+	private ArrayList<Unit> buildingList;
 	
 	/**
 	 * c'tor
 	 * @param game - a reference to the game match
 	 * @param self - a reference to our player of the game
 	 */
-	public BuildingManager(Game game, Player self, String mapName)
+	public BuildingManager(Game game, Player self)
 	{
-		this.mapName = mapName; 
 		this.game = game;
 		this.self = self;
-
+		this.bwta = new BWTA();
+		this.populations = new Hashtable<String, ArrayList<ArrayList<Integer>>>();
 		this.buildingList = new ArrayList<Unit>();
 	}
 
@@ -75,19 +81,7 @@ public class BuildingManager{
 	{
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		return null;
 		
 //		// values to help determine the search radius of where to build different constructs
 //		int maxDist = 8;
@@ -212,31 +206,53 @@ public class BuildingManager{
 		
 		return count;
 	}
-	/*
+	
+	/**
 	 * selectGene()
 	 * Select the specific gene per map. 
+	 * 
+	 * @return The gene that we should use for this game
 	 */
-	public ArrayList selectGene()
+	private ArrayList selectGene()
 	{
-		// hash table where key is "map-name" concatenated with the starting base coordinates,
-		// value is the population of genes
-		Hashtable<String, ArrayList<Integer>[]> populations = new Hashtable<String, ArrayList<Integer>[]>();
-		
-		
-		
-		
-		TilePosition base = self.getStartLocation();
-		String baseString = base.toString();
+		if(IS_TRAINING)
+		{
+			String key = getMapAndCoords();
+			if(populations.containsKey(key))
+			{
+				population = populations.get(key);
+			}
+			else
+			{
+				population = new ArrayList<ArrayList<Integer>>(POPULATION_SIZE);
+				populations.put(key, population);
+			}
+			
+			
+		}
+		else
+		{
+			System.out.println("Hardcoded final genes not yet implemented");
+		}
 		
 		//bwta.Region baseRegion = bwta.getRegion(base); 
 		
 		//ArrayList<TilePosition> tilePositions = new ArrayList<TilePosition>();
 		ArrayList<Integer> genes = new ArrayList<Integer>();
 		
-		
-		
-		
-		
 		return null; 
+	}
+
+	/**
+	 * getMapAndCoords()
+	 * Gets the map name and coordinates of our base and concatenates them together.
+	 * 
+	 * @return String - the map name and coordinates
+	 */
+	private String getMapAndCoords()
+	{
+		TilePosition base = self.getStartLocation();
+		String coords = "(" + base.getX() + "," + base.getY() + ")";
+		return game.mapFileName() + "_" + coords;
 	}
 }
