@@ -23,9 +23,9 @@ public class BuildingManager{
 
 	// hash table where key is "map-name" concatenated with the starting base coordinates,
 	// value is the population of genes
-	private Hashtable<String, ArrayList<ArrayList<Integer>>> populations;
-	private ArrayList<ArrayList<Integer>> population;
-	private ArrayList<Integer> gene;
+	private Hashtable<String, Population> populations;
+	private Population population;
+	private Gene gene;
 	
 	private ArrayList<Unit> buildingList;
 	
@@ -39,7 +39,7 @@ public class BuildingManager{
 		this.game = game;
 		this.self = self;
 		this.bwta = new BWTA();
-		this.populations = new Hashtable<String, ArrayList<ArrayList<Integer>>>();
+		this.populations = new Hashtable<String, Population>();
 		this.buildingList = new ArrayList<Unit>();
 	}
 
@@ -224,7 +224,7 @@ public class BuildingManager{
 			}
 			else
 			{
-				population = new ArrayList<ArrayList<Integer>>(POPULATION_SIZE);
+				population = new Population();
 				populations.put(key, population);
 			}
 			
@@ -238,7 +238,7 @@ public class BuildingManager{
 		//bwta.Region baseRegion = bwta.getRegion(base); 
 		
 		//ArrayList<TilePosition> tilePositions = new ArrayList<TilePosition>();
-		ArrayList<Integer> genes = new ArrayList<Integer>();
+		
 		
 		return null; 
 	}
