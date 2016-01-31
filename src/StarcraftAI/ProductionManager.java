@@ -550,11 +550,14 @@ public class ProductionManager {
 					seen.add(ut);
 				}
 				else{
-					// already been seen, remove from this list. 
-					queue.get(i).remove(j);
-					
-					// Decrement the index to relook at the same j spot. 
-					j--;
+					// already been seen, remove from this list.
+					// unless it is the last element.
+					if(j != queue.get(i).size()-1 ){
+						queue.get(i).remove(j);
+						
+						// Decrement the index to relook at the same j spot. 
+						j--;
+					}
 				}
 			}
 		}
