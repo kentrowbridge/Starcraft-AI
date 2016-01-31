@@ -187,6 +187,8 @@ public class ProductionManager {
 				}
 			}
 			
+			productionQueue = reduceCrossover(productionQueue);
+			printProcutionQueue();
 			processQueue();
 		}
 		catch(Exception e)
@@ -477,11 +479,129 @@ public class ProductionManager {
 	}
 	
 	/**
+	 * 
+	 * @param ProdQueue
+	 * @return
+	 */
+	public ArrayList<List<UnitType>> reduceCrossover(ArrayList<List<UnitType>> ProdQueue)
+	{
+		ArrayList<List<UnitType>> queue = new ArrayList<List<UnitType>>(ProdQueue);
+		
+//		int maxLength = 0;
+//		int numLists = queue.size();
+//		
+//		// find the max length of the queue lists
+//		for(List<UnitType> list : queue)
+//		{
+//			if(list.size() > maxLength)
+//			{
+//				maxLength = list.size();
+//			}
+//		}
+		
+		// compare starting at index 0 to max length -1 the items that are in each queue.
+		// itterate along the lists
+//		for(int idx = 0; idx < maxLength-1; idx++)
+//		{
+//			UnitType[] values = getValueAtIndex(idx, queue);
+//			
+//			// compare each value to each other value. 
+//			// find the ones that are the same.
+//			for(int list_idx = 0; list_idx < values.length; list_idx++)
+//			{
+//				if(values[list_idx] == null)
+//				{
+//					continue;
+//				}
+//				
+//				// idx with same values as in list i . 
+//				ArrayList<Integer> idxOfSameValues = new ArrayList<Integer>();
+//				for(int nextList = list_idx + 1; nextList < values.length; nextList++)
+//				{
+//					if(values[list_idx] == values[nextList])
+//					{
+//						idxOfSameValues.add(nextList);
+//					}
+//				}
+//				
+//				// we should now have a list of integers
+//				// this list has indecies that coorespond to lists with the same values as list i
+//				// ie [[1,2,3,4], [7,2,5,6], [9,2,8]]  => the list would have [1,2] 
+//				
+//				// if we have any overlap
+//				if(!idxOfSameValues.isEmpty())
+//				{
+//					// find shortest list of those list
+//					int shortest = 1000;
+//					
+//					
+//				}
+//			}
+//		}
+		
+		ArrayList<UnitType> seen = new ArrayList<UnitType>();
+		for(int i = 0; i<queue.size(); i++)
+		{
+			for(int j = 0; j<queue.get(i).size(); j++)
+			{
+				UnitType ut = queue.get(i).get(j); 
+				if(!seen.contains(ut))
+				{
+					seen.add(ut);
+				}
+				else{
+					// already been seen, remove from this list. 
+					queue.get(i).remove(j);
+					
+					// Decrement the index to relook at the same j spot. 
+					j--;
+				}
+			}
+		}
+		
+		return queue;
+	}
+	
+	public UnitType[] getValueAtIndex(int idx, ArrayList<List<UnitType>> queue)
+	{
+		UnitType[] values = new UnitType[queue.size()];
+		for(int list_idx = 0; list_idx < queue.size(); list_idx++)
+		{
+			// if the index is "off the end" of one of the queue arrays, that entry is null
+			if(idx > queue.get(list_idx).size()-1)
+			{
+				values[list_idx] = null; 
+			}
+			else{
+				values[list_idx] = queue.get(list_idx).get(idx);
+			}
+		}
+		return values;
+	}
+	
+	/**
 	 * getTechPaths()
 	 * Getter method for Tech paths. 
 	 * @return Hashtable of tech paths. 1 path for each unit type. 
 	 */
-	public Hashtable<UnitType, ArrayList<UnitType>> getTechPaths(){
+	public Hashtable<UnitType, ArrayList<UnitType>> getTechPaths()
+	{
 		return techPaths;
+	}
+	
+	/**
+	 * printProductionQueue
+	 * prints the production queue as it currently is. 
+	 */
+	public void printProcutionQueue()
+	{
+		if(productionQueue.size() > 0)
+		{
+			System.out.println("Production QUEUE");
+			for(List<UnitType> list : productionQueue)
+			{
+				System.out.println(list.toString());
+			}
+		}
 	}
 }
