@@ -185,10 +185,11 @@ public class ProductionManager {
 					//add path to production q
 					productionQueue.add(path);
 				}
+				
+				productionQueue = reduceCrossover(productionQueue);
+				printProcutionQueue();
 			}
 			
-			productionQueue = reduceCrossover(productionQueue);
-			printProcutionQueue();
 			processQueue();
 		}
 		catch(Exception e)
@@ -416,7 +417,16 @@ public class ProductionManager {
 //			temp.add(key);
 			ArrayList<UnitType> temp = buildDependecies(key, techPaths.get(buildingsForUnits.get(key)));
 			techPaths.put(key, temp);
-		}	
+		}
+		
+		ArrayList<UnitType> medic = new ArrayList<UnitType>(academy);
+		medic.add(UnitType.Terran_Medic);		
+		techPaths.put(UnitType.Terran_Medic, medic);
+		
+		ArrayList<UnitType> tank = new ArrayList<UnitType>(machineShop);
+		tank.add(UnitType.Terran_Siege_Tank_Tank_Mode);	
+		techPaths.put(UnitType.Terran_Siege_Tank_Tank_Mode, tank);
+		
 		
 		return techPaths;
 	}
