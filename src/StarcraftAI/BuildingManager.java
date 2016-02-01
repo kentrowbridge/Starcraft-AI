@@ -10,6 +10,7 @@ import bwta.*;
  *  
  * @author Kenny Trowbridge
  * @author Casey Sigelmann
+ * @author Alex Bowns
  *
  */
 public class BuildingManager{
@@ -18,6 +19,7 @@ public class BuildingManager{
 	
 	private final boolean IS_TRAINING = true;
 	private final int POPULATION_SIZE = 20;
+	private final int GENE_SIZE = 2000;
 	
 	private BWTA bwta;
 
@@ -192,6 +194,12 @@ public class BuildingManager{
 		return null;
 	}
 	
+	/*
+	 * productionBuildingCount()
+	 * counts the number of team buildings that are either barracks or command centers
+	 * 
+	 * @return the total count
+	 */
 	public int productionBuildingCount()
 	{
 		int count = 0;
@@ -206,6 +214,40 @@ public class BuildingManager{
 		
 		return count;
 	}
+	
+	/*
+	 * mateGenes() 
+	 * Mate two genes and return two children
+	 * 
+	 * @param gene1 - the first parent gene
+	 * @param gene2 - the second parent gene
+	 * @return children - two child genes of the parents
+	 */
+	public Gene[] mateGenes(Gene gene1, Gene gene2)
+	{
+		Gene[] children = new Gene[2];
+		
+		// split the genes at random index, combine opposite halves
+		int idx = (int)(Math.random() * GENE_SIZE); 
+		ArrayList<Integer> kid1 = new ArrayList<Integer>();
+		ArrayList<Integer> kid2 = new ArrayList<Integer>();
+		
+		kid1.addAll(gene1.getRange(0, idx));
+		kid1.addAll(gene2.getRange(idx, GENE_SIZE));
+		kid2.addAll(gene2.getRange(0, idx));
+		kid2.addAll(gene1.getRange(idx, GENE_SIZE));
+				
+		children[0].setListValues(kid1);
+		children[1].setListValues(kid2);
+		
+		// possibly mutate an allele of either gene
+		children[0].mutateAllele();
+		children[1].mutateAllele();
+		
+		return children;
+	}
+	
+	
 	
 	/**
 	 * selectGene()
