@@ -157,6 +157,27 @@ public class StrategyManager extends DefaultBWListener {
     	int armyCount = militaryManager.getArmyCount();
     	
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
+    	
+    	// ** Simplified workable build queue!
+//    	productionGoal.add(UnitType.Terran_Marine);
+//    	productionGoal.add(UnitType.Terran_Medic);
+//    	productionGoal.add(UnitType.Terran_Siege_Tank_Tank_Mode);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_Refinery) < 1)
+//    		productionGoal.add(UnitType.Terran_Refinery);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_SCV) < 28)
+//    		productionGoal.add(UnitType.Terran_SCV);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_Barracks) < 2)
+//    		productionGoal.add(UnitType.Terran_Barracks);
+//    	
+//    	if((self.supplyTotal() - self.supplyUsed() <= 6 
+//    		|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)
+//    		&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1){
+//    		productionGoal.add(UnitType.Terran_Supply_Depot);
+//    	}
+    	
 		
     	//grab the current resource count
     	int minerals = self.minerals();
@@ -166,7 +187,7 @@ public class StrategyManager extends DefaultBWListener {
     	// Should supply cap - supplyused < = # of production buildings * 2
     	if((self.supplyTotal() - self.supplyUsed() <= 6 
     			|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)  
-    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 
+    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1
     			&& minerals >= 100)
     	{
 //    		System.out.println("BUILD SUPPLY DEPOT!");
