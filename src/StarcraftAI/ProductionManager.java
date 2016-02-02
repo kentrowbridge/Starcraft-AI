@@ -109,7 +109,7 @@ public class ProductionManager {
 	 *  
 	 * @param unitType - type of building ot build
 	 */
-	public void buildBuilding(UnitType unitType)
+	public boolean buildBuilding(UnitType unitType)
 	{
 		if(unitType.isBuilding())
 		{
@@ -119,8 +119,10 @@ public class ProductionManager {
 			if(builder != null && game.canMake(builder, unitType))
 			{
 				buildingManager.build(unitType, builder);
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	/**
@@ -131,17 +133,19 @@ public class ProductionManager {
 	 * @param unitType - unit type to train
 	 * @param building - building to train from
 	 */
-	public void training(UnitType unitType, Unit building)
+	public boolean training(UnitType unitType, Unit building)
 	{
 		if(unitType == null || building == null)
 		{
-			return;
+			return false;
 		}
 		
 		if(!building.isTraining())
 		{
 			building.train(unitType);
+			return true;
 		}
+		return false;
 	}
 	
 	/**
@@ -220,6 +224,7 @@ public class ProductionManager {
 	{
 		for(List<UnitType> buildPath : productionQueue)
 		{
+			boolean pop = false;
 			//temporarily: build path is always going to be the next thing that needs to be built
 			// dependency conflicts are handled by strategy manager FOR NOW
 			UnitType item = buildPath.get(0);
@@ -228,7 +233,7 @@ public class ProductionManager {
 			{
 				if(item.isBuilding())
 				{
-					buildBuilding(item);
+					pop = buildBuilding(item);
 				}
 				else
 				{
@@ -240,13 +245,13 @@ public class ProductionManager {
 
 					if(building != null)
 					{
-						training(item, building);
+						pop = training(item, building);
 					}
 				}
 			}
 			
 			// build the thing in the front of the queue, not pop it off it is not the last thing
-			if( buildPath.size() > 1)
+			if( buildPath.size() > 1 && pop)
 			{
 				buildPath.remove(0);
 			}
