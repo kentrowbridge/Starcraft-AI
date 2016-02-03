@@ -92,9 +92,10 @@ public class WorkerManager{
 				return null;
 			}		
 			
+			Order order = u.getOrder();
 			//find a free worker
 			if(!u.isConstructing() && u.isInterruptible() 
-					&& u.isCompleted() && !u.isRepairing())
+					&& u.isCompleted() && order != Order.Repair)
 			{
 				availableWorker = u;
 			}
