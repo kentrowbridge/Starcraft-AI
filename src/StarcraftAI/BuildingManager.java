@@ -158,26 +158,14 @@ public class BuildingManager{
 		for(Unit b : buildingList)
 		{
 			//check if the building is incomplete and not being constructed
-			if(!b.isCompleted())
+			if(!b.isCompleted() && b.getBuildUnit() == null)
 			{
-				if(b.getBuildUnit() != null)
-				{
-					System.out.println(b.getBuildUnit().getType());
-				}
-				else
-				{
-					if(b.getBuildUnit() == null)
-					{
-						System.out.println("No builder.");
-						returnList.add(b);
-					}
-					continue;
-				}
+				returnList.add(b);
 			}
 			
 			//check if buildings health is too low
 			float healthPercentage = b.getHitPoints() / (float) (buildingMaxHealth.get(b.getType()));
-			if(healthPercentage <= 0.5)
+			if(b.isCompleted() && healthPercentage <= 0.5)
 			{
 				returnList.add(b);
 			}

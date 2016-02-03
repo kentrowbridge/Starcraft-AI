@@ -27,6 +27,7 @@ public class ProductionManager {
 	private WorkerManager workerManager;
 	
 	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
+	private List<Unit> damagedBuildings = new ArrayList<Unit>();
 	
 	/**
 	 * Ctor
@@ -210,17 +211,27 @@ public class ProductionManager {
 	 */
 	private void repairBuildings()
 	{
-		List<Unit> toFix = buildingManager.checkBuildings();
-		int margin = 40;
+		//only repair newly damaged buildings
+		List<Unit> toFix = new ArrayList<Unit>();
+		for(Unit b : buildingManager.checkBuildings())
+		{
+			//add newly damaged buildings
+			if(!damagedBuildings.contains(b))
+			{
+				toFix.add(b);
+				damagedBuildings.add(b);
+			}
+		}
+		
 		for(Unit b : toFix)
 		{
-			game.drawTextScreen(10, margin, "Repairs for " + b.getType() + "needed at " + b.getPosition());
 			Unit worker = workerManager.getWorker();
 			if(worker != null)
 			{
 				worker.repair(b);
+				System.out.println("Worker sent for repairs.");
+				
 			}
-			margin += 40;
 		}
 	}
 	
