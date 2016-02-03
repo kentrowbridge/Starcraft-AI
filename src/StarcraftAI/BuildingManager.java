@@ -1,4 +1,10 @@
 package StarcraftAI;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 import bwapi.*;
@@ -14,13 +20,15 @@ import bwta.*;
  *
  */
 public class BuildingManager{
+	private String fileName = "genetic_populations.txt";
+	
 	private Game game;
 	private Player self;
-	
+
 	private final boolean IS_TRAINING = true;
 	private final int POPULATION_SIZE = 20;
 	private final int GENE_SIZE = 2000;
-	
+
 	private BWTA bwta;
 
 	// hash table where key is "map-name" concatenated with the starting base coordinates,
@@ -28,9 +36,9 @@ public class BuildingManager{
 	private Hashtable<String, Population> populations;
 	private Population population;
 	private Gene gene;
-	
+
 	private ArrayList<Unit> buildingList;
-	
+
 	/**
 	 * c'tor
 	 * @param game - a reference to the game match
@@ -81,62 +89,62 @@ public class BuildingManager{
 	 */
 	private TilePosition getPlacement(UnitType buildingType, Unit builder)
 	{
-		
-		
+
+
 		return null;
-		
-//		// values to help determine the search radius of where to build different constructs
-//		int maxDist = 8;
-//		int changeRate = 2;
-//		int stopDist = 40;
-//		TilePosition aroundTile = self.getStartLocation();
-//
-//		// build a refinery at the nearest geyser location to the starting point
-//		if(buildingType == UnitType.Terran_Refinery)
-//		{
-//			List<Unit> geysers = game.getGeysers();
-//			Unit closest = null;
-//			Position position = BWTA.getStartLocation(self).getPosition();
-//			for(Unit geyser : geysers)
-//			{
-//				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
-//				{
-//					if(closest == null || geyser.getDistance(position) < geyser.getDistance(position))
-//					{
-//						closest = geyser;
-//					}
-//				}
-//			}
-//			return closest.getTilePosition();
-//		}
-//
-//		// search for a an empty tile position that can build a given building type
-//		while((maxDist < stopDist))
-//		{
-//			int minX = aroundTile.getX()-maxDist;
-//			int maxX = aroundTile.getX()+maxDist;
-//			int minY = aroundTile.getY()-maxDist;
-//			int maxY = aroundTile.getY()+maxDist;
-//			// loop through the defined area
-//			for(int i = minX; i <= maxX; i++)
-//			{
-//				for(int j = minY; j <= maxY; j++)
-//				{
-//					if(i < maxX && i > minX && j < maxY && j > minY)
-//					{
-//						continue;
-//					}
-//					if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, true))
-//					{
-//						return new TilePosition(i,j);
-//					}
-//				}
-//			}
-//			// we didn't find a valid tile, so increase max distance
-//			maxDist+=changeRate;
-//		}
-//		game.printf("Unable to find suitable build position for "+buildingType.toString());
-//		return null;
+
+		//		// values to help determine the search radius of where to build different constructs
+		//		int maxDist = 8;
+		//		int changeRate = 2;
+		//		int stopDist = 40;
+		//		TilePosition aroundTile = self.getStartLocation();
+		//
+		//		// build a refinery at the nearest geyser location to the starting point
+		//		if(buildingType == UnitType.Terran_Refinery)
+		//		{
+		//			List<Unit> geysers = game.getGeysers();
+		//			Unit closest = null;
+		//			Position position = BWTA.getStartLocation(self).getPosition();
+		//			for(Unit geyser : geysers)
+		//			{
+		//				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
+		//				{
+		//					if(closest == null || geyser.getDistance(position) < geyser.getDistance(position))
+		//					{
+		//						closest = geyser;
+		//					}
+		//				}
+		//			}
+		//			return closest.getTilePosition();
+		//		}
+		//
+		//		// search for a an empty tile position that can build a given building type
+		//		while((maxDist < stopDist))
+		//		{
+		//			int minX = aroundTile.getX()-maxDist;
+		//			int maxX = aroundTile.getX()+maxDist;
+		//			int minY = aroundTile.getY()-maxDist;
+		//			int maxY = aroundTile.getY()+maxDist;
+		//			// loop through the defined area
+		//			for(int i = minX; i <= maxX; i++)
+		//			{
+		//				for(int j = minY; j <= maxY; j++)
+		//				{
+		//					if(i < maxX && i > minX && j < maxY && j > minY)
+		//					{
+		//						continue;
+		//					}
+		//					if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, true))
+		//					{
+		//						return new TilePosition(i,j);
+		//					}
+		//				}
+		//			}
+		//			// we didn't find a valid tile, so increase max distance
+		//			maxDist+=changeRate;
+		//		}
+		//		game.printf("Unable to find suitable build position for "+buildingType.toString());
+		//		return null;
 	}
 
 	/**
@@ -193,7 +201,7 @@ public class BuildingManager{
 		}
 		return null;
 	}
-	
+
 	/*
 	 * productionBuildingCount()
 	 * counts the number of team buildings that are either barracks or command centers
@@ -211,10 +219,10 @@ public class BuildingManager{
 				count++;
 			}
 		}
-		
+
 		return count;
 	}
-	
+
 	/*
 	 * mateGenes() 
 	 * Mate two genes and return two children
@@ -226,29 +234,29 @@ public class BuildingManager{
 	public Gene[] mateGenes(Gene gene1, Gene gene2)
 	{
 		Gene[] children = new Gene[2];
-		
+
 		// split the genes at random index, combine opposite halves
 		int idx = (int)(Math.random() * GENE_SIZE); 
 		ArrayList<Integer> kid1 = new ArrayList<Integer>();
 		ArrayList<Integer> kid2 = new ArrayList<Integer>();
-		
+
 		kid1.addAll(gene1.getRange(0, idx));
 		kid1.addAll(gene2.getRange(idx, GENE_SIZE));
 		kid2.addAll(gene2.getRange(0, idx));
 		kid2.addAll(gene1.getRange(idx, GENE_SIZE));
-				
+
 		children[0].setListValues(kid1);
 		children[1].setListValues(kid2);
-		
+
 		// possibly mutate an allele of either gene
 		children[0].mutateAllele();
 		children[1].mutateAllele();
-		
+
 		return children;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * selectGene()
 	 * Select the specific gene per map. 
@@ -269,19 +277,20 @@ public class BuildingManager{
 				population = new Population();
 				populations.put(key, population);
 			}
+			//grab the next gene up
 			
-			
+
 		}
 		else
 		{
 			System.out.println("Hardcoded final genes not yet implemented");
 		}
-		
+
 		//bwta.Region baseRegion = bwta.getRegion(base); 
-		
+
 		//ArrayList<TilePosition> tilePositions = new ArrayList<TilePosition>();
-		
-		
+
+
 		return null; 
 	}
 
@@ -297,4 +306,47 @@ public class BuildingManager{
 		String coords = "(" + base.getX() + "," + base.getY() + ")";
 		return game.mapFileName() + "_" + coords;
 	}
+
+	/**
+	 * saveToFile()
+	 * saves the hashtable of populations to a variable filename
+	 */
+	public void saveToFile()
+	{
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		try 
+		{
+			fos = new FileOutputStream(fileName);
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(populations);
+			oos.close();
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			return; 
+		}
+	}
+	
+	/*
+	 * loadFromFile()
+	 * loads the data from 'filename' into the populations Hashtable
+	 */
+	public void loadFromFile()
+	{
+		try 
+		{
+			FileInputStream fis = new FileInputStream(fileName);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			populations = (Hashtable<String, Population>) ois.readObject();
+		}
+		catch (IOException | ClassNotFoundException e) 
+		{
+			e.printStackTrace();
+			return;
+		} 
+	}
+	
+
 }

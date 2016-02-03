@@ -1,5 +1,6 @@
 package StarcraftAI;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -10,40 +11,27 @@ import java.util.Arrays;
  * @author Casey Sigelmann
  * @author Alex Bowns
  */
-public class Gene {
+public class Gene implements Serializable{
 	//private int[] gene
 	private ArrayList<Integer> gene;
 	private double fitness;
 	private final int GENE_SIZE = 2000; //estimated 850 TilePositions in Benzene;
+	private int wins;
+	private int losses; 
+	
 	
 	/**
 	 * ctor
 	 */
 	public Gene()
 	{
-		//gene = new int[GENE_SIZE];
 		gene = new ArrayList<Integer>();
-//		for(int i = 0; i < gene.length; i++)
-//		{
-//			gene[i] = -1;
-//		}
-		
-		fitness = 0;
+		fitness = -1;
+		wins = 0;
+		losses = 0;
 	}
 	
-	/**
-	 * setValues
-	 * Sets this gene to the given values
-	 * 
-	 * @param values
-	 */
-	public void setValues(int[] values)
-	{
-		for (int i = 0; i < values.length; i++)
-		{
-			gene.add(values[i]);
-		}
-	}
+
 	
 	public void setListValues(ArrayList<Integer> values)
 	{
@@ -82,9 +70,20 @@ public class Gene {
 		if (rand == 1)
 		{
 			int allele = (int)(Math.random() * GENE_SIZE);
-			//TODO not sure what the range of our alleles is...so i'm guessing
-			int newVal = (int)(Math.random() * 1000);
+			int newVal = (int)(Math.random() * Integer.MAX_VALUE);
 			gene.set(allele, newVal);
 		}
 	}
+	
+	public double getFitness()
+	{
+		return fitness;
+	}
+	
+	//TODO waiting for Max's StrategyManager winEvent method to be implemented 
+	public int updateWinPct()
+	{
+		return -1; 
+	}
 }
+
