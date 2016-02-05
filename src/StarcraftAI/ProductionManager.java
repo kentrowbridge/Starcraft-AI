@@ -186,6 +186,10 @@ public class ProductionManager {
 			}
 			
 			repairBuildings();
+			for(Unit b : damagedBuildings)
+			{
+				game.drawCircleMap(b.getX(), b.getY(), 50, Color.Red, false);
+			}
 			
 			processQueue();
 		}
@@ -212,25 +216,35 @@ public class ProductionManager {
 	private void repairBuildings()
 	{
 		//only repair newly damaged buildings
-		List<Unit> toFix = new ArrayList<Unit>();
-		for(Unit b : buildingManager.checkBuildings())
-		{
-			//add newly damaged buildings
-			if(!damagedBuildings.contains(b))
-			{
-				toFix.add(b);
-				damagedBuildings.add(b);
-			}
-		}
+		List<Unit> toFix = buildingManager.checkBuildings();
+//		for(Unit b : buildingManager.checkBuildings())
+//		{
+//			//add newly damaged buildings
+//			if(!damagedBuildings.contains(b))
+//			{
+//				toFix.add(b);
+//				damagedBuildings.add(b);
+//			}
+//		}
 		
 		for(Unit b : toFix)
-		{
+		{			
 			Unit worker = workerManager.getWorker();
 			if(worker != null)
 			{
-				worker.repair(b);
-				System.out.println("Worker sent for repairs.");
-				
+				if(b.isCompleted())
+				{ // building is complete but damaged
+					worker.repair(b);
+				}
+				else
+				{ // building is incomplete	
+					worker.rightClick(b);
+					System.out.println(worker.getOrder());
+				}	
+				System.out.println("Worker sent for repairs.");		
+			}
+			else{
+				System.out.println("No available worker");
 			}
 		}
 	}
@@ -329,7 +343,7 @@ public class ProductionManager {
 	 * This runs once at the instantiation of the class and never again. 
 	 * 
 	 */
-	public void initTechPaths()
+	private void initTechPaths()
 	{
 		
 		// command center
@@ -456,7 +470,7 @@ public class ProductionManager {
 	 * @param preReqs - The list of Prerequisite unitTypes that are needed to build ut. 
 	 * @return - a new list with the new Unit Type added to the prerequisites. 
 	 */
-	public ArrayList<UnitType> buildDependecies(UnitType ut, ArrayList<UnitType> preReqs)
+	private ArrayList<UnitType> buildDependecies(UnitType ut, ArrayList<UnitType> preReqs)
 	{
 		ArrayList<UnitType> temp;
 		if(preReqs != null)

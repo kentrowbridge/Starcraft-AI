@@ -130,12 +130,20 @@ public class BuildingManager{
 	{
 		//examine buildings and remove dead units
 		ArrayList<Unit> buildingsToRemove = new ArrayList<Unit>();
+		List<Unit> damagedBuildings = this.checkBuildings();
 		for(Unit building : buildingList)
 		{
-			if (!building.exists())
+			if(!building.exists())
 			{
 				buildingsToRemove.add(building);
 			}
+//			if(damagedBuildings.contains(building))
+//			{
+//				if(building.isCompleted() && building.getHitPoints() == buildingMaxHealth(building.getType()))
+//				{
+//					damaged
+//				}
+//			}
 		}
 		for(Unit building : buildingsToRemove)
 		{
