@@ -12,32 +12,31 @@ import java.util.ArrayList;
  */
 public class Population implements Serializable{
 	private Gene[] population;
-	private final int POPULATION_SIZE = 20;
+	public static final int POPULATION_SIZE = 20;
 	private int generation; 
 	private int index; 
 	
 	public Population()
 	{
 		population = new Gene[POPULATION_SIZE];
-	}
-	
-	//TODO 
-	public Gene getNextGene()
-	{
-		return population[0];
-	}
-	
-	public void initRandomPopulation()
-	{
-		ArrayList<Integer> valList = new ArrayList<Integer>();	
-		for (int z = 0; z < POPULATION_SIZE; z++)
+		for(int i = 0; i < population.length; i++)
 		{
-			for (int i = 0; i < 2000; i++)
-			{
-				valList.add(i);
-			}
-			population[z].setListValues(valList);	
+			population[i] = new Gene();
 		}
 		
+	}
+	
+	//TODO comment
+	public Gene getNextGene()
+	{
+		for(int i = index; i < population.length; i++)
+		{
+			Gene candidateGene = population[i];
+			if(candidateGene.getFitness() == -1.0)
+			{
+				return candidateGene;
+			}
+		}
+		return null;
 	}
 }

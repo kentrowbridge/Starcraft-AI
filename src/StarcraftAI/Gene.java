@@ -15,7 +15,8 @@ public class Gene implements Serializable{
 	//private int[] gene
 	private ArrayList<Integer> gene;
 	private double fitness;
-	private final int GENE_SIZE = 2000; //estimated 850 TilePositions in Benzene;
+	public static final int GENE_SIZE = 2000; //estimated 850 TilePositions in Benzene;
+	public static final int NUM_GAMES_FOR_FITNESS_EVAL = 10;
 	private int wins;
 	private int losses; 
 	
@@ -26,9 +27,15 @@ public class Gene implements Serializable{
 	public Gene()
 	{
 		gene = new ArrayList<Integer>();
-		fitness = -1;
+		fitness = -1.0;
 		wins = 0;
 		losses = 0;
+		
+		//initialize gene with random values
+		for (int i = 0; i < GENE_SIZE; i++)
+		{
+			gene.add(i);
+		}
 	}
 	
 
@@ -81,9 +88,21 @@ public class Gene implements Serializable{
 	}
 	
 	//TODO waiting for Max's StrategyManager winEvent method to be implemented 
-	public int updateWinPct()
+	public void updateFitness(boolean hasWon, double time)
 	{
-		return -1; 
+		if(hasWon)
+		{
+			wins++;
+		}
+		else
+		{
+			losses++;
+		}
+		if(wins + losses >= NUM_GAMES_FOR_FITNESS_EVAL)
+		{
+			//TODO update fitness using time and win/loss percentage
+		}
+		
 	}
 }
 

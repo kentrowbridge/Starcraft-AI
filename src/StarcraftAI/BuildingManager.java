@@ -1,10 +1,5 @@
 package StarcraftAI;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.*;
 
 import bwapi.*;
@@ -26,8 +21,6 @@ public class BuildingManager{
 	private Player self;
 
 	private final boolean IS_TRAINING = true;
-	private final int POPULATION_SIZE = 20;
-	private final int GENE_SIZE = 2000;
 
 	private BWTA bwta;
 
@@ -49,7 +42,15 @@ public class BuildingManager{
 		this.game = game;
 		this.self = self;
 		this.bwta = new BWTA();
-		this.populations = new Hashtable<String, Population>();
+		File f = new File(fileName);
+		if(f.exists())
+		{
+			loadFromFile();
+		}
+		else
+		{
+			this.populations = new Hashtable<String, Population>();
+		}
 		this.buildingList = new ArrayList<Unit>();
 	}
 
@@ -236,14 +237,14 @@ public class BuildingManager{
 		Gene[] children = new Gene[2];
 
 		// split the genes at random index, combine opposite halves
-		int idx = (int)(Math.random() * GENE_SIZE); 
+		int idx = (int)(Math.random() * Gene.GENE_SIZE); 
 		ArrayList<Integer> kid1 = new ArrayList<Integer>();
 		ArrayList<Integer> kid2 = new ArrayList<Integer>();
 
 		kid1.addAll(gene1.getRange(0, idx));
-		kid1.addAll(gene2.getRange(idx, GENE_SIZE));
+		kid1.addAll(gene2.getRange(idx, Gene.GENE_SIZE));
 		kid2.addAll(gene2.getRange(0, idx));
-		kid2.addAll(gene1.getRange(idx, GENE_SIZE));
+		kid2.addAll(gene1.getRange(idx, Gene.GENE_SIZE));
 
 		children[0].setListValues(kid1);
 		children[1].setListValues(kid2);
@@ -263,8 +264,9 @@ public class BuildingManager{
 	 * 
 	 * @return The gene that we should use for this game
 	 */
-	private ArrayList selectGene()
+	private Gene selectGene()
 	{
+		Gene geneToUse = null;
 		if(IS_TRAINING)
 		{
 			String key = getMapAndCoords();
@@ -278,12 +280,13 @@ public class BuildingManager{
 				populations.put(key, population);
 			}
 			//grab the next gene up
-			
+			geneToUse = population.getNextGene();
 
 		}
 		else
 		{
 			System.out.println("Hardcoded final genes not yet implemented");
+			geneToUse = null;
 		}
 
 		//bwta.Region baseRegion = bwta.getRegion(base); 
@@ -291,7 +294,7 @@ public class BuildingManager{
 		//ArrayList<TilePosition> tilePositions = new ArrayList<TilePosition>();
 
 
-		return null; 
+		return geneToUse; 
 	}
 
 	/**
