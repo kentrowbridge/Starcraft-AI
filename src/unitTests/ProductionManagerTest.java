@@ -19,7 +19,7 @@ public class ProductionManagerTest {
 
 	@Test
 	public void testInitTechPaths() {
-		Hashtable<UnitType, ArrayList<UnitType>> results = ProductionManager.initTechPaths();
+//		Hashtable<UnitType, ArrayList<UnitType>> results = ProductionManager.initTechPaths();
 		assertEquals(true, true);
 	}
 

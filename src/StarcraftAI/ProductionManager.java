@@ -1,6 +1,8 @@
 package StarcraftAI;
 import java.util.*;
 
+import javax.sound.midi.ControllerEventListener;
+
 import bwapi.*;
 /**
  * The production manager is responsible for building units that the strategy manager requests. 
@@ -62,7 +64,7 @@ public class ProductionManager {
 		
 		initBuildingsForUnits();
 		
-		techPaths = ProductionManager.initTechPaths();
+		techPaths = initTechPaths();
 		for(UnitType key : techPaths.keySet()){
 			System.out.println(techPaths.get(key).toString());
 		}
@@ -107,7 +109,7 @@ public class ProductionManager {
 	 * then using that worker, issue a build command to the Building Manager to construct 
 	 * the building type specified.
 	 *  
-	 * @param unitType - type of building ot build
+	 * @param unitType - type of building to build
 	 */
 	public boolean buildBuilding(UnitType unitType)
 	{
@@ -316,7 +318,7 @@ public class ProductionManager {
 	 * This runs once at the instantiation of the class and never again. 
 	 * 
 	 */
-	public static Hashtable<UnitType, ArrayList<UnitType>> initTechPaths()
+	public Hashtable<UnitType, ArrayList<UnitType>> initTechPaths()
 	{
 		Hashtable<UnitType, ArrayList<UnitType>> techPaths = new Hashtable<UnitType, ArrayList<UnitType>>();
 		// command center
@@ -414,55 +416,67 @@ public class ProductionManager {
 		techPaths.put(UnitType.Terran_Nuclear_Silo, nuke);
 		
 		/* Non-Building Units */
+		ArrayList<UnitType> scv = new ArrayList<UnitType>(cc);
+		scv.add(UnitType.Terran_SCV);		
+		techPaths.put(UnitType.Terran_SCV, scv);
 		
-		// For each army unit
-		for(UnitType key : buildingsForUnits.keySet())
-		{
-//			ArrayList<UnitType> temp = new ArrayList<UnitType>(techPaths.get(buildingsForUnits.get(key)));
-//			temp.add(key);
-			ArrayList<UnitType> temp = buildDependecies(key, techPaths.get(buildingsForUnits.get(key)));
-			techPaths.put(key, temp);
-		}
+		ArrayList<UnitType> marine = new ArrayList<UnitType>(racks);
+		marine.add(UnitType.Terran_Marine);		
+		techPaths.put(UnitType.Terran_Marine, marine);
 		
 		ArrayList<UnitType> medic = new ArrayList<UnitType>(academy);
 		medic.add(UnitType.Terran_Medic);		
 		techPaths.put(UnitType.Terran_Medic, medic);
 		
+		ArrayList<UnitType> fireBat = new ArrayList<UnitType>(racks);
+		fireBat.add(UnitType.Terran_Firebat);		
+		techPaths.put(UnitType.Terran_Firebat, fireBat);
+		
+		ArrayList<UnitType> ghost = new ArrayList<UnitType>(ops);
+		ghost.add(UnitType.Terran_Academy);
+		ghost.add(UnitType.Terran_Ghost);		
+		techPaths.put(UnitType.Terran_Ghost, ghost);
+		
+		ArrayList<UnitType> vulture = new ArrayList<UnitType>(factory);
+		vulture.add(UnitType.Terran_Vulture);		
+		techPaths.put(UnitType.Terran_Vulture, vulture);
+		
+		ArrayList<UnitType> spiderMine = new ArrayList<UnitType>(vulture);
+		spiderMine.add(UnitType.Terran_Vulture_Spider_Mine);		
+		techPaths.put(UnitType.Terran_Vulture_Spider_Mine, spiderMine);
+		
 		ArrayList<UnitType> tank = new ArrayList<UnitType>(machineShop);
 		tank.add(UnitType.Terran_Siege_Tank_Tank_Mode);	
 		techPaths.put(UnitType.Terran_Siege_Tank_Tank_Mode, tank);
 		
+		ArrayList<UnitType> goliath = new ArrayList<UnitType>(armory);
+		goliath.add(UnitType.Terran_Goliath);		
+		techPaths.put(UnitType.Terran_Goliath, goliath);
+		
+		ArrayList<UnitType> wraith = new ArrayList<UnitType>(starport);
+		wraith.add(UnitType.Terran_Wraith);		
+		techPaths.put(UnitType.Terran_Wraith, wraith);
+		
+		ArrayList<UnitType> dropship = new ArrayList<UnitType>(tower);
+		dropship.add(UnitType.Terran_Dropship);		
+		techPaths.put(UnitType.Terran_Dropship, dropship);
+		
+		ArrayList<UnitType> scienceVessel = new ArrayList<UnitType>(tower);
+		scienceVessel.add(UnitType.Terran_Science_Facility);
+		scienceVessel.add(UnitType.Terran_Science_Vessel);		
+		techPaths.put(UnitType.Terran_Science_Vessel, scienceVessel);
+		
+		ArrayList<UnitType> BattleCruiser = new ArrayList<UnitType>(physics);
+		BattleCruiser.add(UnitType.Terran_Control_Tower);
+		BattleCruiser.add(UnitType.Terran_Battlecruiser);
+		techPaths.put(UnitType.Terran_Battlecruiser, BattleCruiser);
+		
+		ArrayList<UnitType> valkyrie = new ArrayList<UnitType>(tower);
+		valkyrie.add(UnitType.Terran_Armory);
+		valkyrie.add(UnitType.Terran_Valkyrie);
+		techPaths.put(UnitType.Terran_Valkyrie, valkyrie);
 		
 		return techPaths;
-	}
-	
-	/**
-	 * buildDependecies
-	 * given a list of prerequisite unit types, this adds the new unit to the dependent list 
-	 * in a new list after the preReqs. 
-	 *  
-	 * @param ut - The Unit Type to be added to the list
-	 * @param preReqs - The list of Prerequisite unitTypes that are needed to build ut. 
-	 * @return - a new list with the new Unit Type added to the prerequisites. 
-	 */
-	public static ArrayList<UnitType> buildDependecies(UnitType ut, ArrayList<UnitType> preReqs)
-	{
-		ArrayList<UnitType> temp;
-		
-		// if we have prereqs
-		if(preReqs != null)
-		{
-			temp = new ArrayList<UnitType>(preReqs);
-		}
-		// if not, new arrayList.
-		else
-		{
-			temp = new ArrayList<UnitType>();
-		}
-		
-		temp.add(ut);
-		
-		return temp;
 	}
 	
 	/**
