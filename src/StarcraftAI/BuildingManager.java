@@ -23,6 +23,7 @@ public class BuildingManager{
 	private final boolean IS_TRAINING = true;
 
 	private BWTA bwta;
+	private ArrayList<TilePosition> mappedGenesToTilePositions;
 
 	// hash table where key is "map-name" concatenated with the starting base coordinates,
 	// value is the population of genes
@@ -52,6 +53,8 @@ public class BuildingManager{
 			this.populations = new Hashtable<String, Population>();
 		}
 		this.buildingList = new ArrayList<Unit>();
+		mapTiles();
+		selectGene();
 	}
 
 	/**
@@ -80,6 +83,35 @@ public class BuildingManager{
 			builder.build(placement, buildingType);
 		}
 	}
+	
+	//TODO comments
+	private void mapTiles()
+	{
+		mappedGenesToTilePositions = new ArrayList<TilePosition>();
+		// loop through tile positions
+		TilePosition base = self.getStartLocation();
+		bwta.Region baseRegion = bwta.getRegion(base); 
+		//baseRegion.
+		
+		int x = 0, y = 0; 
+		TilePosition searchTile = new TilePosition(x, y);
+	
+		while(searchTile.isValid())
+		{
+			while(searchTile.isValid())
+			{
+				searchTile = new TilePosition(x, y);
+				//map a gene index to a tile position
+				if (bwta.getRegion(searchTile) == baseRegion)
+				{
+					mappedGenesToTilePositions.add(searchTile);
+				}
+				x += 1;
+			}
+			x = 0; 
+			y += 1; 
+		}
+	}
 
 	/**
 	 * getPlacement()
@@ -90,9 +122,70 @@ public class BuildingManager{
 	 */
 	private TilePosition getPlacement(UnitType buildingType, Unit builder)
 	{
+		
+		// build a refinery at the nearest geyser location to the starting point
+		if(buildingType == UnitType.Terran_Refinery)
+		{
+			List<Unit> geysers = game.getGeysers();
+			Unit closest = null;
+			Position position = BWTA.getStartLocation(self).getPosition();
+			for(Unit geyser : geysers)
+			{
+				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
+				{
+					if(closest == null)
+					{
+						closest = geyser;
+					}
+				}
+			}
+			return closest.getTilePosition();
+		}
 
-
-		return null;
+		
+		
+		// use gene to build any other building type
+		int highestIdx = gene.getHighestIdx();
+		TilePosition tp =  mappedGenesToTilePositions.get(highestIdx);
+		ArrayList<Integer> reactivateList = new ArrayList<Integer>();
+		boolean buildingFound = false; 
+		//pick new highest index if we can't build at the tileposition
+		while(!(game.canBuildHere(builder, tp, buildingType, true))){
+			//if a building is in the tile position, deactivate the index
+			List<Unit> tileUnit = game.getUnitsOnTile(tp.getX(), tp.getY());
+			buildingFound = false;
+			for (Unit unit : tileUnit)
+			{
+				if (unit.getType().isBuilding())
+				{
+					//deactivate
+					buildingFound = true; 
+					break;
+				}
+			}
+			// implied some non building is in the space, reactivate the index for later consideration
+			if (buildingFound == false)
+			{
+				reactivateList.add(highestIdx);
+			}
+			gene.deactivateIndex(highestIdx);
+		 
+			
+			highestIdx = gene.getHighestIdx();
+			tp = mappedGenesToTilePositions.get(highestIdx);
+		}
+		
+		// now reactivate all indexes that had non building units occupying tile position
+		for (int idx : reactivateList)
+		{
+			gene.reactivateIndex(idx);
+		}
+						
+		
+		return mappedGenesToTilePositions.get(highestIdx);
+		
+		
+		
 
 		//		// values to help determine the search radius of where to build different constructs
 		//		int maxDist = 8;
@@ -289,11 +382,6 @@ public class BuildingManager{
 			geneToUse = null;
 		}
 
-		//bwta.Region baseRegion = bwta.getRegion(base); 
-
-		//ArrayList<TilePosition> tilePositions = new ArrayList<TilePosition>();
-
-
 		return geneToUse; 
 	}
 
@@ -349,6 +437,11 @@ public class BuildingManager{
 			e.printStackTrace();
 			return;
 		} 
+	}
+	
+	public void onGameEnd(boolean hasWon, double time)
+	{
+		gene.updateFitness(hasWon, time);
 	}
 	
 

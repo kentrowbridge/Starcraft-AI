@@ -12,8 +12,9 @@ import java.util.Arrays;
  * @author Alex Bowns
  */
 public class Gene implements Serializable{
-	//private int[] gene
+	
 	private ArrayList<Integer> gene;
+	private ArrayList<Integer> geneClone;
 	private double fitness;
 	public static final int GENE_SIZE = 2000; //estimated 850 TilePositions in Benzene;
 	public static final int NUM_GAMES_FOR_FITNESS_EVAL = 10;
@@ -27,6 +28,7 @@ public class Gene implements Serializable{
 	public Gene()
 	{
 		gene = new ArrayList<Integer>();
+		geneClone = new ArrayList<Integer>();
 		fitness = -1.0;
 		wins = 0;
 		losses = 0;
@@ -34,15 +36,61 @@ public class Gene implements Serializable{
 		//initialize gene with random values
 		for (int i = 0; i < GENE_SIZE; i++)
 		{
-			gene.add(i);
+			int geneVal = (int) (Math.random()*Integer.MAX_VALUE);
+			gene.add(geneVal);
 		}
+		geneClone.addAll(gene);
 	}
 	
 
 	
+	/* 
+	 * setListValues()
+	 * set the gene and clone values to new values
+	 */
 	public void setListValues(ArrayList<Integer> values)
 	{
 		gene = values;
+		geneClone = values; 
+	}
+	
+	/*
+	 * getHighestIdx()
+	 * find and return the index in the gene array list with the highest value
+	 * 
+	 */
+	public int getHighestIdx()
+	{
+		int tempIdx = 0;
+		int tempVal = -1; 
+		for (int i = 0; i < gene.size(); i++)
+		{
+			if (gene.get(i) > tempVal)
+			{
+				tempVal = gene.get(i);
+				tempIdx = i; 
+			}
+		}
+		
+
+		return tempIdx;
+	}
+	
+	/*
+	 * deactivateIndex()
+	 * set the highest index to be -1 incase if this index was occupied (so we don't re pick it)  
+	 */
+	public void deactivateIndex(int index)
+	{
+		gene.set(index, -1);
+	}
+	
+	/*
+	 * TODO COMMENT
+	 */
+	public void reactivateIndex(int index)
+	{
+		gene.set(index, geneClone.get(index));
 	}
 	
 	/**
@@ -79,9 +127,14 @@ public class Gene implements Serializable{
 			int allele = (int)(Math.random() * GENE_SIZE);
 			int newVal = (int)(Math.random() * Integer.MAX_VALUE);
 			gene.set(allele, newVal);
+			geneClone.set(allele, newVal); 
 		}
 	}
 	
+	/*
+	 * getFitness()
+	 * return the fitness value
+	 */
 	public double getFitness()
 	{
 		return fitness;
@@ -100,7 +153,7 @@ public class Gene implements Serializable{
 		}
 		if(wins + losses >= NUM_GAMES_FOR_FITNESS_EVAL)
 		{
-			//TODO update fitness using time and win/loss percentage
+			fitness = (wins*1.0) / ((wins + losses)*1.0); 
 		}
 		
 	}
