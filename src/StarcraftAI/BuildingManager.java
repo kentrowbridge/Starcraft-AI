@@ -130,25 +130,20 @@ public class BuildingManager{
 	{
 		//examine buildings and remove dead units
 		ArrayList<Unit> buildingsToRemove = new ArrayList<Unit>();
-		List<Unit> damagedBuildings = this.checkBuildings();
 		for(Unit building : buildingList)
 		{
 			if(!building.exists())
 			{
 				buildingsToRemove.add(building);
 			}
-//			if(damagedBuildings.contains(building))
-//			{
-//				if(building.isCompleted() && building.getHitPoints() == buildingMaxHealth(building.getType()))
-//				{
-//					damaged
-//				}
-//			}
 		}
 		for(Unit building : buildingsToRemove)
 		{
 			buildingList.remove(building);
 		}
+		
+		//remove repaired buildings from damaged list
+		
 	}
 
 	/**
@@ -166,14 +161,14 @@ public class BuildingManager{
 		for(Unit b : buildingList)
 		{
 			//check if the building is incomplete and not being constructed
-			if(!b.isCompleted() && b.getBuildUnit() == null)
+			if(!b.isCompleted() && !b.isBeingConstructed())
 			{
 				returnList.add(b);
 			}
 			
 			//check if buildings health is too low
 			float healthPercentage = b.getHitPoints() / (float) (buildingMaxHealth.get(b.getType()));
-			if(b.isCompleted() && healthPercentage <= 0.5)
+			if(b.isCompleted() && !b.isBeingHealed() && healthPercentage <= 0.5)
 			{
 				returnList.add(b);
 			}

@@ -186,10 +186,6 @@ public class ProductionManager {
 			}
 			
 			repairBuildings();
-			for(Unit b : damagedBuildings)
-			{
-				game.drawCircleMap(b.getX(), b.getY(), 50, Color.Red, false);
-			}
 			
 			processQueue();
 		}
@@ -239,13 +235,11 @@ public class ProductionManager {
 				else
 				{ // building is incomplete	
 					worker.rightClick(b);
-					System.out.println(worker.getOrder());
-				}	
-				System.out.println("Worker sent for repairs.");		
+				}			
 			}
-			else{
-				System.out.println("No available worker");
-			}
+			
+			//debugging graphics
+			game.drawCircleMap(b.getX(), b.getY(), 50, Color.Red, false);
 		}
 	}
 	
