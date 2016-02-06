@@ -174,14 +174,6 @@ public class BuildingManager{
 			}
 		}
 		
-		//Display which buildings need repairs
-		int margin = 20;
-		for (Unit b : returnList)
-		{
-			game.drawTextScreen(10, margin, b.getPosition().toString());
-			margin += 10;
-		}	
-		
 		return returnList;
 	}
 

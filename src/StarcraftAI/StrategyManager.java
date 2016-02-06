@@ -219,37 +219,37 @@ public class StrategyManager extends DefaultBWListener {
         }
         
         // else build marines
-//        if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0)
-//        {
-////        	System.out.println("BUILD Marine!!!");
-//        	// If we have an academy and marines make up less than 75 percent of our army then build a marine
-//        	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 
-//        			&& militaryManager.getUnitRatio(UnitType.Terran_Marine) <= .75 )
-//        	{
-//	        	productionGoal.add(UnitType.Terran_Marine);
-//	        	minerals -= 100;
-//        	}
-//        	// else if there is no academy, just build the marine
-//        	else if(self.completedUnitCount(UnitType.Terran_Academy) < 1)
-//        	{
-//        		productionGoal.add(UnitType.Terran_Marine);
-//	        	minerals -= 100;
-//        	}
-//        	//else don't build a marine. We have too many. 
-//        }
+        if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0)
+        {
+//        	System.out.println("BUILD Marine!!!");
+        	// If we have an academy and marines make up less than 75 percent of our army then build a marine
+        	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 
+        			&& militaryManager.getUnitRatio(UnitType.Terran_Marine) <= .75 )
+        	{
+	        	productionGoal.add(UnitType.Terran_Marine);
+	        	minerals -= 100;
+        	}
+        	// else if there is no academy, just build the marine
+        	else if(self.completedUnitCount(UnitType.Terran_Academy) < 1)
+        	{
+        		productionGoal.add(UnitType.Terran_Marine);
+	        	minerals -= 100;
+        	}
+        	//else don't build a marine. We have too many. 
+        }
         
         // else build Medics 
-//        if(minerals >= 50 && gas >= 25 && self.allUnitCount(UnitType.Terran_Barracks)>0 
-//        		&& self.completedUnitCount(UnitType.Terran_Academy) >= 1)
-//        {
-////        	System.out.println("BUILD Marine!!!");
-//        	if(militaryManager.getUnitRatio(UnitType.Terran_Medic) != null 
-//        			&& militaryManager.getUnitRatio(UnitType.Terran_Medic) <= .25){
-//	        	productionGoal.add(UnitType.Terran_Medic);
-//	        	minerals -= 50;
-//	        	gas -= 25;
-//        	}
-//        }
+        if(minerals >= 50 && gas >= 25 && self.allUnitCount(UnitType.Terran_Barracks)>0 
+        		&& self.completedUnitCount(UnitType.Terran_Academy) >= 1)
+        {
+//        	System.out.println("BUILD Marine!!!");
+        	if(militaryManager.getUnitRatio(UnitType.Terran_Medic) != null 
+        			&& militaryManager.getUnitRatio(UnitType.Terran_Medic) <= .25){
+	        	productionGoal.add(UnitType.Terran_Medic);
+	        	minerals -= 50;
+	        	gas -= 25;
+        	}
+        }
     	
     	//if there's enough minerals, and not currently training an SCV, and we don't infringe on building a supply depot
         //train an SCV

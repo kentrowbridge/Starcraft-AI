@@ -212,16 +212,20 @@ public class ProductionManager {
 	private void repairBuildings()
 	{
 		//only repair newly damaged buildings
-		List<Unit> toFix = buildingManager.checkBuildings();
-//		for(Unit b : buildingManager.checkBuildings())
-//		{
-//			//add newly damaged buildings
-//			if(!damagedBuildings.contains(b))
-//			{
-//				toFix.add(b);
-//				damagedBuildings.add(b);
-//			}
-//		}
+		List<Unit> toFix = new ArrayList<Unit>();
+		
+		//only add newly damaged buildings
+		for(Unit b : buildingManager.checkBuildings())
+		{
+			if(!damagedBuildings.contains(b))
+			{
+				damagedBuildings.add(b);
+				toFix.add(b);
+			}
+			
+			//debugging graphics
+			game.drawCircleMap(b.getX(), b.getY(), 50, Color.Red, false);
+		}
 		
 		for(Unit b : toFix)
 		{			
@@ -237,9 +241,6 @@ public class ProductionManager {
 					worker.rightClick(b);
 				}			
 			}
-			
-			//debugging graphics
-			game.drawCircleMap(b.getX(), b.getY(), 50, Color.Red, false);
 		}
 	}
 	
