@@ -82,7 +82,7 @@ public class BuildingManager{
 			{
 				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
 				{
-					if(closest == null || geyser.getDistance(position) < geyser.getDistance(position))
+					if(closest == null || geyser.getDistance(position) < closest.getDistance(position))
 					{
 						closest = geyser;
 					}
