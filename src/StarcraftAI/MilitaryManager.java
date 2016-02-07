@@ -78,6 +78,20 @@ public class MilitaryManager{
 	}
 	
 	/**
+	 * hasScout()
+	 * Check if there is a unit within the scout squad. 
+	 * 
+	 * @return true if there is a scout, false if not
+	 */
+	public boolean hasScout()
+	{
+		if (squads.get(SquadType.Scout).isEmpty()){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * update()
 	 * Examines all the military units and ensures that they 
 	 * are in both the squads list and the militaryUnits list.
@@ -116,16 +130,6 @@ public class MilitaryManager{
 				armyManager.defend();
 				break;
 			case Scout:
-				for(Unit u : self.getUnits())
-				{
-					if(u.getType().equals(UnitType.Terran_SCV))
-					{
-						ArrayList<Unit> units = new ArrayList<Unit>();
-						units.add(u);
-						squads.get(SquadType.Scout).setUnits(units);
-					}
-				}
-				
 				armyManager.scout();
 				break;
 		}
