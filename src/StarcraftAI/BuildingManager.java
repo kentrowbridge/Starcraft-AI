@@ -126,10 +126,11 @@ public class BuildingManager{
 	 */
 	public void update()
 	{
+		//examine buildings and remove dead units
 		ArrayList<Unit> buildingsToRemove = new ArrayList<Unit>();
 		for(Unit building : buildingList)
 		{
-			if (!building.exists())
+			if(!building.exists())
 			{
 				buildingsToRemove.add(building);
 			}
@@ -138,18 +139,40 @@ public class BuildingManager{
 		{
 			buildingList.remove(building);
 		}
+		
+		//remove repaired buildings from damaged list
+		
 	}
 
 	/**
 	 * checkBuildings()
 	 * Checks the buildings list and returns a list of buildings that are 
-	 * damaged or incomplete
+	 * damaged ( < %50 health) or incomplete
 	 * 
 	 * @return - list of damaged or incomplete buildings
 	 */
-	public List checkBuildings()
+	public List<Unit> checkBuildings()
 	{
-		return null;
+		List<Unit> returnList = new ArrayList<Unit>();
+		
+		//search all buildings for incomplete and damaged buildings
+		for(Unit b : buildingList)
+		{
+			//check if the building is incomplete and not being constructed
+			if(!b.isCompleted() && !b.isBeingConstructed())
+			{
+				returnList.add(b);
+			}
+			
+			//check if buildings health is too low
+			float healthPercentage = b.getHitPoints() / (float) (b.getType().maxHitPoints());
+			if(b.isCompleted() && !b.isBeingHealed() && healthPercentage <= 0.5)
+			{
+				returnList.add(b);
+			}
+		}
+		
+		return returnList;
 	}
 
 	/**
@@ -175,13 +198,17 @@ public class BuildingManager{
 		return null;
 	}
 	
+	/**
+	 * productionBuildingCount()
+	 * 
+	 * @return the number of unit producing buildings
+	 */
 	public int productionBuildingCount()
 	{
 		int count = 0;
 		for (Unit building : buildingList)
 		{
-			if(building.getType() == UnitType.Terran_Barracks 
-					|| building.getType() == UnitType.Terran_Command_Center)
+			if(building.getType().canProduce())
 			{
 				count++;
 			}

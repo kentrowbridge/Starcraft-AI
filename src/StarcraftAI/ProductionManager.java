@@ -28,7 +28,8 @@ public class ProductionManager {
 	private BuildingManager buildingManager;
 	private WorkerManager workerManager;
 	
-	private static Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
+	private Hashtable<UnitType, UnitType> buildingsForUnits = new Hashtable<UnitType, UnitType>();
+	private List<Unit> damagedBuildings = new ArrayList<Unit>();
 	
 	/**
 	 * Ctor
@@ -79,7 +80,8 @@ public class ProductionManager {
 	 * @param unit - the specific unit that we are checking
 	 */
 	public void addUnit(Unit unit)
-	{		if (unit == null)
+	{
+		//dont add null or units that do not belong to the agent		if (unit == null || unit.getPlayer() != self)
 			return;
 		
 		if(unit.getType().isBuilding())
@@ -196,6 +198,8 @@ public class ProductionManager {
 				printProcutionQueue();
 			}
 			
+			repairBuildings();
+			
 			processQueue();
 		}
 		catch(Exception e)
@@ -211,6 +215,67 @@ public class ProductionManager {
 	public int getProdBuildingCount()
 	{
 		return buildingManager.productionBuildingCount();
+	}
+	
+	/**
+	 * repairBuildings()
+	 * 
+	 * Find which buildings require repair and task workers to fix them
+	 */
+	private void repairBuildings()
+	{		
+		//reset damagedBuildings list every 500 frames to make sure orders are followed through on
+		if(game.getFrameCount() % 500 == 0)
+		{
+			damagedBuildings.clear();
+		}
+		
+		//only add newly damaged buildings
+		for(Unit b : buildingManager.checkBuildings())
+		{
+			if(!damagedBuildings.contains(b))
+			{
+				damagedBuildings.add(b);
+				issueRepair(b);
+			}
+			
+			//debugging graphics
+			game.drawCircleMap(b.getX(), b.getY(), 50, Color.Red, false);
+		}
+		
+		//remove full health buildings from list
+		for(int i = damagedBuildings.size()-1; i >= 0; i--)
+		{
+			Unit b = damagedBuildings.get(i);
+			if(b.isCompleted() && b.getHitPoints() == b.getType().maxHitPoints())
+			{
+				damagedBuildings.remove(i);
+			}
+		}
+	}
+	
+	/**
+	 * issueRepair()
+	 * 
+	 * Helper method for repairBuildings(). This method take a building and
+	 * tasks a worker to repair the given building.
+	 * 
+	 * @param building - Building to repair
+	 */
+	private void issueRepair(Unit building)
+	{
+		Unit worker = workerManager.getWorker();
+		if(worker != null)
+		{
+			if(building.isCompleted())
+			{ // building is complete but damaged
+				worker.repair(building);
+			}
+			else
+			{ // building is incomplete	
+				worker.rightClick(building);
+			}			
+		}
 	}
 	
 	/**
@@ -475,7 +540,7 @@ public class ProductionManager {
 		valkyrie.add(UnitType.Terran_Armory);
 		valkyrie.add(UnitType.Terran_Valkyrie);
 		techPaths.put(UnitType.Terran_Valkyrie, valkyrie);
-		
+
 		return techPaths;
 	}
 	
