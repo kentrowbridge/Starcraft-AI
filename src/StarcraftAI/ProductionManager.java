@@ -285,4 +285,11 @@ public class ProductionManager {
 		//command center
 		buildingsForUnits.put(UnitType.Terran_SCV, UnitType.Terran_Command_Center);
 	}
+	
+	
+	public void onEnd(boolean isWinner, long elapsedTime)
+	{
+		buildingManager.onEnd(isWinner, elapsedTime);
+		
+	}
 }

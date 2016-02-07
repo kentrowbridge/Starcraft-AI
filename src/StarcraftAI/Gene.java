@@ -20,6 +20,7 @@ public class Gene implements Serializable{
 	public static final int NUM_GAMES_FOR_FITNESS_EVAL = 10;
 	private int wins;
 	private int losses; 
+	private ArrayList<Long> timeList;
 	
 	
 	/**
@@ -40,6 +41,7 @@ public class Gene implements Serializable{
 			gene.add(geneVal);
 		}
 		geneClone.addAll(gene);
+		timeList = new ArrayList<Long>(); 
 	}
 	
 
@@ -141,8 +143,10 @@ public class Gene implements Serializable{
 	}
 	
 	//TODO waiting for Max's StrategyManager winEvent method to be implemented 
-	public void updateFitness(boolean hasWon, double time)
+	public void updateFitness(boolean hasWon, long elapsedTime)
 	{
+		timeList.add(elapsedTime);
+				
 		if(hasWon)
 		{
 			wins++;
@@ -153,9 +157,15 @@ public class Gene implements Serializable{
 		}
 		if(wins + losses >= NUM_GAMES_FOR_FITNESS_EVAL)
 		{
-			fitness = (wins*1.0) / ((wins + losses)*1.0); 
-		}
-		
+			long avgTime = (long) 0.0;
+			for (long time : timeList)
+			{
+				avgTime += time;
+			}
+			avgTime /= timeList.size();
+			
+			fitness = ((wins*1.0) / ((wins + losses)*1.0))*.8 + ((double)avgTime / 500.0)*.2; 
+		}	
 	}
 }
 

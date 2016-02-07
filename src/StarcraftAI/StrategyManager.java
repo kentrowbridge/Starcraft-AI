@@ -1,5 +1,6 @@
 package StarcraftAI;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import bwapi.*;
 import bwta.BWTA;
@@ -16,6 +17,8 @@ public class StrategyManager extends DefaultBWListener {
     private Hashtable<UnitType, Integer> enemyBuildingInfo;
     private HashSet<Position> enemyArmyPosition;
     private HashSet<Position> enemyBuildingLocation;
+    private long startTime;
+    private long endTime;
     
     private ProductionManager productionManager;
     private MilitaryManager militaryManager;
@@ -72,6 +75,17 @@ public class StrategyManager extends DefaultBWListener {
         	
     }
     
+    @Override
+    public void onEnd(boolean isWinner)
+    {
+    	endTime = System.nanoTime();
+    	long elapsedTime = endTime - startTime; 
+    	TimeUnit.NANOSECONDS.toSeconds(elapsedTime);
+    	
+    	productionManager.onEnd(isWinner, elapsedTime);
+    	
+    }
+    
     /**
      * onStart()
      * 
@@ -84,6 +98,9 @@ public class StrategyManager extends DefaultBWListener {
     {
         game = mirror.getGame();
         self = game.self();
+        
+        //start a clock for the game time
+        startTime = System.nanoTime();
         
         // init production manager and military manager
         productionManager = new ProductionManager(game, self);

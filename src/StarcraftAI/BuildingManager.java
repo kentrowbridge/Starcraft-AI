@@ -348,7 +348,27 @@ public class BuildingManager{
 
 		return children;
 	}
-
+	
+	private Gene selectGenesToMate()
+	{
+		double combinedFitness = 0.0;
+		double[] evalArr = new double[population.POPULATION_SIZE];
+		
+		for (int i = 0; i < population.POPULATION_SIZE; i++)
+		{
+			combinedFitness += population.getGene(i).getFitness();
+			evalArr[i] = combinedFitness;
+		}
+		double randVal = Math.random() * combinedFitness;
+		for (int i = 0; i < population.POPULATION_SIZE; i++)
+		{
+			if (randVal < evalArr[i])
+			{
+				return population.getGene(i);
+			}
+		}
+		return population.getGene(population.POPULATION_SIZE-1);
+	}
 
 
 	/**
@@ -439,9 +459,23 @@ public class BuildingManager{
 		} 
 	}
 	
-	public void onGameEnd(boolean hasWon, double time)
+	public void onEnd(boolean isWinner, long elapsedTime)
 	{
-		gene.updateFitness(hasWon, time);
+		gene.updateFitness(isWinner, elapsedTime);
+		if (population.allGenesAnalyzed())
+		{
+			Population tempPopulation = new Population();
+			for (int i = 0; i < population.POPULATION_SIZE; i+=2)
+			{
+				Gene g1 = selectGenesToMate();
+				Gene g2 = selectGenesToMate();
+				Gene[] matedGenes = mateGenes(g1, g2);
+				tempPopulation.setGene(i, g1);
+				tempPopulation.setGene(i+1, g2);
+			}	
+			population = tempPopulation; 
+		}
+		saveToFile();
 	}
 	
 

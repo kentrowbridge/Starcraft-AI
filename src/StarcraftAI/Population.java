@@ -13,8 +13,6 @@ import java.util.ArrayList;
 public class Population implements Serializable{
 	private Gene[] population;
 	public static final int POPULATION_SIZE = 20;
-	private int generation; 
-	private int index; 
 	
 	public Population()
 	{
@@ -26,10 +24,13 @@ public class Population implements Serializable{
 		
 	}
 	
-	//TODO comment
+	/*
+	 * getNextGene()
+	 * from the gene population, select the next gene that has not been evaluated yet. 
+	 */
 	public Gene getNextGene()
 	{
-		for(int i = index; i < population.length; i++)
+		for(int i = 0; i < population.length; i++)
 		{
 			Gene candidateGene = population[i];
 			if(candidateGene.getFitness() == -1.0)
@@ -39,4 +40,32 @@ public class Population implements Serializable{
 		}
 		return null;
 	}
+	
+	public void setGene(int index, Gene gene)
+	{
+		population[index] = gene; 
+	}
+	
+	/*
+	 * allGenesAnalyzed()
+	 * check if all the genes in a population have been analyzed
+	 */
+	public boolean allGenesAnalyzed()
+	{
+		for(int i = 0; i < population.length; i++)
+		{
+			Gene candidateGene = population[i];
+			if(candidateGene.getFitness() == -1.0)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public Gene getGene(int index)
+	{
+		return population[index];
+	}
+	
 }
