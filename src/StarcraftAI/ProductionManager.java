@@ -210,9 +210,12 @@ public class ProductionManager {
 	 * Find which buildings require repair and task workers to fix them
 	 */
 	private void repairBuildings()
-	{
-		//only repair newly damaged buildings
-		List<Unit> toFix = new ArrayList<Unit>();
+	{		
+		//reset damagedBuildings list every 500 frames to make sure orders are followed through on
+		if(game.getFrameCount() % 500 == 0)
+		{
+			damagedBuildings.clear();
+		}
 		
 		//only add newly damaged buildings
 		for(Unit b : buildingManager.checkBuildings())
@@ -220,27 +223,45 @@ public class ProductionManager {
 			if(!damagedBuildings.contains(b))
 			{
 				damagedBuildings.add(b);
-				toFix.add(b);
+				issueRepair(b);
 			}
 			
 			//debugging graphics
 			game.drawCircleMap(b.getX(), b.getY(), 50, Color.Red, false);
 		}
 		
-		for(Unit b : toFix)
-		{			
-			Unit worker = workerManager.getWorker();
-			if(worker != null)
+		//remove full health buildings from list
+		for(int i = damagedBuildings.size()-1; i >= 0; i--)
+		{
+			Unit b = damagedBuildings.get(i);
+			if(b.isCompleted() && b.getHitPoints() == b.getType().maxHitPoints())
 			{
-				if(b.isCompleted())
-				{ // building is complete but damaged
-					worker.repair(b);
-				}
-				else
-				{ // building is incomplete	
-					worker.rightClick(b);
-				}			
+				damagedBuildings.remove(i);
 			}
+		}
+	}
+	
+	/**
+	 * issueRepair()
+	 * 
+	 * Helper method for repairBuildings(). This method take a building and
+	 * tasks a worker to repair the given building.
+	 * 
+	 * @param building - Building to repair
+	 */
+	private void issueRepair(Unit building)
+	{
+		Unit worker = workerManager.getWorker();
+		if(worker != null)
+		{
+			if(building.isCompleted())
+			{ // building is complete but damaged
+				worker.repair(building);
+			}
+			else
+			{ // building is incomplete	
+				worker.rightClick(building);
+			}			
 		}
 	}
 	
