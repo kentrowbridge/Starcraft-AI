@@ -54,7 +54,7 @@ public class BuildingManager{
 		}
 		this.buildingList = new ArrayList<Unit>();
 		mapTiles();
-		selectGene();
+		this.gene = selectGene();
 	}
 
 	/**
