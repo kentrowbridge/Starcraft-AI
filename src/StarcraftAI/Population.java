@@ -14,12 +14,12 @@ public class Population implements Serializable{
 	private Gene[] population;
 	public static final int POPULATION_SIZE = 20;
 	
-	public Population()
+	public Population(int geneSize)
 	{
 		population = new Gene[POPULATION_SIZE];
 		for(int i = 0; i < population.length; i++)
 		{
-			population[i] = new Gene();
+			population[i] = new Gene(geneSize);
 		}
 		
 	}

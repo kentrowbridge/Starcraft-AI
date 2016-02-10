@@ -16,7 +16,7 @@ public class Gene implements Serializable{
 	private ArrayList<Integer> gene;
 	private ArrayList<Integer> geneClone;
 	private double fitness;
-	public static final int GENE_SIZE = 2000; //estimated 850 TilePositions in Benzene;
+	private int size;
 	public static final int NUM_GAMES_FOR_FITNESS_EVAL = 10;
 	private int wins;
 	private int losses; 
@@ -26,16 +26,17 @@ public class Gene implements Serializable{
 	/**
 	 * ctor
 	 */
-	public Gene()
+	public Gene(int geneSize)
 	{
 		gene = new ArrayList<Integer>();
 		geneClone = new ArrayList<Integer>();
+		size = geneSize;
 		fitness = -1.0;
 		wins = 0;
 		losses = 0;
 		
 		//initialize gene with random values
-		for (int i = 0; i < GENE_SIZE; i++)
+		for (int i = 0; i < size; i++)
 		{
 			int geneVal = (int) (Math.random()*Integer.MAX_VALUE);
 			gene.add(geneVal);
@@ -44,6 +45,10 @@ public class Gene implements Serializable{
 		timeList = new ArrayList<Long>(); 
 	}
 	
+	public int getSize()
+	{
+		return size;
+	}
 
 	
 	/* 
@@ -126,7 +131,7 @@ public class Gene implements Serializable{
 		// pick a random allele of the gene to mutate
 		if (rand == 1)
 		{
-			int allele = (int)(Math.random() * GENE_SIZE);
+			int allele = (int)(Math.random() * size);
 			int newVal = (int)(Math.random() * Integer.MAX_VALUE);
 			gene.set(allele, newVal);
 			geneClone.set(allele, newVal); 

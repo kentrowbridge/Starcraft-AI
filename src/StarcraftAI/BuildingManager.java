@@ -77,6 +77,7 @@ public class BuildingManager{
 	 */
 	public void build(UnitType buildingType, Unit builder)
 	{ 
+		System.out.println("Build " + buildingType.toString() + " with " + builder.toString());
 		TilePosition placement = getPlacement(buildingType, builder);
 		if(placement != null)
 		{
@@ -142,8 +143,6 @@ public class BuildingManager{
 			return closest.getTilePosition();
 		}
 
-		
-		
 		// use gene to build any other building type
 		int highestIdx = gene.getHighestIdx();
 		TilePosition tp =  mappedGenesToTilePositions.get(highestIdx);
@@ -151,6 +150,7 @@ public class BuildingManager{
 		boolean buildingFound = false; 
 		//pick new highest index if we can't build at the tileposition
 		while(!(game.canBuildHere(builder, tp, buildingType, true))){
+			System.out.println("getPlacement TilePosition: (" + tp.getX() + "," + tp.getY() + ")");
 			//if a building is in the tile position, deactivate the index
 			List<Unit> tileUnit = game.getUnitsOnTile(tp.getX(), tp.getY());
 			buildingFound = false;
@@ -328,16 +328,17 @@ public class BuildingManager{
 	public Gene[] mateGenes(Gene gene1, Gene gene2)
 	{
 		Gene[] children = new Gene[2];
+		int geneSize = gene1.getSize();
 
 		// split the genes at random index, combine opposite halves
-		int idx = (int)(Math.random() * Gene.GENE_SIZE); 
+		int idx = (int)(Math.random() * geneSize); 
 		ArrayList<Integer> kid1 = new ArrayList<Integer>();
 		ArrayList<Integer> kid2 = new ArrayList<Integer>();
 
 		kid1.addAll(gene1.getRange(0, idx));
-		kid1.addAll(gene2.getRange(idx, Gene.GENE_SIZE));
+		kid1.addAll(gene2.getRange(idx, geneSize));
 		kid2.addAll(gene2.getRange(0, idx));
-		kid2.addAll(gene1.getRange(idx, Gene.GENE_SIZE));
+		kid2.addAll(gene1.getRange(idx, geneSize));
 
 		children[0].setListValues(kid1);
 		children[1].setListValues(kid2);
@@ -352,22 +353,22 @@ public class BuildingManager{
 	private Gene selectGenesToMate()
 	{
 		double combinedFitness = 0.0;
-		double[] evalArr = new double[population.POPULATION_SIZE];
+		double[] evalArr = new double[Population.POPULATION_SIZE];
 		
-		for (int i = 0; i < population.POPULATION_SIZE; i++)
+		for (int i = 0; i < Population.POPULATION_SIZE; i++)
 		{
 			combinedFitness += population.getGene(i).getFitness();
 			evalArr[i] = combinedFitness;
 		}
 		double randVal = Math.random() * combinedFitness;
-		for (int i = 0; i < population.POPULATION_SIZE; i++)
+		for (int i = 0; i < Population.POPULATION_SIZE; i++)
 		{
 			if (randVal < evalArr[i])
 			{
 				return population.getGene(i);
 			}
 		}
-		return population.getGene(population.POPULATION_SIZE-1);
+		return population.getGene(Population.POPULATION_SIZE-1);
 	}
 
 
@@ -389,7 +390,7 @@ public class BuildingManager{
 			}
 			else
 			{
-				population = new Population();
+				population = new Population(mappedGenesToTilePositions.size());
 				populations.put(key, population);
 			}
 			//grab the next gene up
@@ -464,7 +465,7 @@ public class BuildingManager{
 		gene.updateFitness(isWinner, elapsedTime);
 		if (population.allGenesAnalyzed())
 		{
-			Population tempPopulation = new Population();
+			Population tempPopulation = new Population(mappedGenesToTilePositions.size());
 			for (int i = 0; i < population.POPULATION_SIZE; i+=2)
 			{
 				Gene g1 = selectGenesToMate();
