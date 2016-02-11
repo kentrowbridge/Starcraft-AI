@@ -77,7 +77,6 @@ public class BuildingManager{
 	 */
 	public void build(UnitType buildingType, Unit builder)
 	{ 
-		System.out.println("Build " + buildingType.toString() + " with " + builder.toString());
 		TilePosition placement = getPlacement(buildingType, builder);
 		if(placement != null)
 		{
@@ -92,11 +91,6 @@ public class BuildingManager{
 		// loop through tile positions
 		TilePosition base = self.getStartLocation();
 		bwta.Region baseRegion = BWTA.getRegion(base); 
-		List<BaseLocation> list = baseRegion.getBaseLocations();
-		for(BaseLocation bl : list) {
-			System.out.println("Base in Region: " + bl.getX() + "," + bl.getY());
-		}
-		System.out.println("Start Base: " + base.getX() + "," + base.getY());
 		
 		int x = 0, y = 0; 
 		TilePosition searchTile = new TilePosition(x, y);
@@ -155,7 +149,6 @@ public class BuildingManager{
 		boolean buildingFound = false; 
 		//pick new highest index if we can't build at the tileposition
 		while(!(game.canBuildHere(builder, tp, buildingType, true))){
-			System.out.println("getPlacement TilePosition: (" + tp.getX() + "," + tp.getY() + ")");
 			//if a building is in the tile position, deactivate the index
 			List<Unit> tileUnit = game.getUnitsOnTile(tp.getX(), tp.getY());
 			buildingFound = false;

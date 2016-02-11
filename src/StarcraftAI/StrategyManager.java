@@ -106,6 +106,8 @@ public class StrategyManager extends DefaultBWListener {
         game = mirror.getGame();
         self = game.self();
         
+        game.setLocalSpeed(10);
+        
         //start a clock for the game time
         startTime = System.nanoTime();
         
