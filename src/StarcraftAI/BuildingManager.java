@@ -91,8 +91,12 @@ public class BuildingManager{
 		mappedGenesToTilePositions = new ArrayList<TilePosition>();
 		// loop through tile positions
 		TilePosition base = self.getStartLocation();
-		bwta.Region baseRegion = bwta.getRegion(base); 
-		//baseRegion.
+		bwta.Region baseRegion = BWTA.getRegion(base); 
+		List<BaseLocation> list = baseRegion.getBaseLocations();
+		for(BaseLocation bl : list) {
+			System.out.println("Base in Region: " + bl.getX() + "," + bl.getY());
+		}
+		System.out.println("Start Base: " + base.getX() + "," + base.getY());
 		
 		int x = 0, y = 0; 
 		TilePosition searchTile = new TilePosition(x, y);
@@ -101,16 +105,17 @@ public class BuildingManager{
 		{
 			while(searchTile.isValid())
 			{
-				searchTile = new TilePosition(x, y);
 				//map a gene index to a tile position
-				if (bwta.getRegion(searchTile) == baseRegion)
+				if (BWTA.getRegion(searchTile) == baseRegion)
 				{
 					mappedGenesToTilePositions.add(searchTile);
 				}
 				x += 1;
+				searchTile = new TilePosition(x, y);
 			}
 			x = 0; 
 			y += 1; 
+			searchTile = new TilePosition(x, y);
 		}
 	}
 
@@ -164,6 +169,7 @@ public class BuildingManager{
 				}
 			}
 			// implied some non building is in the space, reactivate the index for later consideration
+			// TODO tps might be reactivated if no units were on that tile but it still can't be built on
 			if (buildingFound == false)
 			{
 				reactivateList.add(highestIdx);
