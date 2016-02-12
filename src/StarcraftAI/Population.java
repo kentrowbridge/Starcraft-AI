@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class Population implements Serializable{
 	private Gene[] population;
 	public static final int POPULATION_SIZE = 20;
+	private static final long serialVersionUID = 7808275998841633772L;
 	
 	public Population(int geneSize)
 	{

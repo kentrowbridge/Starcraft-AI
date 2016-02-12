@@ -13,6 +13,8 @@ import java.util.Arrays;
  */
 public class Gene implements Serializable{
 	
+	private static final long serialVersionUID = 4107160788130307474L;
+	
 	private ArrayList<Integer> gene;
 	private ArrayList<Integer> geneClone;
 	private double fitness;
