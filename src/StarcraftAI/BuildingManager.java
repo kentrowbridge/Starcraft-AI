@@ -144,6 +144,10 @@ public class BuildingManager{
 
 		// use gene to build any other building type
 		int highestIdx = gene.getHighestIdx();
+		if (highestIdx == -1)
+		{
+			return null; 
+		}
 		TilePosition tp =  mappedGenesToTilePositions.get(highestIdx);
 		ArrayList<Integer> reactivateList = new ArrayList<Integer>();
 		boolean buildingFound = false; 
@@ -171,6 +175,10 @@ public class BuildingManager{
 		 
 			
 			highestIdx = gene.getHighestIdx();
+			if (highestIdx == -1)
+			{
+				return null; 
+			}
 			tp = mappedGenesToTilePositions.get(highestIdx);
 		}
 		

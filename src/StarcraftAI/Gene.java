@@ -70,7 +70,7 @@ public class Gene implements Serializable{
 	 */
 	public int getHighestIdx()
 	{
-		int tempIdx = 0;
+		int tempIdx = -1;
 		int tempVal = -1; 
 		for (int i = 0; i < gene.size(); i++)
 		{
