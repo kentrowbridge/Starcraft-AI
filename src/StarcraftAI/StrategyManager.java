@@ -326,6 +326,12 @@ public class StrategyManager extends DefaultBWListener {
     		}
     	}
     	
+    	//if we can't find the enemy continue scouting
+    	if(enemyBuildingLocation.isEmpty())
+    	{
+    		isScouting = false;
+    	}
+    	
     	//make sure we are scouting  	
     	if(!isScouting)
     	{

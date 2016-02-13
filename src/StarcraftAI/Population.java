@@ -13,16 +13,17 @@ import java.util.ArrayList;
 public class Population implements Serializable{
 	private Gene[] population;
 	public static final int POPULATION_SIZE = 20;
+	private int generationCount;
 	private static final long serialVersionUID = 7808275998841633772L;
 	
-	public Population(int geneSize)
+	public Population(int geneSize, int generationCount)
 	{
 		population = new Gene[POPULATION_SIZE];
 		for(int i = 0; i < population.length; i++)
 		{
 			population[i] = new Gene(geneSize);
 		}
-		
+		this.generationCount = generationCount;
 	}
 	
 	/*
@@ -67,6 +68,23 @@ public class Population implements Serializable{
 	public Gene getGene(int index)
 	{
 		return population[index];
+	}
+	
+	public void printPopulation()
+	{
+		System.out.println("***** <Population> *****");
+		System.out.println("Generation: " + generationCount);
+		for(Gene gene : population)
+		{
+			System.out.println("====================");
+			gene.printGene();
+		}
+		System.out.println("***** </Population> *****");
+	}
+	
+	public int getGenerationCount()
+	{
+		return generationCount;
 	}
 	
 }

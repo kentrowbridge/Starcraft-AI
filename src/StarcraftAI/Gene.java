@@ -186,6 +186,7 @@ public class Gene implements Serializable{
 		System.out.println("GeneClone: " + geneClone.toString());
 		System.out.println("Games: " + (wins+losses));
 		System.out.println("Wins: " + wins);
+		System.out.println("Fitness: " + fitness);
 	}
 	
 	

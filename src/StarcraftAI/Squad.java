@@ -93,11 +93,14 @@ public class Squad {
 	public void moveQueue(ArrayList<Position> positions){
 		for(Unit unit : squad){
 			for(Position pos : positions){
-				if(unit.isIdle()){
-					unit.move(pos);
-				}
-				else{
-					unit.move(pos, true);
+				if(unit.getPosition().hasPath(pos))
+				{
+					if(unit.isIdle()){
+						unit.move(pos);
+					}
+					else{
+						unit.move(pos, true);
+					}
 				}
 			}
 		}

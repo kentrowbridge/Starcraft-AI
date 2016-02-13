@@ -28,6 +28,7 @@ public class BuildingManager{
 	// hash table where key is "map-name" concatenated with the starting base coordinates,
 	// value is the population of genes
 	private Hashtable<String, Population> populations;
+	private Hashtable<String, Integer> generationCount;
 	private Population population;
 	private Gene gene;
 
@@ -52,6 +53,7 @@ public class BuildingManager{
 		{
 			this.populations = new Hashtable<String, Population>();
 		}
+		this.generationCount = new Hashtable<String, Integer>();
 		this.buildingList = new ArrayList<Unit>();
 		mapTiles();
 		this.gene = selectGene();
@@ -399,8 +401,9 @@ public class BuildingManager{
 			}
 			else
 			{
-				population = new Population(mappedGenesToTilePositions.size());
+				population = new Population(mappedGenesToTilePositions.size(), 0);
 				populations.put(key, population);
+				generationCount.put(key, 0);
 			}
 			//grab the next gene up
 			geneToUse = population.getNextGene();
@@ -477,14 +480,15 @@ public class BuildingManager{
 		gene.updateFitness(isWinner, elapsedTime);
 		if (population.allGenesAnalyzed())
 		{
-			Population tempPopulation = new Population(mappedGenesToTilePositions.size());
-			for (int i = 0; i < population.POPULATION_SIZE; i+=2)
+			population.printPopulation();
+			Population tempPopulation = new Population(mappedGenesToTilePositions.size(), population.getGenerationCount()+1);
+			for (int i = 0; i < Population.POPULATION_SIZE; i+=2)
 			{
 				Gene g1 = selectGenesToMate();
 				Gene g2 = selectGenesToMate();
 				Gene[] matedGenes = mateGenes(g1, g2);
-				tempPopulation.setGene(i, g1);
-				tempPopulation.setGene(i+1, g2);
+				tempPopulation.setGene(i, matedGenes[0]);
+				tempPopulation.setGene(i+1, matedGenes[1]);
 			}	
 			population = tempPopulation; 
 		}
