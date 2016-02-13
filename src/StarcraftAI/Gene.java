@@ -174,5 +174,33 @@ public class Gene implements Serializable{
 			fitness = ((wins*1.0) / ((wins + losses)*1.0))*.8 + ((double)avgTime / 500.0)*.2; 
 		}	
 	}
+	
+	
+	/**
+	 * printGene
+	 * Prints the values in the gene and geneClone
+	 */
+	public void printGene()
+	{
+		System.out.println("Gene: " + gene.toString());
+		System.out.println("GeneClone: " + geneClone.toString());
+		System.out.println("Games: " + (wins+losses));
+		System.out.println("Wins: " + wins);
+	}
+	
+	
+	/**
+	 * reset
+	 * Resets the gene to original values
+	 */
+	public void reset()
+	{
+		for (int i = 0; i < gene.size(); i++)
+		{
+			reactivateIndex(i);	
+		}
+		
+		//gene = geneClone;
+	}
 }
 

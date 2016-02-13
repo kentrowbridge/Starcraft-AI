@@ -391,9 +391,11 @@ public class BuildingManager{
 		if(IS_TRAINING)
 		{
 			String key = getMapAndCoords();
+			System.out.println("Key: " + key);
 			if(populations.containsKey(key))
 			{
 				population = populations.get(key);
+				
 			}
 			else
 			{
@@ -409,6 +411,8 @@ public class BuildingManager{
 			System.out.println("Hardcoded final genes not yet implemented");
 			geneToUse = null;
 		}
+		
+		geneToUse.printGene();
 
 		return geneToUse; 
 	}
@@ -469,6 +473,7 @@ public class BuildingManager{
 	
 	public void onEnd(boolean isWinner, long elapsedTime)
 	{
+		gene.reset();
 		gene.updateFitness(isWinner, elapsedTime);
 		if (population.allGenesAnalyzed())
 		{

@@ -85,6 +85,8 @@ public class Squad {
 	}
 
 	/**
+	 * moveQueue()
+	 * Given a queue of positions, move a all idle units in a squad to the next queue position
 	 * 
 	 * @param positions
 	 */
