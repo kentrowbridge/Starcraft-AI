@@ -18,6 +18,7 @@ public class BuildingManager{
 	private String fileName = "genetic_populations.txt";
 	private String mapFileName = getMapAndCoords()+".txt";
 	
+	
 	private Game game;
 	private Player self;
 
@@ -471,6 +472,13 @@ public class BuildingManager{
 		}
 	}
 	
+	public void savePopulationToFile()
+	{
+		//when all genes in a population are analyzed, save to file
+		population.savePopulationFile(mapFileName);
+		
+	}
+	
 	/*
 	 * loadFromFile()
 	 * loads the data from 'filename' into the populations Hashtable
@@ -498,7 +506,7 @@ public class BuildingManager{
 			gene.updateFitness(isWinner, elapsedTime);
 			if (population.allGenesAnalyzed())
 			{
-				population.printPopulation();
+				population.savePopulationFile(mapFileName);
 				Population tempPopulation = new Population(mappedGenesToTilePositions.size(), population.getGenerationCount()+1);
 				for (int i = 0; i < Population.POPULATION_SIZE; i+=2)
 				{

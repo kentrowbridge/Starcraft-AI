@@ -1,5 +1,8 @@
 package StarcraftAI;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -87,4 +90,35 @@ public class Population implements Serializable{
 		return generationCount;
 	}
 	
+	public void savePopulationFile(String mapFileName)
+	{
+		String populationFileName = "population_"+mapFileName;
+		FileOutputStream fos;
+		ObjectOutputStream oos;
+		
+		try 
+		{
+			fos = new FileOutputStream(populationFileName);
+			oos = new ObjectOutputStream(fos);
+//			oos.writeObject(population.toString());
+			oos.writeObject("***** <Population> *****");
+			oos.writeObject("Generation: " + generationCount);
+			for(Gene gene : population)
+			{
+//				oos.writeObject("====================");
+//				System.out.println("Gene: " + gene.toString());
+//				System.out.println("GeneClone: " + geneClone.toString());
+//				System.out.println("Games: " + (wins+losses));
+//				System.out.println("Wins: " + wins);
+//				System.out.println("Fitness: " + fitness);
+			}
+			oos.writeObject("***** </Population> *****");
+			oos.close();
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			return; 
+		}
+	}
 }

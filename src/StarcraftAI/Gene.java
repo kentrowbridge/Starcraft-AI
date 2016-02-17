@@ -189,6 +189,14 @@ public class Gene implements Serializable{
 		System.out.println("Fitness: " + fitness);
 	}
 	
+	/**
+	 * toString()
+	 */
+	public String geneToString()
+	{
+		return "hi";
+	}
+	
 	
 	/**
 	 * reset
