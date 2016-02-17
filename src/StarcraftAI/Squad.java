@@ -85,17 +85,22 @@ public class Squad {
 	}
 
 	/**
+	 * moveQueue()
+	 * Given a queue of positions, move a all idle units in a squad to the next queue position
 	 * 
 	 * @param positions
 	 */
 	public void moveQueue(ArrayList<Position> positions){
 		for(Unit unit : squad){
 			for(Position pos : positions){
-				if(unit.isIdle()){
-					unit.move(pos);
-				}
-				else{
-					unit.move(pos, true);
+				if(unit.getPosition().hasPath(pos))
+				{
+					if(unit.isIdle()){
+						unit.move(pos);
+					}
+					else{
+						unit.move(pos, true);
+					}
 				}
 			}
 		}

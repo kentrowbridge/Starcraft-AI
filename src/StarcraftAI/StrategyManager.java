@@ -1,5 +1,6 @@
 package StarcraftAI;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import bwapi.*;
 import bwta.BWTA;
@@ -16,6 +17,8 @@ public class StrategyManager extends DefaultBWListener {
     private Hashtable<UnitType, Integer> enemyBuildingInfo;
     private HashSet<Position> enemyArmyPosition;
     private HashSet<Position> enemyBuildingLocation;
+    private long startTime;
+    private long endTime;
     
     private ProductionManager productionManager;
     private MilitaryManager militaryManager;
@@ -72,6 +75,17 @@ public class StrategyManager extends DefaultBWListener {
         	
     }
     
+    @Override
+    public void onEnd(boolean isWinner)
+    {
+    	endTime = System.nanoTime();
+    	long elapsedTime = endTime - startTime; 
+    	TimeUnit.NANOSECONDS.toSeconds(elapsedTime);
+    	
+    	productionManager.onEnd(isWinner, elapsedTime);
+    	
+    }
+    
     /**
      * onStart()
      * 
@@ -82,13 +96,28 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onStart() 
     {
+    	//Use BWTA to analyze map
+        //This may take a few minutes if the map is processed first time!
+        System.out.println("Analyzing map...");
+        BWTA.readMap();
+        BWTA.analyze();
+        System.out.println("Map data ready");
+    	
         game = mirror.getGame();
         self = game.self();
         
-        // init production manager and military manager
-        productionManager = new ProductionManager(game, self);
-        militaryManager = new MilitaryManager(game, self);
+        game.setLocalSpeed(5);
         
+        //start a clock for the game time
+        startTime = System.nanoTime();
+        
+        // init production manager and military manager
+        try{
+        	productionManager = new ProductionManager(game, self);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+        militaryManager = new MilitaryManager(game, self);
         // Init variables for enemy info
         enemyArmyCount = 0;
         enemyArmyRatio = new Hashtable<UnitType, Double>();
@@ -98,13 +127,6 @@ public class StrategyManager extends DefaultBWListener {
         
         isScouting = false;
         hasExtendedRange = false;
-        
-        //Use BWTA to analyze map
-        //This may take a few minutes if the map is processed first time!
-        System.out.println("Analyzing map...");
-        BWTA.readMap();
-        BWTA.analyze();
-        System.out.println("Map data ready");
     }
     
     /**
@@ -116,7 +138,7 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onFrame() 
     {
-    	displayGameInfo();
+    	//displayGameInfo();
         
         try
         {
@@ -127,6 +149,7 @@ public class StrategyManager extends DefaultBWListener {
         {
         	//catches any errors we may get, Brood War does nothing to let us know
         	e.printStackTrace();
+        	System.exit(0);
         }
     }
     
@@ -164,6 +187,27 @@ public class StrategyManager extends DefaultBWListener {
     	int armyCount = militaryManager.getArmyCount();
     	
     	ArrayList<UnitType> productionGoal = new ArrayList<UnitType>();
+    	
+    	// ** Simplified workable build queue!
+//    	productionGoal.add(UnitType.Terran_Marine);
+//    	productionGoal.add(UnitType.Terran_Medic);
+//    	productionGoal.add(UnitType.Terran_Siege_Tank_Tank_Mode);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_Refinery) < 1)
+//    		productionGoal.add(UnitType.Terran_Refinery);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_SCV) < 28)
+//    		productionGoal.add(UnitType.Terran_SCV);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_Barracks) < 2)
+//    		productionGoal.add(UnitType.Terran_Barracks);
+//    	
+//    	if((self.supplyTotal() - self.supplyUsed() <= 6 
+//    		|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)
+//    		&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1){
+//    		productionGoal.add(UnitType.Terran_Supply_Depot);
+//    	}
+    	
 		
     	//grab the current resource count
     	int minerals = self.minerals();
@@ -173,7 +217,7 @@ public class StrategyManager extends DefaultBWListener {
     	// Should supply cap - supplyused < = # of production buildings * 2
     	if((self.supplyTotal() - self.supplyUsed() <= 6 
     			|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)  
-    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1 
+    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1
     			&& minerals >= 100)
     	{
 //    		System.out.println("BUILD SUPPLY DEPOT!");
@@ -303,6 +347,12 @@ public class StrategyManager extends DefaultBWListener {
     		}
     	}
     	
+    	//if we can't find the enemy continue scouting
+    	if(enemyBuildingLocation.isEmpty() && armyCount > 20)
+    	{
+    		isScouting = false;
+    	}
+    	
     	//make sure we are scouting  	
     	if(!isScouting)
     	{
@@ -346,6 +396,7 @@ public class StrategyManager extends DefaultBWListener {
     	ArrayList<Position> toRemove = new ArrayList<Position>();
     	
     	//loop over the visible enemy units that we remember
+    	if(enemyBuildingLocation == null) System.out.println("Uh Oh!");
     	for(Position p : enemyBuildingLocation)
     	{
     		TilePosition tileCorrespondingToP = new TilePosition(p.getX()/32, p.getY()/32);

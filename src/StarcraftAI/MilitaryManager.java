@@ -130,7 +130,14 @@ public class MilitaryManager{
 				armyManager.defend();
 				break;
 			case Scout:
-				armyManager.scout();
+				if(armyCount > 20)
+				{
+					armyManager.scoutMap();
+				}
+				else
+				{
+					armyManager.scoutBases();
+				}
 				break;
 		}
 	}

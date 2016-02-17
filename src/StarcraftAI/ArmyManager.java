@@ -28,7 +28,8 @@ public class ArmyManager{
 	private HashMap<SquadType, Squad> squads;
 	private TilePosition queuedTile = null;
 	private List<BaseLocation> baseLocations = new ArrayList<BaseLocation>(); 
-
+	
+	private ArrayList<Position> allPositions = new ArrayList<Position>();
 	/**
 	 * ctor
 	 * Set up the game, player and squads for the Army Manager. 
@@ -39,6 +40,22 @@ public class ArmyManager{
 		this.squads = squads;
 		this.self = self;
 		this.game = game;
+		
+		int x = 0, y = 0; 
+		Position searchPos = new Position(x, y);
+	
+		while(searchPos.isValid())
+		{
+			while(searchPos.isValid())
+			{
+					allPositions.add(searchPos);
+				x += 32;
+				searchPos = new Position(x, y);
+			}
+			x = 0; 
+			y += 32; 
+			searchPos = new Position(x, y);
+		}
 	}
 
 	/**
@@ -74,10 +91,10 @@ public class ArmyManager{
 	}
 
 	/**
-	 * scout()
+	 * scoutBases()
 	 * Moves units in the scout squad to unexplored locations.
 	 */
-	public void scout()
+	public void scoutBases()
 	{	
 		// get base Locations
 		List<BaseLocation> baseLocations = BWTA.getStartLocations();
@@ -97,4 +114,17 @@ public class ArmyManager{
 		
 		squads.get(SquadType.Scout).moveQueue(basePoss);
 	}
+	
+	public void scoutMap()
+	{
+		for(Unit unit : squads.get(SquadType.Offense).getUnits())
+		{
+			if(unit.isIdle())
+			{
+				unit.move(allPositions.get((int)(Math.random()*allPositions.size())));
+			}
+		}
+	}
+	
+	
 }

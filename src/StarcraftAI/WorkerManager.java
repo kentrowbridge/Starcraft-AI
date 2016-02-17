@@ -87,15 +87,16 @@ public class WorkerManager{
 		for(Unit u : workerList)
 		{			
 			//make sure no workers are on there way to build at the same time
-//			if(u.isConstructing() && u.isMoving() && (u.getBuildUnit() == null))
 			if(u.getOrder().equals(Order.PlaceBuilding))
 			{
 				return null;
 			}		
 			
+			Order order = u.getOrder();
 			//find a free worker
-			if(!u.isConstructing() && u.isInterruptible() && u.isCompleted())
-			{//save a valid worker
+			if(!u.isConstructing() && u.isInterruptible() 
+					&& u.isCompleted() && order != Order.Repair)
+			{
 				availableWorker = u;
 			}
 		}
