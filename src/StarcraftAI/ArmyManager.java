@@ -117,7 +117,13 @@ public class ArmyManager{
 	
 	public void scoutMap()
 	{
-		squads.get(SquadType.Scout).moveQueue(allPositions);
+		for(Unit unit : squads.get(SquadType.Offense).getUnits())
+		{
+			if(unit.isIdle())
+			{
+				unit.move(allPositions.get((int)Math.random()*allPositions.size()));
+			}
+		}
 	}
 	
 	
