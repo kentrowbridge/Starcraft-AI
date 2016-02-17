@@ -327,7 +327,7 @@ public class StrategyManager extends DefaultBWListener {
     	}
     	
     	//if we can't find the enemy continue scouting
-    	if(enemyBuildingLocation.isEmpty())
+    	if(enemyBuildingLocation.isEmpty() && armyCount > 20)
     	{
     		isScouting = false;
     	}

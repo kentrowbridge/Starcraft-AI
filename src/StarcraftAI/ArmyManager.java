@@ -121,7 +121,7 @@ public class ArmyManager{
 		{
 			if(unit.isIdle())
 			{
-				unit.move(allPositions.get((int)Math.random()*allPositions.size()));
+				unit.move(allPositions.get((int)(Math.random()*allPositions.size())));
 			}
 		}
 	}

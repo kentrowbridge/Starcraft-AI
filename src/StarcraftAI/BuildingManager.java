@@ -16,6 +16,7 @@ import bwta.*;
  */
 public class BuildingManager{
 	private String fileName = "genetic_populations.txt";
+	private String mapFileName = getMapAndCoords()+".txt";
 	
 	private Game game;
 	private Player self;
@@ -455,9 +456,10 @@ public class BuildingManager{
 	{
 		FileOutputStream fos;
 		ObjectOutputStream oos;
+		
 		try 
 		{
-			fos = new FileOutputStream(fileName);
+			fos = new FileOutputStream(mapFileName);
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(populations);
 			oos.close();
@@ -477,7 +479,7 @@ public class BuildingManager{
 	{
 		try 
 		{
-			FileInputStream fis = new FileInputStream(fileName);
+			FileInputStream fis = new FileInputStream(mapFileName);
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			populations = (Hashtable<String, Population>) ois.readObject();
 		}
