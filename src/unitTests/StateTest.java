@@ -63,6 +63,16 @@ public class StateTest {
 		System.out.println(state.toString(true));
 		assertEquals(state.toString(true), this.toString());
 	}
+	
+	@Test
+	public void testMemoryInitEmpty() {
+		
+		StrategyManager strat = new StrategyManager();
+		strat.initMemory();
+		System.out.println(strat.getMemory().toString());
+		
+		assertEquals(strat.getMemory().toString(), "{}");
+	}
 
 	
 	

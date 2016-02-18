@@ -1,4 +1,5 @@
 package StarcraftAI;
+import java.io.*;
 import java.util.*;
 
 import bwapi.*;
@@ -7,6 +8,20 @@ import bwta.BaseLocation;
 
 public class StrategyManager extends DefaultBWListener {
 
+//	private static final int INIT_UT_VALUE = 0;
+	private static final int INIT_ET_VALUE = 1;
+	private static final String memoryFileName = "memory.txt";
+	private static final String alphaValueFileName = "alpha_value.txt";
+	private static final String epsilonValueFileName = "epsilon_value.txt";
+	
+	private int GameNumber = 1;
+	private double Gamma = .8;
+	private double Alpha = .999;
+	private double Epsilon = .9999;
+	
+	// variable for holding the previous state.
+    private State PreviousState = null;
+	
     private Mirror mirror = new Mirror();
     protected Game game;
     private Player self;    
@@ -21,8 +36,11 @@ public class StrategyManager extends DefaultBWListener {
     private MilitaryManager militaryManager;
     
     private boolean isScouting = false;
-    
     private boolean hasExtendedRange = false;
+    
+    // Memory<stateHashCode, UtilityValue, Eligibility Trace Value>
+    private Hashtable<Integer, Integer[]> Memory;
+    
 
     /**
      * run()
@@ -99,6 +117,8 @@ public class StrategyManager extends DefaultBWListener {
         isScouting = false;
         hasExtendedRange = false;
         
+        initMemory();
+        
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
         System.out.println("Analyzing map...");
@@ -117,6 +137,8 @@ public class StrategyManager extends DefaultBWListener {
     public void onFrame() 
     {
     	displayGameInfo();
+    	
+    	updateMemory();
         
         try
         {
@@ -454,7 +476,87 @@ public class StrategyManager extends DefaultBWListener {
         game.setTextSize(10);
         game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
     }
-
+    
+    /**
+     * 
+     */
+    public void initMemory(){
+   		File f = new File(memoryFileName);
+    	if(f.exists()){
+    		Memory = readMemory();
+    	}
+    	else{
+    		Memory = new Hashtable<Integer,Integer[]>();
+    	}
+    }
+    
+    /**
+     * 
+     */
+    public void updateMemory(){
+    	
+    }
+    
+    /**
+     * readMemory()
+     * Reads out to a Hashtable
+     * 
+     * @return
+     */
+    public Hashtable<Integer, Integer[]> readMemory(){
+    	
+    	Hashtable<Integer, Integer[]> temp = new Hashtable<Integer, Integer[]>(); 
+    	
+    	try
+    	{
+    		FileInputStream fis = new FileInputStream(memoryFileName);
+    		ObjectInputStream ois = new ObjectInputStream(fis);
+    		
+    		Object obj = ois.readObject();
+    		if(obj instanceof Hashtable<?, ?>)
+    		{
+    			temp = (Hashtable<Integer, Integer[]>)obj;
+    		}
+    	}
+    	catch(Exception ex)
+    	{
+    		
+    	}
+    	return temp;
+    }
+    
+    /**
+     * 
+     */
+    public void writeMemory(){
+    	try
+    	{
+    		FileOutputStream fos = new FileOutputStream(memoryFileName);
+    		ObjectOutputStream oos = new ObjectOutputStream(fos);
+    		
+    		oos.writeObject(Memory);
+    		oos.close();
+    	}
+    	catch(Exception ex)
+    	{
+    		
+    	}
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public Hashtable<Integer, Integer[]> getMemory()
+    {
+    	return Memory;
+    }
+    
+    /**
+     * Main()
+     * Runs the program
+     * @param args
+     */
     public static void main(String[] args) 
     {
         new StrategyManager().run();
