@@ -378,7 +378,8 @@ public class StrategyManager extends DefaultBWListener {
     /**
      * updateEnemyBuildingLocations
      * 
-     * TODO
+     * This method updates the memory of the AI using Eligibility trace
+     * for TD-Learning.
      */
     private void updateEnemyBuildingLocations()
     {
@@ -612,6 +613,84 @@ public class StrategyManager extends DefaultBWListener {
     		
     		oos.writeObject(Memory);
     		oos.close();
+    	}
+    	catch(IOException ex)
+    	{
+    		System.out.println(ex.getMessage());
+    	}
+    }
+    
+    /**
+     * readAlphaValue()
+     * @return
+     */
+    public double readAlphaValue()
+    {
+    	Double result = 0.0;
+    	try
+    	{
+    		File f = new File(alphaValueFileName);
+			Scanner sc = new Scanner(f);
+			result = sc.nextDouble();
+			sc.close();
+    	}
+    	catch(Exception ex)
+    	{
+    		
+    	}
+    	return result;
+    }
+    
+    /**
+     * writeAlphaValue
+     */
+    public void writeAlphaValue()
+    {
+    	try
+    	{
+    		PrintWriter pw = new PrintWriter(alphaValueFileName);
+    		pw.print(Alpha);
+    		
+    		pw.close();
+    	}
+    	catch(IOException ex)
+    	{
+    		System.out.println(ex.getMessage());
+    	}
+    }
+    
+    /**
+     * readEpsilonValue()
+     * @return
+     */
+    public double readEpsilonValue()
+    {
+    	Double result = 0.0;
+    	try
+    	{
+    		File f = new File(epsilonValueFileName);
+			Scanner sc = new Scanner(f);
+			result = sc.nextDouble();
+			sc.close();
+    	}
+    	catch(Exception ex)
+    	{
+    		System.out.println(ex.getMessage());
+    	}
+    	return result;
+    }
+    
+    /**
+     * writeEpsilonValue()
+     */
+    public void writeEpsilonValue()
+    {
+    	try
+    	{
+    		PrintWriter pw = new PrintWriter(epsilonValueFileName);
+    		pw.print(Epsilon);
+    		
+    		pw.close();
     	}
     	catch(IOException ex)
     	{

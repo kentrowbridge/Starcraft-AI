@@ -3,9 +3,7 @@ package unitTests;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,6 +13,8 @@ import StarcraftAI.*;
 
 public class StateTest {
 	private static final String memoryFileName = "memory.txt";
+	private static final String alphaValueFileName = "alpha_value.txt";
+	private static final String epsilonValueFileName = "epsilon_value.txt";
 	
 	private ArrayList<Unit> Units;
 	private ArrayList<ArmyPosition> EnemyArmyPosition;
@@ -77,11 +77,9 @@ public class StateTest {
 	@Test
 	public void testMemoryInitEmpty() 
 	{
-		
 		StrategyManager strat = new StrategyManager();
 		strat.initMemory();
-		System.out.println(strat.getMemory().toString());
-		
+		System.out.println(strat.getMemory().toString());	
 		assertEquals(strat.getMemory().toString(), "{}");
 	}
 
@@ -103,7 +101,63 @@ public class StateTest {
 		assertEquals(temp.toString(), "{}");
 	}
 	
+	@Test
+	public void testAlphaWrite()
+	{
+		StrategyManager strat = new StrategyManager();
+		strat.writeAlphaValue();
+		
+		Double value = 0.0;
+		try{
+			File f = new File(alphaValueFileName);
+			Scanner sc = new Scanner(f);
+			value = sc.nextDouble();
+			sc.close();
+		}
+		catch(Exception ex){
+			
+		}
+		assertTrue(value.equals(.999));
+	}
 	
+	@Test
+	public void testAlphaRead()
+	{
+		StrategyManager strat = new StrategyManager();
+		strat.writeAlphaValue();
+		Double result = strat.readAlphaValue();
+		
+		assertTrue(result.equals(.999));
+	}
+	
+	@Test
+	public void testEpsilonWrite()
+	{
+		StrategyManager strat = new StrategyManager();
+		strat.writeEpsilonValue();
+		
+		Double value = 0.0;
+		try{
+			File f = new File(epsilonValueFileName);
+			Scanner sc = new Scanner(f);
+			value = sc.nextDouble();
+			sc.close();
+		}
+		catch(Exception ex){
+			
+		}
+		assertTrue(value.equals(.9999));
+	}
+	
+	@Test
+	public void testEpsilonRead()
+	{
+		StrategyManager strat = new StrategyManager();
+		strat.writeEpsilonValue();
+		Double result = strat.readEpsilonValue();
+		
+		assertTrue(result.equals(.9999));
+	}
 	
 	////// ==== Helper methods =====  //////
 	@Override
