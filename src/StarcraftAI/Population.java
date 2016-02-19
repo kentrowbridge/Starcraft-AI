@@ -3,6 +3,7 @@ package StarcraftAI;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -89,31 +90,29 @@ public class Population implements Serializable{
 	{
 		return generationCount;
 	}
+	public void setGenerationCount(int generationCount)
+	{
+		this.generationCount = generationCount;
+	}
 	
 	public void savePopulationFile(String mapFileName)
 	{
-		String populationFileName = "population_"+mapFileName;
-		FileOutputStream fos;
-		ObjectOutputStream oos;
+		String populationFileName = mapFileName;
+		PrintWriter pw;
 		
 		try 
 		{
-			fos = new FileOutputStream(populationFileName);
-			oos = new ObjectOutputStream(fos);
-//			oos.writeObject(population.toString());
-			oos.writeObject("***** <Population> *****");
-			oos.writeObject("Generation: " + generationCount);
+			pw = new PrintWriter(populationFileName);
+			pw.println(generationCount);
 			for(Gene gene : population)
 			{
-//				oos.writeObject("====================");
-//				System.out.println("Gene: " + gene.toString());
-//				System.out.println("GeneClone: " + geneClone.toString());
-//				System.out.println("Games: " + (wins+losses));
-//				System.out.println("Wins: " + wins);
-//				System.out.println("Fitness: " + fitness);
+				pw.println("====================");
+				pw.println(gene.geneToString());
+				pw.println(gene.getWins());
+				pw.println(gene.getLosses());
+				pw.println(gene.getFitness());
 			}
-			oos.writeObject("***** </Population> *****");
-			oos.close();
+			pw.close();
 		} 
 		catch (IOException e) 
 		{

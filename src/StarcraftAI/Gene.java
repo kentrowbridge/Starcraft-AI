@@ -194,7 +194,36 @@ public class Gene implements Serializable{
 	 */
 	public String geneToString()
 	{
-		return "hi";
+		return gene.toString();
+	}
+	
+	/**
+	 * getGames()
+	 */
+	public int getLosses()
+	{
+		return losses;
+	}
+	
+	/**
+	 * getWins()
+	 */
+	public int getWins()
+	{
+		return wins;
+	}
+	
+	public void setWins(int wins)
+	{
+		this.wins = wins;
+	}
+	public void setLosses(int losses)
+	{
+		this.losses = losses;
+	}
+	public void setFitness(int fitness)
+	{
+		this.fitness = fitness;
 	}
 	
 	
