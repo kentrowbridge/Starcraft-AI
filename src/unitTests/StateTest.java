@@ -2,8 +2,10 @@ package unitTests;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
 
 import org.junit.After;
 import org.junit.Before;
@@ -12,6 +14,8 @@ import bwapi.*;
 import StarcraftAI.*;
 
 public class StateTest {
+	private static final String memoryFileName = "memory.txt";
+	
 	private ArrayList<Unit> Units;
 	private ArrayList<ArmyPosition> EnemyArmyPosition;
 	private HashSet<UnitType> EnemyBuildingInfo;
@@ -19,10 +23,12 @@ public class StateTest {
 	private int EnemyArmyCount;
 	
 	
+	
 	///// ===== Set up, Tear Down ==== //////
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws Exception 
+	{
 		
 		Units = new ArrayList<Unit>();
 		EnemyArmyPosition = new ArrayList<ArmyPosition>();
@@ -37,35 +43,40 @@ public class StateTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() throws Exception 
+	{
 	}
 
 	
 	///// ====== Tests ====  ////// 
 	
 	@Test
-	public void hashCodeReturn0Test() {
+	public void hashCodeReturn0Test() 
+	{
 		State state = new State();
 		System.out.println(state.toString());
 		assertEquals(state.hashCode(), 28630113);
 	}
 	
 	@Test
-	public void hashCodeReturnEquivalenceTest() {
+	public void hashCodeReturnEquivalenceTest() 
+	{
 		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount);
 		System.out.println(state.toString());
 		assertEquals(state.hashCode(), 861800028);
 	}
 	
 	@Test
-	public void toStringDebugTest() {
+	public void toStringDebugTest() 
+	{
 		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount);
 		System.out.println(state.toString(true));
 		assertEquals(state.toString(true), this.toString());
 	}
 	
 	@Test
-	public void testMemoryInitEmpty() {
+	public void testMemoryInitEmpty() 
+	{
 		
 		StrategyManager strat = new StrategyManager();
 		strat.initMemory();
@@ -74,6 +85,24 @@ public class StateTest {
 		assertEquals(strat.getMemory().toString(), "{}");
 	}
 
+	@Test
+	public void testMemoryWriteWithEmptyMemory()
+	{
+		StrategyManager strat = new StrategyManager();
+		strat.initMemory();
+		strat.writeMemory();
+		assertTrue(new File(memoryFileName).exists());
+	}
+	
+	@Test
+	public void testMemoryReadWithEmptyMemory()
+	{
+		StrategyManager strat = new StrategyManager();
+		strat.initMemory();
+		Hashtable<Integer, Double[]> temp = strat.readMemory();
+		assertEquals(temp.toString(), "{}");
+	}
+	
 	
 	
 	////// ==== Helper methods =====  //////

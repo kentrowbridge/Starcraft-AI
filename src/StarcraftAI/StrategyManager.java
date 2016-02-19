@@ -9,7 +9,10 @@ import bwta.BaseLocation;
 public class StrategyManager extends DefaultBWListener {
 
 //	private static final int INIT_UT_VALUE = 0;
-	private static final int INIT_ET_VALUE = 1;
+	private static final double INIT_ET_VALUE = 1;
+	private static final int UTIL_INDEX = 0;
+	private static final int ET_INDEX = 1;
+	
 	private static final String memoryFileName = "memory.txt";
 	private static final String alphaValueFileName = "alpha_value.txt";
 	private static final String epsilonValueFileName = "epsilon_value.txt";
@@ -18,6 +21,7 @@ public class StrategyManager extends DefaultBWListener {
 	private double Gamma = .8;
 	private double Alpha = .999;
 	private double Epsilon = .9999;
+	private double Lambda = .95;
 	
 	// variable for holding the previous state.
     private State PreviousState = null;
@@ -39,7 +43,7 @@ public class StrategyManager extends DefaultBWListener {
     private boolean hasExtendedRange = false;
     
     // Memory<stateHashCode, UtilityValue, Eligibility Trace Value>
-    private Hashtable<Integer, Integer[]> Memory;
+    private Hashtable<Integer, Double[]> Memory;
     
 
     /**
@@ -127,6 +131,12 @@ public class StrategyManager extends DefaultBWListener {
         System.out.println("Map data ready");
     }
     
+    @Override
+    public void onEnd(boolean isWinner)
+    {
+    	
+    }
+    
     /**
      * onFrame()
      * 
@@ -138,7 +148,7 @@ public class StrategyManager extends DefaultBWListener {
     {
     	displayGameInfo();
     	
-    	updateMemory();
+    	updateMemory(new State());
         
         try
         {
@@ -478,7 +488,11 @@ public class StrategyManager extends DefaultBWListener {
     }
     
     /**
+     * initMemory()
      * 
+     * Initializes the memory of the AI. 
+     * If a memory file exists, read from that. 
+     * otherwise, init with a new memory.
      */
     public void initMemory(){
    		File f = new File(memoryFileName);
@@ -486,15 +500,72 @@ public class StrategyManager extends DefaultBWListener {
     		Memory = readMemory();
     	}
     	else{
-    		Memory = new Hashtable<Integer,Integer[]>();
+    		Memory = new Hashtable<Integer, Double[]>();
     	}
     }
     
     /**
-     * 
+     * updateMemory
+     * @param currentState
      */
-    public void updateMemory(){
+    public void updateMemory(State currentState){
+    	int currHashCode = currentState.hashCode();
     	
+    	// step 1, check if current state exists, 
+    	// if not, place the current state in Memory
+    	if(!Memory.containsKey(currHashCode)){
+    		Double[] initValues = {0.0, INIT_ET_VALUE};
+    		Memory.put(currHashCode, initValues );
+    	}
+    	
+    	// step 2, get current state UtilValue and ET Value
+    	Double[] currUtilAndET = Memory.get(currHashCode);
+    	
+    	// step 3, Calculate delta and update ET since last time
+    	double delta = 0;
+    	if(PreviousState != null){
+    		PreviousState = currentState;
+    		// if no previous state then the delta value is 0;
+    		delta = 0;
+    		// no prior Et value to update if no previous state. 
+    	}
+    	else{
+    		delta = getReward(PreviousState) + Gamma * currUtilAndET[UTIL_INDEX] - Memory.get(PreviousState.hashCode())[UTIL_INDEX];
+    		// update the previous State's ET to 1
+    		// currUtil is a reference to the one in memory. 
+    		currUtilAndET[ET_INDEX] = INIT_ET_VALUE;
+    	}
+    	
+    	// step 4, Iterate through all states and adjust their Util and ET values accordingly.
+    	for(Integer key : Memory.keySet() )
+    	{
+    		// get states Util and ET values
+    		Double[] utilAndET = Memory.get(key);
+    		
+    		Double stateUtil = utilAndET[UTIL_INDEX];
+    		Double stateET = utilAndET[ET_INDEX];
+    		
+    		// update the Util Value of all states
+            // equation: where s' is my current state
+            // U(s) = U(s) + alpha * eligibility Trace * delta
+    		utilAndET[UTIL_INDEX] = stateUtil + stateET * Alpha * delta;
+    		
+    		// Update ET Value
+    		// Et(s) = Et(s) * Lambda * gamma
+    		utilAndET[ET_INDEX] = stateET * Lambda * Gamma;
+    	}
+    	
+    	// Last Thing, set Previous state to current State'
+    	PreviousState = currentState;
+    }
+    
+    /**
+     * getReward
+     * @param state - the state to get the reward for. 
+     * @return 
+     */
+    public int getReward(State state){
+    	return 0;
     }
     
     /**
@@ -503,9 +574,9 @@ public class StrategyManager extends DefaultBWListener {
      * 
      * @return
      */
-    public Hashtable<Integer, Integer[]> readMemory(){
+    public Hashtable<Integer, Double[]> readMemory(){
     	
-    	Hashtable<Integer, Integer[]> temp = new Hashtable<Integer, Integer[]>(); 
+    	Hashtable<Integer, Double[]> temp = new Hashtable<Integer, Double[]>(); 
     	
     	try
     	{
@@ -515,18 +586,23 @@ public class StrategyManager extends DefaultBWListener {
     		Object obj = ois.readObject();
     		if(obj instanceof Hashtable<?, ?>)
     		{
-    			temp = (Hashtable<Integer, Integer[]>)obj;
+    			temp = (Hashtable<Integer, Double[]>)obj;
     		}
     	}
-    	catch(Exception ex)
+    	catch(IOException ex)
     	{
-    		
+    		System.out.println("IOException: " + ex.getMessage());
+    	}
+    	catch(ClassNotFoundException ex){
+    		System.out.println("ClassNotFoundException: " + ex.getMessage());
     	}
     	return temp;
     }
     
     /**
+     * writeMemory()
      * 
+     * Write Memory to File.
      */
     public void writeMemory(){
     	try
@@ -537,17 +613,17 @@ public class StrategyManager extends DefaultBWListener {
     		oos.writeObject(Memory);
     		oos.close();
     	}
-    	catch(Exception ex)
+    	catch(IOException ex)
     	{
-    		
+    		System.out.println(ex.getMessage());
     	}
     }
     
     /**
-     * 
-     * @return
+     * getMemory()
+     * @return memory
      */
-    public Hashtable<Integer, Integer[]> getMemory()
+    public Hashtable<Integer, Double[]> getMemory()
     {
     	return Memory;
     }
