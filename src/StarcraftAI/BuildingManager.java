@@ -515,7 +515,7 @@ public class BuildingManager{
 		{
 			Scanner scanner = new Scanner(f);
 			population = null;
-			int generation = Integer.parseInt(scanner.nextLine());
+			int generation = Integer.parseInt(scanner.nextLine().trim());
 			scanner.nextLine();
 			while(scanner.hasNextLine())
 			{
@@ -528,17 +528,17 @@ public class BuildingManager{
 					
 					//get values for gene
 					line = scanner.nextLine();
-					String[] arr = line.replaceAll("\\[", "").split(",");
+					String[] arr = line.replaceAll("\\[", "").replaceAll("\\]", "").split(",");
 					ArrayList<Integer> geneArray = new ArrayList<Integer>();
 					for(String s : arr)
 					{
-						geneArray.add(Integer.parseInt(s));
+						geneArray.add(Integer.parseInt(s.trim()));
 					}
 					
 					//get win and loss and fitness
-					int wins = Integer.parseInt(scanner.nextLine());
-					int losses = Integer.parseInt(scanner.nextLine());
-					int fitness = Integer.parseInt(scanner.nextLine());
+					int wins = Integer.parseInt(scanner.nextLine().trim());
+					int losses = Integer.parseInt(scanner.nextLine().trim());
+					float fitness = Float.parseFloat(scanner.nextLine().trim());
 					
 					//set values
 					Gene gene = new Gene(geneArray.size());

@@ -221,7 +221,7 @@ public class Gene implements Serializable{
 	{
 		this.losses = losses;
 	}
-	public void setFitness(int fitness)
+	public void setFitness(float fitness)
 	{
 		this.fitness = fitness;
 	}
