@@ -5,11 +5,13 @@ import java.util.*;
 import bwapi.*;
 
 public class State {
-	private ArrayList<Unit> Units;
+	private Hashtable<String, Integer> Units;
 	private ArrayList<ArmyPosition> EnemyArmyPosition;
-	private HashSet<UnitType> EnemyBuildingInfo;
-	private HashSet<UnitType> EnemyArmyInfo;
+	private HashSet<String> EnemyBuildingInfo;
+	private HashSet<String> EnemyArmyInfo;
 	private int EnemyArmyCount;
+	private MineralAndGasValue Minerals;
+	private MineralAndGasValue Gas;
 
 	/**
 	 * State
@@ -17,11 +19,13 @@ public class State {
 	 */
 	public State()
 	{
-		Units = new ArrayList<Unit>();
+		Units = new Hashtable<String, Integer>();
 		EnemyArmyPosition = new ArrayList<ArmyPosition>();
-		EnemyBuildingInfo = new HashSet<UnitType>();
-		EnemyArmyInfo = new HashSet<UnitType>();
-		EnemyArmyCount = 0;		
+		EnemyBuildingInfo = new HashSet<String>();
+		EnemyArmyInfo = new HashSet<String>();
+		EnemyArmyCount = 0;
+		Minerals = MineralAndGasValue.m0_149;
+		Gas = MineralAndGasValue.g0_24;
 	}
 	
 	/**
@@ -36,14 +40,16 @@ public class State {
 	 * @param enemyArmyInfo
 	 * @param enemyArmyCount
 	 */
-	public State(ArrayList<Unit> units, ArrayList<ArmyPosition> enemyArmyPosition, HashSet<UnitType> enemyBuildingInfo, 
-			HashSet<UnitType> enemyArmyInfo, int enemyArmyCount)
+	public State(Hashtable<String, Integer> units, ArrayList<ArmyPosition> enemyArmyPosition, HashSet<String> enemyBuildingInfo, 
+			HashSet<String> enemyArmyInfo, int enemyArmyCount, MineralAndGasValue minerals, MineralAndGasValue gas)
 	{
-		Units = new ArrayList<Unit>(units);
+		Units = new Hashtable<String, Integer>(units);
 		EnemyArmyPosition = new ArrayList<ArmyPosition>(enemyArmyPosition);
-		EnemyBuildingInfo = new HashSet<UnitType>(enemyBuildingInfo);
-		EnemyArmyInfo = new HashSet<UnitType>(enemyArmyInfo);
+		EnemyBuildingInfo = new HashSet<String>(enemyBuildingInfo);
+		EnemyArmyInfo = new HashSet<String>(enemyArmyInfo);
 		EnemyArmyCount = enemyArmyCount;
+		Minerals = minerals;
+		Gas = gas;
 	}
 	
 	/**
@@ -54,37 +60,32 @@ public class State {
 	 */
 	public State(State state)
 	{
-		Units = new ArrayList<Unit>(state.getUnits());
+		Units = new Hashtable<String, Integer>(state.getUnits());
 		EnemyArmyPosition = new ArrayList<ArmyPosition>(state.getEnemyArmyPosition());
-		EnemyBuildingInfo = new HashSet<UnitType>(state.getEnemyBuildingInfo());
-		EnemyArmyInfo = new HashSet<UnitType>(state.getEnemyArmyInfo());
+		EnemyBuildingInfo = new HashSet<String>(state.getEnemyBuildingInfo());
+		EnemyArmyInfo = new HashSet<String>(state.getEnemyArmyInfo());
 		EnemyArmyCount = state.getEnemyArmyCount();
+		Minerals = state.getMinerals();
+		Gas = state.getGas();
 	}
 	
 	
-	/**
-	 * hashCode()
-	 */
 	@Override
-	public int hashCode() 
-	{
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + EnemyArmyCount;
 		result = prime * result + ((EnemyArmyInfo == null) ? 0 : EnemyArmyInfo.hashCode());
 		result = prime * result + ((EnemyArmyPosition == null) ? 0 : EnemyArmyPosition.hashCode());
 		result = prime * result + ((EnemyBuildingInfo == null) ? 0 : EnemyBuildingInfo.hashCode());
+		result = prime * result + ((Gas == null) ? 0 : Gas.hashCode());
+		result = prime * result + ((Minerals == null) ? 0 : Minerals.hashCode());
 		result = prime * result + ((Units == null) ? 0 : Units.hashCode());
 		return result;
 	}
 
-	/**
-	 * equals
-	 * 
-	 */
 	@Override
-	public boolean equals(Object obj) 
-	{
+	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -108,6 +109,10 @@ public class State {
 			if (other.EnemyBuildingInfo != null)
 				return false;
 		} else if (!EnemyBuildingInfo.equals(other.EnemyBuildingInfo))
+			return false;
+		if (Gas != other.Gas)
+			return false;
+		if (Minerals != other.Minerals)
 			return false;
 		if (Units == null) {
 			if (other.Units != null)
@@ -149,11 +154,11 @@ public class State {
 
 	
 	//// ==== Getters and Setters ==== /////
-	public ArrayList<Unit> getUnits() {
+	public Hashtable<String, Integer> getUnits() {
 		return Units;
 	}
 
-	public void setUnits(ArrayList<Unit> units) {
+	public void setUnits(Hashtable<String, Integer> units) {
 		Units = units;
 	}
 
@@ -165,19 +170,19 @@ public class State {
 		EnemyArmyPosition = enemyArmyPosition;
 	}
 
-	public HashSet<UnitType> getEnemyBuildingInfo() {
+	public HashSet<String> getEnemyBuildingInfo() {
 		return EnemyBuildingInfo;
 	}
 
-	public void setEnemyBuildingInfo(HashSet<UnitType> enemyBuildingInfo) {
+	public void setEnemyBuildingInfo(HashSet<String> enemyBuildingInfo) {
 		EnemyBuildingInfo = enemyBuildingInfo;
 	}
 
-	public HashSet<UnitType> getEnemyArmyInfo() {
+	public HashSet<String> getEnemyArmyInfo() {
 		return EnemyArmyInfo;
 	}
 
-	public void setEnemyArmyInfo(HashSet<UnitType> enemyArmyInfo) {
+	public void setEnemyArmyInfo(HashSet<String> enemyArmyInfo) {
 		EnemyArmyInfo = enemyArmyInfo;
 	}
 
@@ -187,5 +192,21 @@ public class State {
 
 	public void setEnemyArmyCount(int enemyArmyCount) {
 		EnemyArmyCount = enemyArmyCount;
+	}
+
+	public MineralAndGasValue getMinerals() {
+		return Minerals;
+	}
+
+	public void setMinerals(MineralAndGasValue minerals) {
+		Minerals = minerals;
+	}
+
+	public MineralAndGasValue getGas() {
+		return Gas;
+	}
+
+	public void setGas(MineralAndGasValue gas) {
+		Gas = gas;
 	}
 }

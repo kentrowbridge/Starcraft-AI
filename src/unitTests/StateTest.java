@@ -16,11 +16,13 @@ public class StateTest {
 	private static final String alphaValueFileName = "alpha_value.txt";
 	private static final String epsilonValueFileName = "epsilon_value.txt";
 	
-	private ArrayList<Unit> Units;
+	private Hashtable<String, Integer> Units;
 	private ArrayList<ArmyPosition> EnemyArmyPosition;
-	private HashSet<UnitType> EnemyBuildingInfo;
-	private HashSet<UnitType> EnemyArmyInfo;
+	private HashSet<String> EnemyBuildingInfo;
+	private HashSet<String> EnemyArmyInfo;
 	private int EnemyArmyCount;
+	private MineralAndGasValue Minerals;
+	private MineralAndGasValue Gas; 
 	
 	
 	
@@ -30,16 +32,18 @@ public class StateTest {
 	public void setUp() throws Exception 
 	{
 		
-		Units = new ArrayList<Unit>();
+		Units = new Hashtable<String, Integer>();
 		EnemyArmyPosition = new ArrayList<ArmyPosition>();
-		EnemyBuildingInfo = new HashSet<UnitType>();
-		EnemyArmyInfo = new HashSet<UnitType>();
+		EnemyBuildingInfo = new HashSet<String>();
+		EnemyArmyInfo = new HashSet<String>();
 		EnemyArmyCount = 0;		
 		
 		EnemyArmyPosition.add(ArmyPosition.OurBase);
-		EnemyBuildingInfo.add(UnitType.Terran_SCV);
-		EnemyArmyInfo.add(UnitType.Zerg_Zergling);
+		EnemyBuildingInfo.add("Terran SCV");
+		EnemyArmyInfo.add("Zerg Zergling");
 		EnemyArmyCount = 10;
+		Minerals = MineralAndGasValue.m0_149;
+		Gas = MineralAndGasValue.g0_24;
 	}
 
 	@After
@@ -54,14 +58,14 @@ public class StateTest {
 	public void hashCodeReturn0Test() 
 	{
 		State state = new State();
-		System.out.println(state.toString());
-		assertEquals(state.hashCode(), 28630113);
+		System.out.println("hashCodeReturn0Test: " + state.toString());
+		assertEquals(state.hashCode(), -436006662);
 	}
 	
 	@Test
 	public void hashCodeReturnEquivalenceTest() 
 	{
-		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount);
+		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas );
 		System.out.println(state.toString());
 		assertEquals(state.hashCode(), 861800028);
 	}
@@ -69,7 +73,7 @@ public class StateTest {
 	@Test
 	public void toStringDebugTest() 
 	{
-		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount);
+		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
 		System.out.println(state.toString(true));
 		assertEquals(state.toString(true), this.toString());
 	}
