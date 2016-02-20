@@ -188,14 +188,14 @@ public class ProductionManager {
 //					path.add(u);
 					
 					path = examinePath(path);
-					System.out.println("Path changed to: " + path.toString());
+					//System.out.println("Path changed to: " + path.toString());
 					
 					//add path to production q
 					productionQueue.add(path);
 				}
 				
 				productionQueue = reduceCrossover(productionQueue);
-				printProcutionQueue();
+				//printProcutionQueue();
 			}
 			
 			repairBuildings();

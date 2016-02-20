@@ -444,8 +444,6 @@ public class BuildingManager{
 //			}
 			//grab the next gene up
 			geneToUse = population.getNextGene();
-			System.out.println("Gene got");
-
 		}
 		else
 		{
@@ -516,15 +514,15 @@ public class BuildingManager{
 			Scanner scanner = new Scanner(f);
 			population = null;
 			int generation = Integer.parseInt(scanner.nextLine().trim());
-			scanner.nextLine();
+			int index = -1;
 			while(scanner.hasNextLine())
 			{
-				int index = -1;
 				String line = scanner.nextLine();
 				if(line.matches("===*"))
 				{
 					//move to next gene
 					index++;
+					//System.out.println("Reading gene " + index);
 					
 					//get values for gene
 					line = scanner.nextLine();
@@ -534,11 +532,16 @@ public class BuildingManager{
 					{
 						geneArray.add(Integer.parseInt(s.trim()));
 					}
+					//System.out.println("Found array " + geneArray);
 					
 					//get win and loss and fitness
 					int wins = Integer.parseInt(scanner.nextLine().trim());
+					//System.out.println("Found wins " + wins);
 					int losses = Integer.parseInt(scanner.nextLine().trim());
+					//System.out.println("Found losses " + losses);
 					float fitness = Float.parseFloat(scanner.nextLine().trim());
+					//System.out.println("Found fitness " + fitness);
+
 					
 					//set values
 					Gene gene = new Gene(geneArray.size());
@@ -546,6 +549,9 @@ public class BuildingManager{
 					gene.setWins(wins);
 					gene.setLosses(losses);
 					gene.setFitness(fitness);
+					
+					//System.out.println("Final Gene:");
+					gene.printGene();
 					
 					//add gene to population
 					if(population == null)
@@ -557,7 +563,7 @@ public class BuildingManager{
 			}
 			scanner.close();
 			System.out.println("Gene Read.");
-			population.printPopulation();
+			//population.printPopulation();
 		}
 		catch(FileNotFoundException e)
 		{
