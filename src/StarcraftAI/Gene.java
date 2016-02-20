@@ -59,8 +59,8 @@ public class Gene implements Serializable{
 	 */
 	public void setListValues(ArrayList<Integer> values)
 	{
-		gene = values;
-		geneClone = values; 
+		gene = new ArrayList<Integer>(values);
+		geneClone = new ArrayList<Integer>(values); 
 	}
 	
 	/*
@@ -171,7 +171,7 @@ public class Gene implements Serializable{
 			}
 			avgTime /= timeList.size();
 			
-			fitness = ((wins*1.0) / ((wins + losses)*1.0))*.8 + ((double)avgTime / 500.0)*.2; 
+			fitness = (wins / (wins + losses))*0.8 + (avgTime / 500.0)*0.2; 
 		}	
 	}
 	
