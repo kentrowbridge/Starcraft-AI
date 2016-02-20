@@ -69,21 +69,28 @@ public class State {
 		Gas = state.getGas();
 	}
 	
-	
+	/**
+	 * hashCode()
+	 * 
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + EnemyArmyCount;
 		result = prime * result + ((EnemyArmyInfo == null) ? 0 : EnemyArmyInfo.hashCode());
-		result = prime * result + ((EnemyArmyPosition == null) ? 0 : EnemyArmyPosition.hashCode());
+		result = prime * result + ((EnemyArmyPosition == null) ? 0 : EnemyArmyPosition.toString().hashCode());
 		result = prime * result + ((EnemyBuildingInfo == null) ? 0 : EnemyBuildingInfo.hashCode());
-		result = prime * result + ((Gas == null) ? 0 : Gas.hashCode());
-		result = prime * result + ((Minerals == null) ? 0 : Minerals.hashCode());
+		result = prime * result + ((Gas == null) ? 0 : Gas.toString().hashCode());
+		result = prime * result + ((Minerals == null) ? 0 : Minerals.toString().hashCode());
 		result = prime * result + ((Units == null) ? 0 : Units.hashCode());
 		return result;
 	}
 
+	/**
+	 * equals()
+	 * 
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

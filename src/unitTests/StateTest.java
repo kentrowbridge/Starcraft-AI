@@ -59,15 +59,22 @@ public class StateTest {
 	{
 		State state = new State();
 		System.out.println("hashCodeReturn0Test: " + state.toString());
-		assertEquals(state.hashCode(), -436006662);
+		assertEquals(state.hashCode(), -2056846209);
 	}
 	
 	@Test
-	public void hashCodeReturnEquivalenceTest() 
+	public void hashCodeInitializedStateTest() 
 	{
-		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas );
+		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
 		System.out.println(state.toString());
-		assertEquals(state.hashCode(), 861800028);
+		assertEquals(state.hashCode(), 834821160);
+	}
+	
+	@Test
+	public void testStateHashCodeEquivalence(){
+		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
+		State state2 = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
+		assertTrue(state.hashCode() == state2.hashCode());
 	}
 	
 	@Test
@@ -76,6 +83,13 @@ public class StateTest {
 		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
 		System.out.println(state.toString(true));
 		assertEquals(state.toString(true), this.toString());
+	}
+	
+	@Test
+	public void testStateEquals(){
+		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
+		State state2 = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
+		assertTrue(state.equals(state2));
 	}
 	
 	@Test
