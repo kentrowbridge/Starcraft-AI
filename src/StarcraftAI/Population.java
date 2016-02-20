@@ -106,6 +106,7 @@ public class Population implements Serializable{
 			pw.println(generationCount);
 			for(Gene gene : population)
 			{
+				gene.reset();
 				pw.println("====================");
 				pw.println(gene.geneToString());
 				pw.println(gene.getWins());
