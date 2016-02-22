@@ -171,7 +171,7 @@ public class Gene implements Serializable{
 			}
 			avgTime /= timeList.size();
 			
-			fitness = (wins / (wins + losses))*0.8 + (avgTime / 500.0)*0.2; 
+			fitness = ((wins*1.0) / (wins + losses))*0.8 + (avgTime / 500.0)*0.2; 
 		}	
 	}
 	
