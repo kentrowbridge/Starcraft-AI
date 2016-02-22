@@ -80,7 +80,7 @@ public class StrategyManager extends DefaultBWListener {
     {
     	endTime = System.nanoTime();
     	long elapsedTime = endTime - startTime; 
-    	TimeUnit.NANOSECONDS.toSeconds(elapsedTime);
+    	elapsedTime = TimeUnit.NANOSECONDS.toSeconds(elapsedTime);
     	
     	productionManager.onEnd(isWinner, elapsedTime);
     	
