@@ -20,8 +20,29 @@ public class StateTransition {
 		Hashtable<String, Integer> units = newState.getUnits();		
 		int goalCount = units.get(goal) == null ? 0 : units.get(goal);  
 		
-		if(validUnits.contains(goal)) {
+		//increment unit count
+		if(validUnits.contains(goal)) 
+		{
 			units.put(goal, goalCount + 1);
+			
+			//update minerals
+			if(newState.getMinerals() == MineralAndGasValue.m150_400) 
+			{
+				newState.setMinerals(MineralAndGasValue.m0_149);
+			} 
+			else if(newState.getMinerals() == MineralAndGasValue.m401) 
+			{
+				newState.setMinerals(MineralAndGasValue.m150_400);
+			} 
+			//update gas
+			if(newState.getGas() == MineralAndGasValue.g25_125)
+			{
+				newState.setGas(MineralAndGasValue.g0_24);
+			}
+			else if(newState.getGas() == MineralAndGasValue.g126) 
+			{
+				newState.setGas(MineralAndGasValue.g25_125);
+			}
 		}
 		else {
 			System.out.println("Transition goal not recognized: " + goal);
