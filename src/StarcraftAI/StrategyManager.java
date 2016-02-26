@@ -78,6 +78,7 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onEnd(boolean isWinner)
     {
+    	System.out.println("Game ended. IsWinner=" + isWinner);
     	endTime = System.nanoTime();
     	long elapsedTime = endTime - startTime; 
     	elapsedTime = TimeUnit.NANOSECONDS.toSeconds(elapsedTime);
@@ -151,6 +152,15 @@ public class StrategyManager extends DefaultBWListener {
         	e.printStackTrace();
         	System.exit(0);
         }
+        
+        endTime = System.nanoTime();
+    	long elapsedTime = endTime - startTime; 
+    	elapsedTime = TimeUnit.NANOSECONDS.toMinutes(elapsedTime);
+    	if(elapsedTime > 30)
+    	{
+    		onEnd(true);
+    		game.leaveGame();
+    	}
     }
     
     /**
