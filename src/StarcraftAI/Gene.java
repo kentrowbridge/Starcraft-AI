@@ -3,6 +3,7 @@ package StarcraftAI;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Gene
@@ -118,18 +119,18 @@ public class Gene implements Serializable{
 	 * @param - start and end - both are indices
 	 * @return the subList of the gene
 	 */
-	public ArrayList<Integer> getRange(int start, int end)
+	public List<Integer> getRange(int start, int end)
 	{
-		return (ArrayList<Integer>) gene.subList(start, end);
+		return gene.subList(start, end);
 	}
 	
 	/*
 	 * mutateAllele()
-	 * Sometimes mutate a single, random, allele of a gene. The probability of a mutation is 5%. 
+	 * Sometimes mutate a single, random, allele of a gene. The probability of a mutation is 20%. 
 	 */
 	public void mutateAllele()
 	{
-		int rand = (int)(Math.random() * 20);
+		int rand = (int)(Math.random() * 5);
 		// pick a random allele of the gene to mutate
 		if (rand == 1)
 		{

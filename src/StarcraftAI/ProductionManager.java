@@ -66,9 +66,9 @@ public class ProductionManager {
 		initBuildingsForUnits();
 		
 		techPaths = initTechPaths();
-		for(UnitType key : techPaths.keySet()){
-			System.out.println(techPaths.get(key).toString());
-		}
+//		for(UnitType key : techPaths.keySet()){
+//			System.out.println(techPaths.get(key).toString());
+//		}
 		
 	}
 

@@ -22,7 +22,7 @@ public class BuildingManager{
 	private Game game;
 	private Player self;
 
-	private final boolean IS_TRAINING = false;
+	private final boolean IS_TRAINING = true;
 
 	private BWTA bwta;
 	private ArrayList<TilePosition> mappedGenesToTilePositions;
@@ -470,6 +470,8 @@ public class BuildingManager{
 		kid2.addAll(gene2.getRange(0, idx));
 		kid2.addAll(gene1.getRange(idx, geneSize));
 
+		children[0] = new Gene(geneSize);
+		children[1] = new Gene(geneSize);
 		children[0].setListValues(kid1);
 		children[1].setListValues(kid2);
 
@@ -635,7 +637,7 @@ public class BuildingManager{
 					gene.setFitness(fitness);
 					
 					//System.out.println("Final Gene:");
-					gene.printGene();
+					//gene.printGene();
 					
 					//add gene to population
 					if(population == null)
