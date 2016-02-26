@@ -240,6 +240,10 @@ public class BuildingManager{
 					}
 				}
 			}
+			if(closest == null) 
+			{
+				return null;
+			}
 			return closest.getTilePosition();
 		}
 
