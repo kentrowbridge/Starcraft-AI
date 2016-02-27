@@ -148,7 +148,12 @@ public class StrategyManager extends DefaultBWListener {
     {
     	displayGameInfo();
     	
-    	updateMemory(new State());
+    	// only update every 200 frames
+    	if(game.getFrameCount() % 200 == 0)
+    	{
+    		State currentState = compressState();
+    		updateMemory(currentState);
+    	}
         
         try
         {
@@ -559,6 +564,48 @@ public class StrategyManager extends DefaultBWListener {
     	
     	// Last Thing, set Previous state to current State'
     	PreviousState = currentState;
+    }
+    
+    /**
+     * 
+     * @return compressed current State
+     */
+    public State compressState(){
+    	
+    	// our Units <String, Integer> 
+    	
+    	// Enemy Army Position <ArmyPosition>
+    	
+    	// Enemy Building Info <String>
+    	
+    	// EnemyArmy Info <EnemyArmyInfo>
+    	
+    	// Enemy Army Count -  int
+    	
+    	// Mineral Count - MineralAndGasValue
+    	MineralAndGasValue mineralValue = MineralAndGasValue.m0_149;
+    	int minerals = self.minerals();
+    	if(minerals < 150){
+    		mineralValue = MineralAndGasValue.m0_149;
+    	}
+    	else if(minerals <= 400){
+    		mineralValue = MineralAndGasValue.m150_400;
+    	}
+    	else{
+    		mineralValue = MineralAndGasValue.m401;
+    	}
+    		
+    		
+    	
+    	// Gas count - MineralAndGasValue
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	return null;
     }
     
     /**
