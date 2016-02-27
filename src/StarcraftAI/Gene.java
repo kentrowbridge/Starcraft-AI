@@ -2,7 +2,6 @@ package StarcraftAI;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,9 +12,9 @@ import java.util.List;
  * @author Alex Bowns
  */
 public class Gene implements Serializable{
-	
+
 	private static final long serialVersionUID = 4107160788130307474L;
-	
+
 	private ArrayList<Integer> gene;
 	private ArrayList<Integer> geneClone;
 	private double fitness;
@@ -24,8 +23,8 @@ public class Gene implements Serializable{
 	private int wins;
 	private int losses; 
 	private ArrayList<Long> timeList;
-	
-	
+
+
 	/**
 	 * ctor
 	 */
@@ -37,7 +36,7 @@ public class Gene implements Serializable{
 		fitness = -1.0;
 		wins = 0;
 		losses = 0;
-		
+
 		//initialize gene with random values
 		for (int i = 0; i < size; i++)
 		{
@@ -47,27 +46,26 @@ public class Gene implements Serializable{
 		geneClone.addAll(gene);
 		timeList = new ArrayList<Long>(); 
 	}
-	
+
 	public int getSize()
 	{
 		return size;
 	}
 
-	
-	/* 
+
+	/**
 	 * setListValues()
-	 * set the gene and clone values to new values
+	 * Set the gene and clone values to new values.
 	 */
 	public void setListValues(ArrayList<Integer> values)
 	{
 		gene = new ArrayList<Integer>(values);
 		geneClone = new ArrayList<Integer>(values); 
 	}
-	
-	/*
+
+	/**
 	 * getHighestIdx()
-	 * find and return the index in the gene array list with the highest value
-	 * 
+	 * Find and return the index in the gene array list with the highest value.
 	 */
 	public int getHighestIdx()
 	{
@@ -81,50 +79,56 @@ public class Gene implements Serializable{
 				tempIdx = i; 
 			}
 		}
-		
+
 
 		return tempIdx;
 	}
-	
-	/*
+
+	/**
 	 * deactivateIndex()
-	 * set the highest index to be -1 incase if this index was occupied (so we don't re pick it)  
+	 * Set the given index to be -1 in case this index was occupied (so we don't re pick it). 
+	 * 
+	 * @param index	the index of this gene to deactivate.
 	 */
 	public void deactivateIndex(int index)
 	{
 		gene.set(index, -1);
 	}
-	
-	/*
-	 * TODO COMMENT
+
+	/**
+	 * reactivateIndex()
+	 * Resets the given index to its original value.
+	 * 
+	 * @param index	the index of this gene to reset.
 	 */
 	public void reactivateIndex(int index)
 	{
 		gene.set(index, geneClone.get(index));
 	}
-	
+
 	/**
 	 * getValue
 	 * 
-	 * @return the value of the given allele
+	 * @return the value of the given allele.
 	 */
 	public int getValue(int idx)
 	{
 		return gene.get(idx);
 	}
-	
+
 	/**
 	 * getRange()
 	 * 
-	 * @param - start and end - both are indices
+	 * @param start	index at start of range
+	 * @param end	index at end of range
 	 * @return the subList of the gene
 	 */
 	public List<Integer> getRange(int start, int end)
 	{
 		return gene.subList(start, end);
 	}
-	
-	/*
+
+	/**
 	 * mutateAllele()
 	 * Sometimes mutate a single, random, allele of a gene. The probability of a mutation is 20%. 
 	 */
@@ -140,8 +144,8 @@ public class Gene implements Serializable{
 			geneClone.set(allele, newVal); 
 		}
 	}
-	
-	/*
+
+	/**
 	 * getFitness()
 	 * return the fitness value
 	 */
@@ -149,12 +153,18 @@ public class Gene implements Serializable{
 	{
 		return fitness;
 	}
-	
-	//TODO waiting for Max's StrategyManager winEvent method to be implemented 
+
+	/**
+	 * updateFitness()
+	 * Updates the fitness for this gene.
+	 * 
+	 * @param hasWon		true if we have won the last game.
+	 * @param elapsedTime	how long the game took in seconds.
+	 */
 	public void updateFitness(boolean hasWon, long elapsedTime)
 	{
 		timeList.add(elapsedTime);
-				
+
 		if(hasWon)
 		{
 			wins++;
@@ -171,12 +181,12 @@ public class Gene implements Serializable{
 				avgTime += time;
 			}
 			avgTime /= timeList.size();
-			
+
 			fitness = ((wins*1.0) / (wins + losses))*0.8 + (avgTime / 500.0)*0.2; 
 		}	
 	}
-	
-	
+
+
 	/**
 	 * printGene
 	 * Prints the values in the gene and geneClone
@@ -189,7 +199,7 @@ public class Gene implements Serializable{
 		System.out.println("Wins: " + wins);
 		System.out.println("Fitness: " + fitness);
 	}
-	
+
 	/**
 	 * toString()
 	 */
@@ -197,7 +207,7 @@ public class Gene implements Serializable{
 	{
 		return gene.toString();
 	}
-	
+
 	/**
 	 * getGames()
 	 */
@@ -205,7 +215,7 @@ public class Gene implements Serializable{
 	{
 		return losses;
 	}
-	
+
 	/**
 	 * getWins()
 	 */
@@ -213,7 +223,7 @@ public class Gene implements Serializable{
 	{
 		return wins;
 	}
-	
+
 	public void setWins(int wins)
 	{
 		this.wins = wins;
@@ -226,8 +236,8 @@ public class Gene implements Serializable{
 	{
 		this.fitness = fitness;
 	}
-	
-	
+
+
 	/**
 	 * reset
 	 * Resets the gene to original values
@@ -238,8 +248,6 @@ public class Gene implements Serializable{
 		{
 			reactivateIndex(i);	
 		}
-		
-		//gene = geneClone;
 	}
 }
 

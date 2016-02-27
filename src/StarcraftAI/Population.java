@@ -1,11 +1,8 @@
 package StarcraftAI;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * Population
@@ -30,7 +27,7 @@ public class Population implements Serializable{
 		this.generationCount = generationCount;
 	}
 	
-	/*
+	/**
 	 * getNextGene()
 	 * from the gene population, select the next gene that has not been evaluated yet. 
 	 */
@@ -52,9 +49,9 @@ public class Population implements Serializable{
 		population[index] = gene; 
 	}
 	
-	/*
+	/**
 	 * allGenesAnalyzed()
-	 * check if all the genes in a population have been analyzed
+	 * Check if all the genes in a population have been analyzed
 	 */
 	public boolean allGenesAnalyzed()
 	{
@@ -74,6 +71,10 @@ public class Population implements Serializable{
 		return population[index];
 	}
 	
+	/**
+	 * printPopulation()
+	 * Prints a representation of this population to the console.
+	 */
 	public void printPopulation()
 	{
 		System.out.println("***** <Population> *****");
@@ -90,11 +91,18 @@ public class Population implements Serializable{
 	{
 		return generationCount;
 	}
+	
 	public void setGenerationCount(int generationCount)
 	{
 		this.generationCount = generationCount;
 	}
 	
+	/**
+	 * savePopulationFile()
+	 * Saves this population to the given file.
+	 * 
+	 * @param mapFileName	the name of the file to save to.
+	 */
 	public void savePopulationFile(String mapFileName)
 	{
 		String populationFileName = mapFileName;

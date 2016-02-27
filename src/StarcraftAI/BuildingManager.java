@@ -24,7 +24,6 @@ public class BuildingManager{
 
 	private final boolean IS_TRAINING = true;
 
-	private BWTA bwta;
 	private ArrayList<TilePosition> mappedGenesToTilePositions;
 
 	// hash table where key is "map-name" concatenated with the starting base coordinates,
@@ -45,7 +44,6 @@ public class BuildingManager{
 	{
 		this.game = game;
 		this.self = self;
-		this.bwta = new BWTA();
 		
 		//initialize trained genes
 		initTrainedGenes1();
@@ -185,7 +183,11 @@ public class BuildingManager{
 		}
 	}
 	
-	//TODO comments
+	/**
+	 * mapTiles()
+	 * Initializes the mappedGenesToTilePositions array list to map
+	 * indexes to tile positions for the genetic algorithm.
+	 */
 	private void mapTiles()
 	{
 		mappedGenesToTilePositions = new ArrayList<TilePosition>();
@@ -271,7 +273,6 @@ public class BuildingManager{
 				}
 			}
 			// implied some non building is in the space, reactivate the index for later consideration
-			// TODO tps might be reactivated if no units were on that tile but it still can't be built on
 			if (buildingFound == false)
 			{
 				reactivateList.add(highestIdx);
@@ -295,62 +296,6 @@ public class BuildingManager{
 						
 		
 		return mappedGenesToTilePositions.get(highestIdx);
-		
-		
-		
-
-		//		// values to help determine the search radius of where to build different constructs
-		//		int maxDist = 8;
-		//		int changeRate = 2;
-		//		int stopDist = 40;
-		//		TilePosition aroundTile = self.getStartLocation();
-		//
-		//		// build a refinery at the nearest geyser location to the starting point
-		//		if(buildingType == UnitType.Terran_Refinery)
-		//		{
-		//			List<Unit> geysers = game.getGeysers();
-		//			Unit closest = null;
-		//			Position position = BWTA.getStartLocation(self).getPosition();
-		//			for(Unit geyser : geysers)
-		//			{
-		//				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
-		//				{
-		//					if(closest == null || geyser.getDistance(position) < geyser.getDistance(position))
-		//					{
-		//						closest = geyser;
-		//					}
-		//				}
-		//			}
-		//			return closest.getTilePosition();
-		//		}
-		//
-		//		// search for a an empty tile position that can build a given building type
-		//		while((maxDist < stopDist))
-		//		{
-		//			int minX = aroundTile.getX()-maxDist;
-		//			int maxX = aroundTile.getX()+maxDist;
-		//			int minY = aroundTile.getY()-maxDist;
-		//			int maxY = aroundTile.getY()+maxDist;
-		//			// loop through the defined area
-		//			for(int i = minX; i <= maxX; i++)
-		//			{
-		//				for(int j = minY; j <= maxY; j++)
-		//				{
-		//					if(i < maxX && i > minX && j < maxY && j > minY)
-		//					{
-		//						continue;
-		//					}
-		//					if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, true))
-		//					{
-		//						return new TilePosition(i,j);
-		//					}
-		//				}
-		//			}
-		//			// we didn't find a valid tile, so increase max distance
-		//			maxDist+=changeRate;
-		//		}
-		//		game.printf("Unable to find suitable build position for "+buildingType.toString());
-		//		return null;
 	}
 
 	/**
@@ -451,7 +396,7 @@ public class BuildingManager{
 		return count;
 	}
 
-	/*
+	/**
 	 * mateGenes() 
 	 * Mate two genes and return two children
 	 * 
@@ -486,16 +431,26 @@ public class BuildingManager{
 		return children;
 	}
 	
+	/**
+	 * selectGenesToMate()
+	 * Selects a single gene from the population with probability
+	 * weighted by fitness.
+	 * 
+	 * @return The gene to be used in mating.
+	 */
 	private Gene selectGenesToMate()
 	{
 		double combinedFitness = 0.0;
 		double[] evalArr = new double[Population.POPULATION_SIZE];
 		
+		// create a super-increasing sequence of doubles
 		for (int i = 0; i < Population.POPULATION_SIZE; i++)
 		{
 			combinedFitness += population.getGene(i).getFitness();
 			evalArr[i] = combinedFitness;
 		}
+		
+		// generate a random double and find which index it corresponds to
 		double randVal = Math.random() * combinedFitness;
 		for (int i = 0; i < Population.POPULATION_SIZE; i++)
 		{
@@ -521,23 +476,11 @@ public class BuildingManager{
 		System.out.println("Key: " + key);
 		if(IS_TRAINING)
 		{
-//			if(populations.containsKey(key))
-//			{
-//				population = populations.get(key);
-//				
-//			}
-//			else
-//			{
-//				population = new Population(mappedGenesToTilePositions.size(), 0);
-//				populations.put(key, population);
-//				generationCount.put(key, 0);
-//			}
 			//grab the next gene up
 			geneToUse = population.getNextGene();
 		}
 		else
 		{
-			System.out.println(trainedGenes);
 			int[] geneArray = trainedGenes.get(key);
 			ArrayList<Integer> geneList = new ArrayList<Integer>();
 			for(int i : geneArray)
@@ -565,36 +508,21 @@ public class BuildingManager{
 		String coords = "(" + base.getX() + "," + base.getY() + ")";
 		return game.mapFileName() + "_" + coords;
 	}
-
-//	/**
-//	 * saveToFile()
-//	 * saves the hashtable of populations to a variable filename
-//	 */
-//	public void saveToFile()
-//	{
-//		FileOutputStream fos;
-//		ObjectOutputStream oos;
-//		
-//		try 
-//		{
-//			fos = new FileOutputStream(mapFileName);
-//			oos = new ObjectOutputStream(fos);
-//			oos.writeObject(populations);
-//			oos.close();
-//		} 
-//		catch (IOException e) 
-//		{
-//			e.printStackTrace();
-//			return; 
-//		}
-//	}
 	
+	/**
+	 * savePopulationToFile()
+	 * Saves the population to a file specified by the mapFileName instance variable.
+	 */
 	public void savePopulationToFile()
 	{
-		//when all genes in a population are analyzed, save to file
 		population.savePopulationFile(mapFileName);
 	}
 	
+	/**
+	 * loadPopulationFromFile()
+	 * Sets the population instance variable to the values stored in the file
+	 * for the appropriate map.
+	 */
 	public void loadPopulationFromFile()
 	{
 		System.out.println("Loading from " + mapFileName);
@@ -612,7 +540,6 @@ public class BuildingManager{
 				{
 					//move to next gene
 					index++;
-					//System.out.println("Reading gene " + index);
 					
 					//get values for gene
 					line = scanner.nextLine();
@@ -622,15 +549,11 @@ public class BuildingManager{
 					{
 						geneArray.add(Integer.parseInt(s.trim()));
 					}
-					//System.out.println("Found array " + geneArray);
 					
 					//get win and loss and fitness
 					int wins = Integer.parseInt(scanner.nextLine().trim());
-					//System.out.println("Found wins " + wins);
 					int losses = Integer.parseInt(scanner.nextLine().trim());
-					//System.out.println("Found losses " + losses);
 					float fitness = Float.parseFloat(scanner.nextLine().trim());
-					//System.out.println("Found fitness " + fitness);
 
 					
 					//set values
@@ -639,9 +562,6 @@ public class BuildingManager{
 					gene.setWins(wins);
 					gene.setLosses(losses);
 					gene.setFitness(fitness);
-					
-					//System.out.println("Final Gene:");
-					//gene.printGene();
 					
 					//add gene to population
 					if(population == null)
@@ -653,7 +573,6 @@ public class BuildingManager{
 			}
 			scanner.close();
 			System.out.println("Gene Read.");
-			//population.printPopulation();
 		}
 		catch(FileNotFoundException e)
 		{
@@ -663,25 +582,13 @@ public class BuildingManager{
 		
 	}
 	
-//	/*
-//	 * loadFromFile()
-//	 * loads the data from 'filename' into the populations Hashtable
-//	 */
-//	public void loadFromFile()
-//	{
-//		try 
-//		{
-//			FileInputStream fis = new FileInputStream(mapFileName);
-//			ObjectInputStream ois = new ObjectInputStream(fis);
-//			populations = (Hashtable<String, Population>) ois.readObject();
-//		}
-//		catch (IOException | ClassNotFoundException e) 
-//		{
-//			e.printStackTrace();
-//			return;
-//		} 
-//	}
-//	
+	/**
+	 * onEnd()
+	 * Does all updating needed at the end of a game.
+	 * 
+	 * @param isWinner		true if we won the game.
+	 * @param elapsedTime	the length of the game in seconds.
+	 */
 	public void onEnd(boolean isWinner, long elapsedTime)
 	{
 		gene.reset();
