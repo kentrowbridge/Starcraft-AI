@@ -32,9 +32,10 @@ public class StrategyManager extends DefaultBWListener {
     
     private int enemyArmyCount;
     private Hashtable<UnitType, Double> enemyArmyRatio;
-    private Hashtable<UnitType, Integer> enemyBuildingInfo;
+    private Hashtable<Position, UnitType> enemyBuildingInfo;
     private HashSet<Position> enemyArmyPosition;
     private HashSet<Position> enemyBuildingLocation;
+    private HashSet<UnitType> enemyArmyInfo;
     
     private ProductionManager productionManager;
     private MilitaryManager militaryManager;
@@ -114,9 +115,11 @@ public class StrategyManager extends DefaultBWListener {
         // Init variables for enemy info
         enemyArmyCount = 0;
         enemyArmyRatio = new Hashtable<UnitType, Double>();
-        enemyBuildingInfo = new Hashtable<UnitType, Integer>();
+//        enemyBuildingInfo = new Hashtable<UnitType, Integer>();
+        enemyBuildingInfo = new Hashtable<Position, UnitType>();
         enemyArmyPosition = new HashSet<Position>();
         enemyBuildingLocation = new HashSet<Position>();
+        enemyArmyInfo = new HashSet<UnitType>();
         
         isScouting = false;
         hasExtendedRange = false;
@@ -134,7 +137,9 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onEnd(boolean isWinner)
     {
-    	
+    	writeMemory();
+    	writeAlphaValue();
+    	writeEpsilonValue();
     }
     
     /**
@@ -148,13 +153,6 @@ public class StrategyManager extends DefaultBWListener {
     {
     	displayGameInfo();
     	
-    	// only update every 200 frames
-    	if(game.getFrameCount() % 200 == 0)
-    	{
-    		State currentState = compressState();
-    		updateMemory(currentState);
-    	}
-        
         try
         {
         	//update game info for this and subsequent classes
@@ -178,9 +176,17 @@ public class StrategyManager extends DefaultBWListener {
 		//update game information
 		updateEnemyBuildingLocations();
 		
-		//give orders to lower tier classes
-		executeStrategy();
-
+		// only update every 200 frames
+    	if(game.getFrameCount() % 200 == 0)
+    	{
+    		State currentState = compressState();
+    		updateMemory(currentState);
+    		//give orders to lower tier classes
+//    		executeStrategy();
+    	}
+    	
+    	executeStrategy();
+		
 		//update lower tier classes with new information from game
     	productionManager.update();
     	militaryManager.update();
@@ -398,7 +404,10 @@ public class StrategyManager extends DefaultBWListener {
     			if(!enemyBuildingLocation.contains(u.getPosition()))
     			{
     				enemyBuildingLocation.add(u.getPosition());
+    				// add to enemy Building Info
+        			enemyBuildingInfo.put(u.getPosition(), u.getType());
     			}
+    			
     		}
     	}
     	
@@ -436,6 +445,7 @@ public class StrategyManager extends DefaultBWListener {
     	for(Position p : toRemove)
     	{
     		enemyBuildingLocation.remove(p);
+    		enemyBuildingInfo.remove(p);
     	}
     }
     
@@ -468,30 +478,55 @@ public class StrategyManager extends DefaultBWListener {
     }
     
     /**
-     * displayUnitOrders()
+     * displayGameInfo()
      * 
-     * Debugging method that disiplays the units order near the unit itself and also
+     * Debugging method that displays the units order near the unit itself and also
      * displays a green line to its destination, if it has one.
      */
     private void displayGameInfo()
     {
-    	//Unit destination lines and orders
+        //Unit destination lines and orders
     	for(Unit myUnit : self.getUnits())
     	{
     		//display units order
-	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
+//	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), myUnit.getOrder().toString());
 	    	
 	    	int x = myUnit.getOrderTargetPosition().getX() == 0 ? myUnit.getPosition().getX() : myUnit.getOrderTargetPosition().getX();
 	    	int y = myUnit.getOrderTargetPosition().getY() == 0 ? myUnit.getPosition().getY() : myUnit.getOrderTargetPosition().getY();
 	    	//draw line to unit destination
+	    	
 	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
 	    			y, bwapi.Color.Green);
+	    	
+	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), "Attack Position: " + myUnit.getOrderTargetPosition().toString());
     	}
     	
+    	for(Position p : enemyBuildingLocation)
+    	{
+    		game.drawCircleMap(p.getX(), p.getY(), 20, Color.Green);
+    	}
+    	
+    	
     	//Race identifier
-        game.setTextSize(10);
-        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
+        game.setTextSize(1);
+//        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
+        game.drawTextScreen(10,10, "Army Count: " + militaryManager.getArmyCount());
+        
+        for(Position pos : enemyBuildingLocation)
+		{
+        	game.drawTextScreen(10, 20, "Attack Position: " + pos.toString());
+			break;
+		}
     }
+    
+    /////////////////////////////////////////////////////////
+    ///                                                   ///
+    ///                                                   ///
+    ///                TD LEARNING CODE                   ///
+    ///                                                   ///
+    ///                                                   ///
+    /////////////////////////////////////////////////////////
+    
     
     /**
      * initMemory()
@@ -573,14 +608,34 @@ public class StrategyManager extends DefaultBWListener {
     public State compressState(){
     	
     	// our Units <String, Integer> 
+    	Hashtable<String, Integer> units = new Hashtable<String, Integer>();
+    	for(Unit u : self.getUnits()){
+    		String uTypeString = u.getType().c_str();
+    		if(units.get(uTypeString) == null){
+    			units.put(uTypeString, 1);
+    		}
+    		else{
+    			units.put(uTypeString, units.get(uTypeString) + 1);
+    		}
+    	}
     	
     	// Enemy Army Position <ArmyPosition>
+    	ArrayList<ArmyPosition> enemyArmyPosition = new ArrayList<ArmyPosition>();
     	
     	// Enemy Building Info <String>
+    	HashSet<String> enemyBuildingInfoString = new HashSet<String>();
+    	for(Position pos : enemyBuildingInfo.keySet()){
+    		enemyBuildingInfoString.add(enemyBuildingInfo.get(pos).c_str());
+    	}
     	
-    	// EnemyArmy Info <EnemyArmyInfo>
+    	// EnemyArmy Info <UnitType>
+    	HashSet<String> enemyArmyInfoString = new HashSet<String>();
+    	for(UnitType ut : enemyArmyInfo){
+    		enemyArmyInfoString.add(ut.c_str());
+    	}
     	
     	// Enemy Army Count -  int
+    	int EnemyArmyCount = enemyArmyCount;
     	
     	// Mineral Count - MineralAndGasValue
     	MineralAndGasValue mineralValue = MineralAndGasValue.m0_149;
@@ -595,17 +650,23 @@ public class StrategyManager extends DefaultBWListener {
     		mineralValue = MineralAndGasValue.m401;
     	}
     		
-    		
     	
     	// Gas count - MineralAndGasValue
+    	MineralAndGasValue gasValue = MineralAndGasValue.m0_149;
+    	int gas = self.gas();
+    	if(gas < 25){
+    		gasValue = MineralAndGasValue.g0_24;
+    	}
+    	else if(gas < 126){
+    		gasValue = MineralAndGasValue.g25_125;
+    	}
+    	else{
+    		gasValue = MineralAndGasValue.g126;
+    	}
     	
     	
-    	
-    	
-    	
-    	
-    	
-    	return null;
+    	return new State(units, enemyArmyPosition, enemyBuildingInfoString, 
+    			enemyArmyInfoString, enemyArmyCount, mineralValue, gasValue);
     }
     
     /**
