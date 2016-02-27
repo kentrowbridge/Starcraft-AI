@@ -7,6 +7,15 @@ import java.util.List;
 
 import bwapi.*;
 
+/**
+ * StateTransition
+ * 
+ * This is a class is meant to be a stand alone class that provides static methods for 
+ * 
+ * 
+ * @author Kenny Trowbridge
+ *
+ */
 public class StateTransition {
 	private static String[] unitsArr = {"Terran_Marine","Terran_Medic","Terran_SCV","Terran_Siege_Tank_Tank_Mode",
 						 "Terran_Vulture","Terran_Academy","Terran_Barracks","Terran_Command_Center",

@@ -152,7 +152,12 @@ public class StrategyManager extends DefaultBWListener {
     {
     	displayGameInfo();
     	
-//    	updateMemory(new State());
+    	// only update every 200 frames
+    	if(game.getFrameCount() % 200 == 0)
+    	{
+    		State currentState = compressState();
+    		updateMemory(currentState);
+    	}
         
         try
         {
@@ -599,7 +604,8 @@ public class StrategyManager extends DefaultBWListener {
     	
     	// step 3, Calculate delta and update ET since last time
     	double delta = 0;
-    	if(PreviousState != null){
+    	// if no previous state
+    	if(PreviousState == null){
     		PreviousState = currentState;
     		// if no previous state then the delta value is 0;
     		delta = 0;
@@ -636,6 +642,48 @@ public class StrategyManager extends DefaultBWListener {
     }
     
     /**
+     * 
+     * @return compressed current State
+     */
+    public State compressState(){
+    	
+    	// our Units <String, Integer> 
+    	
+    	// Enemy Army Position <ArmyPosition>
+    	
+    	// Enemy Building Info <String>
+    	
+    	// EnemyArmy Info <EnemyArmyInfo>
+    	
+    	// Enemy Army Count -  int
+    	
+    	// Mineral Count - MineralAndGasValue
+    	MineralAndGasValue mineralValue = MineralAndGasValue.m0_149;
+    	int minerals = self.minerals();
+    	if(minerals < 150){
+    		mineralValue = MineralAndGasValue.m0_149;
+    	}
+    	else if(minerals <= 400){
+    		mineralValue = MineralAndGasValue.m150_400;
+    	}
+    	else{
+    		mineralValue = MineralAndGasValue.m401;
+    	}
+    		
+    		
+    	
+    	// Gas count - MineralAndGasValue
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	return null;
+    }
+    
+    /**
      * getReward
      * @param state - the state to get the reward for. 
      * @return 
@@ -664,6 +712,7 @@ public class StrategyManager extends DefaultBWListener {
     		{
     			temp = (Hashtable<Integer, Double[]>)obj;
     		}
+    		ois.close();
     	}
     	catch(IOException ex)
     	{
@@ -781,6 +830,34 @@ public class StrategyManager extends DefaultBWListener {
     {
     	return Memory;
     }
+    
+    public String toStringMemory()
+    {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append('{');
+    	for(int key : Memory.keySet())
+    	{
+    		sb.append(key);
+    		sb.append('=');
+    		sb.append('[');
+    		Double[] values = Memory.get(key);
+    		for(int i = 0; i<2; i++){
+    			sb.append(values[i]);
+    			if (i!=1){
+    				sb.append(',');
+    				sb.append(' ');
+    			}
+    				
+    		}
+    		sb.append(']');
+    		sb.append(',');
+    		sb.append(' ');
+    	}
+    	sb.append('}');
+    	
+    	return sb.toString();
+    }
+    
     
     /**
      * Main()
