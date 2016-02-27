@@ -32,10 +32,14 @@ public class StrategyManager extends DefaultBWListener {
     
     private int enemyArmyCount;
     private Hashtable<UnitType, Double> enemyArmyRatio;
+
     private Hashtable<Position, UnitType> enemyBuildingInfo;
-    private HashSet<Position> enemyArmyPosition;
+    private ArmyPosition enemyArmyPosition;
+
     private HashSet<Position> enemyBuildingLocation;
     private HashSet<UnitType> enemyArmyInfo;
+    
+    private Hashtable<Position, ArmyPosition> regionCategories;
     
     private ProductionManager productionManager;
     private MilitaryManager militaryManager;
@@ -117,7 +121,7 @@ public class StrategyManager extends DefaultBWListener {
         enemyArmyRatio = new Hashtable<UnitType, Double>();
 //        enemyBuildingInfo = new Hashtable<UnitType, Integer>();
         enemyBuildingInfo = new Hashtable<Position, UnitType>();
-        enemyArmyPosition = new HashSet<Position>();
+        enemyArmyPosition = null;
         enemyBuildingLocation = new HashSet<Position>();
         enemyArmyInfo = new HashSet<UnitType>();
         
@@ -132,6 +136,8 @@ public class StrategyManager extends DefaultBWListener {
         BWTA.readMap();
         BWTA.analyze();
         System.out.println("Map data ready");
+        
+        initRegionCategories();
     }
     
     @Override
@@ -175,6 +181,7 @@ public class StrategyManager extends DefaultBWListener {
     {
 		//update game information
 		updateEnemyBuildingLocations();
+		updateEnemyArmyPos();
 		
 		// only update every 200 frames
     	if(game.getFrameCount() % 200 == 0)
@@ -382,7 +389,39 @@ public class StrategyManager extends DefaultBWListener {
      */
     private void updateEnemyArmyPos()
     {
-    	
+    	if(!game.enemy().getUnits().isEmpty())
+    	{
+    		ArmyPosition armyPos = null;
+    		int buildingCount = 0;
+	    	for(Unit u : game.enemy().getUnits())
+	    	{
+	    		//ignore buildings
+	    		if(u.getType().isBuilding())
+	    		{
+	    			buildingCount++;
+	    			continue;
+	    		}
+	    		//find out which region unit is in
+	    		ArmyPosition uPos = regionCategories.get(BWTA.getRegion(u.getPosition()).getCenter());
+	    		if(armyPos == null)
+	    		{
+	    			armyPos = uPos;
+	    		}
+	    		else if(uPos == ArmyPosition.OurBase)// ourbase is top priority
+	    		{
+	    			armyPos = uPos;
+	    		}
+	    		else if(uPos == ArmyPosition.Neutral && armyPos != ArmyPosition.OurBase)// neutral is second priority
+	    		{
+	    			armyPos = uPos;
+	    		}
+	    	}
+	    	//only update if some non-buildings were found
+	    	if(buildingCount != game.enemy().getUnits().size())
+	    	{
+	    		enemyArmyPosition = armyPos;
+	    	}	    	
+    	}
     }
     
     
@@ -408,6 +447,12 @@ public class StrategyManager extends DefaultBWListener {
         			enemyBuildingInfo.put(u.getPosition(), u.getType());
     			}
     			
+				//track which regions have enemy buildings
+				bwta.Region uRegion = BWTA.getRegion(u.getPosition());
+				if(regionCategories.get(uRegion.getCenter()) != ArmyPosition.EnemyBase)
+				{
+					regionCategories.put(uRegion.getCenter(), ArmyPosition.EnemyBase);
+				}
     		}
     	}
     	
@@ -436,7 +481,7 @@ public class StrategyManager extends DefaultBWListener {
     			if(!buildingStillThere)
     			{
     				toRemove.add(p);
-    				break;//TODO check if this is necessary
+    				break;
     			}
     		}
     	}
@@ -506,8 +551,7 @@ public class StrategyManager extends DefaultBWListener {
     		game.drawCircleMap(p.getX(), p.getY(), 20, Color.Green);
     	}
     	
-    	
-    	//Race identifier
+    	// ATTACK POSITION DEBUG CODE
         game.setTextSize(1);
 //        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
         game.drawTextScreen(10,10, "Army Count: " + militaryManager.getArmyCount());
@@ -517,6 +561,37 @@ public class StrategyManager extends DefaultBWListener {
         	game.drawTextScreen(10, 20, "Attack Position: " + pos.toString());
 			break;
 		}
+
+    	//Display region control information (OurBase, Neutral, EnemyBase)
+    	for(Position r : regionCategories.keySet())
+        {
+    		Color c;
+    		ArmyPosition category = regionCategories.get(r); 
+    		if(category == ArmyPosition.OurBase)
+    			c = Color.Green;
+    		else if(category == ArmyPosition.EnemyBase)
+    			c = Color.Red;
+    		else
+    			c = Color.White;
+        	game.drawCircleMap(r.getX(), r.getY(), 25, c, true);
+        }
+    }
+    
+    private void initRegionCategories() 
+    {
+    	regionCategories = new Hashtable<Position, ArmyPosition>();
+    	bwta.Region home = BWTA.getRegion(self.getStartLocation());
+    	if(home != null)
+    	{
+    		regionCategories.put(home.getCenter(), ArmyPosition.OurBase);
+    	}
+    	for(bwta.Region r : BWTA.getRegions()) 
+    	{
+    		if(!regionCategories.containsKey(r.getCenter()))
+    		{
+    			regionCategories.put(r.getCenter(), ArmyPosition.Neutral);
+    		}
+    	}
     }
     
     /////////////////////////////////////////////////////////
