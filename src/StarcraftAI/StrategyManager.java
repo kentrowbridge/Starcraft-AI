@@ -355,16 +355,6 @@ public class StrategyManager extends DefaultBWListener {
     			productionGoal.add(UnitType.Terran_SCV);
                 minerals -= 50;
     		}
-//    		else if(self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 
-//    				|| (self.supplyTotal() - self.supplyUsed() != productionBuildings*3 + 1 
-//    				&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot)>=1))
-//    		{
-//    			productionGoal.add(UnitType.Terran_SCV);
-//                minerals -= 50;
-//        	}
-//    		System.out.println("BUILD SCV");
-//          productionGoal.add(UnitType.Terran_SCV);
-//          minerals -= 50;
     	}
     	
     	//Contingency to build more barracks over time. 
@@ -594,6 +584,14 @@ public class StrategyManager extends DefaultBWListener {
         }
     }
     
+    /**
+     * drawGoals
+     * 
+     * Draws each of the goals onto the screen.
+     * This is separate from Display Game info because it requires the goas to be passed in. 
+     * 
+     * @param goals - a list of UnitTypes that symbolize the goals of the StratManager at that point in time. 
+     */
     private void drawGoals(ArrayList<UnitType> goals){
     	
     	game.drawTextScreen(10, 30, "Production Goals: " );
