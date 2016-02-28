@@ -129,6 +129,8 @@ public class StrategyManager extends DefaultBWListener {
         hasExtendedRange = false;
         
         initMemory();
+        readAlphaValue();
+        readEpsilonValue();
         
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -140,10 +142,22 @@ public class StrategyManager extends DefaultBWListener {
         initRegionCategories();
     }
     
+    /**
+     * TODO: HAVN'T DONE CLEAN UP YET. 
+     * TODO: ALPHA AND EPSILON REDUCTIONS 
+     *  
+     */
     @Override
     public void onEnd(boolean isWinner)
     {
+    	// save Memory
     	writeMemory();
+    	
+    	// Update alpha and epsilon
+    	Alpha*= .999;
+    	Epsilon *= .9999;
+    	
+    	// save alpha and epsilon
     	writeAlphaValue();
     	writeEpsilonValue();
     }
@@ -362,6 +376,9 @@ public class StrategyManager extends DefaultBWListener {
     	
         //set goal for the production manager
     	productionManager.setGoal(productionGoal);
+    	
+    	// Debugging 
+    	drawGoals(productionGoal);
 		
     	//Attack if we have enough units
     	if(armyCount >= 20 && armyCount >= (productionBuildings-1)*3)
@@ -575,6 +592,15 @@ public class StrategyManager extends DefaultBWListener {
     			c = Color.White;
         	game.drawCircleMap(r.getX(), r.getY(), 25, c, true);
         }
+    }
+    
+    private void drawGoals(ArrayList<UnitType> goals){
+    	
+    	game.drawTextScreen(10, 30, "Production Goals: " );
+    	for(int i = 0; i<goals.size(); i++)
+    	{
+    		game.drawTextScreen(10, i*10 + 40, goals.get(i).c_str());
+    	}
     }
     
     private void initRegionCategories() 
@@ -819,9 +845,13 @@ public class StrategyManager extends DefaultBWListener {
 			result = sc.nextDouble();
 			sc.close();
     	}
+    	catch(FileNotFoundException ex)
+    	{
+    		return .999;
+    	}
     	catch(Exception ex)
     	{
-    		
+    		System.out.println(ex.getMessage());
     	}
     	return result;
     }
@@ -857,6 +887,10 @@ public class StrategyManager extends DefaultBWListener {
 			Scanner sc = new Scanner(f);
 			result = sc.nextDouble();
 			sc.close();
+    	}
+    	catch(FileNotFoundException ex)
+    	{
+    		return .9999;
     	}
     	catch(Exception ex)
     	{
