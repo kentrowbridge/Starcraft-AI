@@ -66,9 +66,9 @@ public class ProductionManager {
 		initBuildingsForUnits();
 		
 		techPaths = initTechPaths();
-		for(UnitType key : techPaths.keySet()){
-			System.out.println(techPaths.get(key).toString());
-		}
+//		for(UnitType key : techPaths.keySet()){
+//			System.out.println(techPaths.get(key).toString());
+//		}
 		
 	}
 
@@ -188,14 +188,14 @@ public class ProductionManager {
 //					path.add(u);
 					
 					path = examinePath(path);
-					System.out.println("Path changed to: " + path.toString());
+//					System.out.println("Path changed to: " + path.toString());
 					
 					//add path to production q
 					productionQueue.add(path);
 				}
 				
 				productionQueue = reduceCrossover(productionQueue);
-				printProcutionQueue();
+//				printProductionQueue();
 			}
 			
 			repairBuildings();
@@ -690,7 +690,7 @@ public class ProductionManager {
 	 * printProductionQueue
 	 * prints the production queue as it currently is. 
 	 */
-	public void printProcutionQueue()
+	public void printProductionQueue()
 	{
 		if(productionQueue.size() > 0)
 		{

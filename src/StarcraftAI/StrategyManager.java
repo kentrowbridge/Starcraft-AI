@@ -50,6 +50,11 @@ public class StrategyManager extends DefaultBWListener {
     // Memory<stateHashCode, UtilityValue, Eligibility Trace Value>
     private Hashtable<Integer, Double[]> Memory;
     
+    
+    
+    // VARIABLE FOR DE BUGGING 
+    private long UpdateTime;
+    private long FrameTime;
 
     /**
      * run()
@@ -140,6 +145,15 @@ public class StrategyManager extends DefaultBWListener {
         System.out.println("Map data ready");
         
         initRegionCategories();
+        
+        
+        // Timing
+        UpdateTime = 0L;
+        FrameTime = 0L;
+        
+        // Set Game Speed
+        game.setLocalSpeed(15);
+        
     }
     
     /**
@@ -180,8 +194,11 @@ public class StrategyManager extends DefaultBWListener {
     	
         try
         {
+        	long startTime = System.currentTimeMillis();
         	//update game info for this and subsequent classes
         	update();
+        	long endTime = System.currentTimeMillis();
+        	FrameTime = startTime - endTime;
         }
         catch(Exception e)
         {
@@ -205,8 +222,12 @@ public class StrategyManager extends DefaultBWListener {
 		// only update every 200 frames
     	if(game.getFrameCount() % 200 == 0)
     	{
+    		long startTime = System.currentTimeMillis();
     		State currentState = compressState();
     		updateMemory(currentState);
+    		long endTime = System.currentTimeMillis();
+    		UpdateTime = endTime - startTime;
+    		
     		//give orders to lower tier classes
 //    		executeStrategy();
     	}
@@ -554,8 +575,9 @@ public class StrategyManager extends DefaultBWListener {
 	    	
 	    	game.drawLineMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), x, 
 	    			y, bwapi.Color.Green);
-	    	
-	    	game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), "Attack Position: " + myUnit.getOrderTargetPosition().toString());
+	    	if(!myUnit.getType().isBuilding()){
+	    		game.drawTextMap(myUnit.getPosition().getX(), myUnit.getPosition().getY(), "AP: " + myUnit.getOrderTargetPosition().toString());
+	    	}
     	}
     	
     	for(Position p : enemyBuildingLocation)
@@ -587,6 +609,12 @@ public class StrategyManager extends DefaultBWListener {
     			c = Color.White;
         	game.drawCircleMap(r.getX(), r.getY(), 25, c, true);
         }
+    	
+    	
+    	// Display Frame time 
+    	game.drawTextScreen(500, 290, "Frame Time: " + FrameTime + " ms");
+    	// Display update time
+    	game.drawTextScreen(500, 300, "Update Time: " + UpdateTime + " ms");
     }
     
     /**
