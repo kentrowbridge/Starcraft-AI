@@ -143,20 +143,25 @@ public class StrategyManager extends DefaultBWListener {
     }
     
     /**
-     * TODO: HAVN'T DONE CLEAN UP YET. 
-     * TODO: ALPHA AND EPSILON REDUCTIONS 
-     *  
+     * onEnd 
      */
     @Override
     public void onEnd(boolean isWinner)
     {
-    	// save Memory
-    	writeMemory();
+    	// create end State
+    	State endState = new State();
+    	endState.setHasWon(isWinner);
+    	endState.setHasWon(!isWinner);
+    	
+    	// update Memory with the win State
+    	updateMemory(endState);
     	
     	// Update alpha and epsilon
     	Alpha*= .999;
     	Epsilon *= .9999;
     	
+    	// save Memory
+    	writeMemory();
     	// save alpha and epsilon
     	writeAlphaValue();
     	writeEpsilonValue();

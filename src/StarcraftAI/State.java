@@ -12,6 +12,8 @@ public class State {
 	private int EnemyArmyCount;
 	private MineralAndGasValue Minerals;
 	private MineralAndGasValue Gas;
+	private boolean hasWon;
+	private boolean hasLost;
 
 	/**
 	 * State
@@ -26,6 +28,8 @@ public class State {
 		EnemyArmyCount = 0;
 		Minerals = MineralAndGasValue.m0_149;
 		Gas = MineralAndGasValue.g0_24;
+		hasWon = false;
+		hasLost = false;
 	}
 	
 	/**
@@ -71,7 +75,6 @@ public class State {
 	
 	/**
 	 * hashCode()
-	 * 
 	 */
 	@Override
 	public int hashCode() {
@@ -84,48 +87,69 @@ public class State {
 		result = prime * result + ((Gas == null) ? 0 : Gas.toString().hashCode());
 		result = prime * result + ((Minerals == null) ? 0 : Minerals.toString().hashCode());
 		result = prime * result + ((Units == null) ? 0 : Units.hashCode());
+		result = prime * result + (hasLost ? 1231 : 1237);
+		result = prime * result + (hasWon ? 1231 : 1237);
 		return result;
 	}
 
 	/**
 	 * equals()
-	 * 
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		State other = (State) obj;
-		if (EnemyArmyCount != other.EnemyArmyCount)
+		if (EnemyArmyCount != other.EnemyArmyCount) {
 			return false;
+		}
 		if (EnemyArmyInfo == null) {
-			if (other.EnemyArmyInfo != null)
+			if (other.EnemyArmyInfo != null) {
 				return false;
-		} else if (!EnemyArmyInfo.equals(other.EnemyArmyInfo))
+			}
+		} else if (!EnemyArmyInfo.equals(other.EnemyArmyInfo)) {
 			return false;
+		}
 		if (EnemyArmyPosition == null) {
-			if (other.EnemyArmyPosition != null)
+			if (other.EnemyArmyPosition != null) {
 				return false;
-		} else if (!EnemyArmyPosition.equals(other.EnemyArmyPosition))
+			}
+		} else if (!EnemyArmyPosition.equals(other.EnemyArmyPosition)) {
 			return false;
+		}
 		if (EnemyBuildingInfo == null) {
-			if (other.EnemyBuildingInfo != null)
+			if (other.EnemyBuildingInfo != null) {
 				return false;
-		} else if (!EnemyBuildingInfo.equals(other.EnemyBuildingInfo))
+			}
+		} else if (!EnemyBuildingInfo.equals(other.EnemyBuildingInfo)) {
 			return false;
-		if (Gas != other.Gas)
+		}
+		if (Gas != other.Gas) {
 			return false;
-		if (Minerals != other.Minerals)
+		}
+		if (Minerals != other.Minerals) {
 			return false;
+		}
 		if (Units == null) {
-			if (other.Units != null)
+			if (other.Units != null) {
 				return false;
-		} else if (!Units.equals(other.Units))
+			}
+		} else if (!Units.equals(other.Units)) {
 			return false;
+		}
+		if (hasLost != other.hasLost) {
+			return false;
+		}
+		if (hasWon != other.hasWon) {
+			return false;
+		}
 		return true;
 	}
 	
@@ -215,5 +239,21 @@ public class State {
 
 	public void setGas(MineralAndGasValue gas) {
 		Gas = gas;
+	}
+
+	public boolean isHasWon() {
+		return hasWon;
+	}
+
+	public void setHasWon(boolean hasWon) {
+		this.hasWon = hasWon;
+	}
+
+	public boolean isHasLost() {
+		return hasLost;
+	}
+
+	public void setHasLost(boolean hasLost) {
+		this.hasLost = hasLost;
 	}
 }

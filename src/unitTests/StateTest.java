@@ -47,7 +47,7 @@ public class StateTest {
 		Gas = MineralAndGasValue.g0_24;
 		
 		TestState = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
-		TestStateString = "{834821160=[0.0, 0.76], }";
+		TestStateString = "{-895710008=[0.0, 0.76], }";
 	}
 
 	@After
@@ -68,7 +68,7 @@ public class StateTest {
 	{
 		State state = new State();
 //		System.out.println("hashCodeReturn0Test: " + state.toString());
-		assertEquals(state.hashCode(), -2056846209);
+		assertEquals(-944211105, state.hashCode());
 	}
 	
 	@Test
@@ -76,7 +76,7 @@ public class StateTest {
 	{
 		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
 //		System.out.println(state.toString());
-		assertEquals(state.hashCode(), 834821160);
+		assertEquals(-895710008, state.hashCode());
 	}
 	
 	@Test
@@ -93,7 +93,7 @@ public class StateTest {
 	{
 		State state = new State(Units, EnemyArmyPosition, EnemyBuildingInfo, EnemyArmyInfo, EnemyArmyCount, Minerals, Gas);
 //		System.out.println(state.toString(true));
-		assertEquals(state.toString(true), this.toString());
+		assertEquals( this.toString(), state.toString(true));
 	}
 	
 	@Test
@@ -117,7 +117,7 @@ public class StateTest {
 		StrategyManager strat1 = new StrategyManager();
 		strat1.initMemory();
 //		System.out.println(strat.getMemory().toString());	
-		assertEquals(strat1.getMemory().toString(), "{}");
+		assertEquals("{}", strat1.getMemory().toString());
 	}
 	
 	@Test
@@ -127,7 +127,7 @@ public class StateTest {
 		strat2.initMemory();
 		strat2.updateMemory(TestState);
 		System.out.println(strat2.toStringMemory());
-		assertEquals(strat2.toStringMemory(), "{834821160=[0.0, 0.76], }");
+		assertEquals("{-895710008=[0.0, 0.76], }", strat2.toStringMemory());
 	}
 	
 	@Test
@@ -141,7 +141,7 @@ public class StateTest {
 		strat.updateMemory(TestState2);
 		
 		System.out.println(strat.toStringMemory());
-		assertEquals(strat.toStringMemory(), "{-1970240992=[0.0, 0.76], 834821160=[0.0, 0.5776], }");
+		assertEquals("{-895710008=[0.0, 0.5776], 679023808=[0.0, 0.76], }", strat.toStringMemory());
 	}
 	
 	// =========== I/O Unit Tests =========== //
@@ -161,7 +161,7 @@ public class StateTest {
 		strat5.initMemory();
 		strat5.writeMemory();
 		Hashtable<Integer, Double[]> temp = strat5.readMemory();
-		assertEquals(temp.toString(), "{}");
+		assertEquals("{}", temp.toString());
 	}
 	
 	@Test
@@ -183,7 +183,7 @@ public class StateTest {
 		strat7.writeMemory();
 		
 		Hashtable<Integer, Double[]> temp = strat7.readMemory();
-		assertEquals(HashTableToString(temp), TestStateString);
+		assertEquals(TestStateString, HashTableToString(temp));
 	}
 	
 	
@@ -252,6 +252,13 @@ public class StateTest {
 				+ EnemyBuildingInfo.toString() + ", EnemyArmyInfo=" + EnemyArmyInfo.toString() + ", EnemyArmyCount=" + EnemyArmyCount + "]";
 	}
 	
+	/**
+	 * deleteFile
+	 * 
+	 * If the file exists, delete it. 
+	 * 
+	 * @param fileName - file name to be deleted
+	 */
 	public void deleteFile(String fileName){
 		File f = new File(fileName);
     	if(f.exists()){
