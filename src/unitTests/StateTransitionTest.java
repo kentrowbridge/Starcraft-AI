@@ -16,7 +16,7 @@ public class StateTransitionTest {
 	@Test
 	public void simpleUnitTest() {
 		State s = new State();
-		String goal = "Terran_Marine";
+		String goal = "Terran Marine";
 		
 		State newS = StateTransition.transition(s, goal);
 		
@@ -30,7 +30,7 @@ public class StateTransitionTest {
 		State s = new State();
 		s.setMinerals(MineralAndGasValue.m150_400);
 		s.setGas(MineralAndGasValue.g25_125);
-		String goal = "Terran_Barracks";
+		String goal = "Terran Barracks";
 		
 		State newS = StateTransition.transition(s, goal);
 		
@@ -45,8 +45,8 @@ public class StateTransitionTest {
 	public void multipleTransitionsTest() {
 		State s = new State();
 		State newS = new State(s);
-		String[] goals = {"Terran_Barracks","Terran_Marine","Terran_Academy",
-						  "Terran_Medic","Terran_Factory","Terran_Marine"};
+		String[] goals = {"Terran Barracks","Terran Marine","Terran Academy",
+						  "Terran Medic","Terran Factory","Terran Marine"};
 		
 		
 		for(String g : goals) {
