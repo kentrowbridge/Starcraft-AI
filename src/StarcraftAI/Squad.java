@@ -117,7 +117,7 @@ public class Squad {
 		for(Unit unit: squad){
 
 			if(unit.getOrder().equals(Order.AttackUnit)){
-				return;
+				continue;
 			}
 
 			if(unit != null && unit.exists() && !unit.isAttacking() && !unit.isStartingAttack() 
