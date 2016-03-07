@@ -1,5 +1,6 @@
 package StarcraftAI;
 import java.util.ArrayList;
+import java.util.List;
 
 import bwapi.*;
 
@@ -109,17 +110,36 @@ public class Squad {
 	 */
 	public void attackMove(Position position)
 	{
+		//find marines for medics to follow
+		List<Unit> marines = new ArrayList<Unit>();
+		for(Unit u : squad)
+		{
+			if(u.getType() == UnitType.Terran_Marine)
+			{
+				marines.add(u);
+			}
+		}
+		
 		for(Unit unit: squad){
 
 			if(unit.getOrder().equals(Order.AttackUnit)){
-				return;
+				continue;
 			}
 
 			if(unit != null && unit.exists() && !unit.isAttacking() && !unit.isStartingAttack() 
 					&& unit.isCompleted()){
 				if(unit.getTargetPosition() != null && !unit.getTargetPosition().equals(position)){
 					//					System.out.println("set: "+ unit+ "   Attack position " + position);
-					unit.attack(position);
+					if(unit.getType() == UnitType.Terran_Medic && !marines.isEmpty())
+					{
+						//have medic follow another unit in the squad
+						Unit marine = marines.remove(0);
+						unit.follow(marine);
+					}
+					else
+					{
+						unit.attack(position);
+					}
 				}
 			}
 		}

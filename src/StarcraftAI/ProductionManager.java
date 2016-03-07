@@ -4,6 +4,8 @@ import java.util.*;
 import javax.sound.midi.ControllerEventListener;
 
 import bwapi.*;
+import bwta.BWTA;
+import bwta.Chokepoint;
 /**
  * The production manager is responsible for building units that the strategy manager requests. 
  * ProductionManager uses the WorkerManager and the BuildingManager to handle build and research 
@@ -87,6 +89,11 @@ public class ProductionManager {
 		if(unit.getType().isBuilding())
 		{
 			buildingManager.addUnit(unit);
+			//set rally point for barracks
+			if(unit.getType() == UnitType.Terran_Barracks)
+			{
+				unit.setRallyPoint(findClosestChokePoint(unit.getPosition()));
+			}
 		}
 		else if(unit.getType() == UnitType.Terran_SCV)
 		{
@@ -94,6 +101,24 @@ public class ProductionManager {
 		}
 	}
 	
+	private Position findClosestChokePoint(Position pos) 
+	{
+		int dist = Integer.MAX_VALUE;
+		Position closest = pos;
+		for(Chokepoint c : BWTA.getChokepoints())
+		{
+			int temp = pos.getApproxDistance(c.getCenter());
+			if(temp < dist && game.isExplored(StrategyManager.convertPositionToTilePosition(pos)))
+			{
+				closest = c.getCenter();
+				dist = temp;
+			}
+		}
+		
+		//default to units position
+		return closest;
+	}
+
 	/**
 	 * setGoal()
 	 * This method sets the newGoal instance variable to the specified parameter.
