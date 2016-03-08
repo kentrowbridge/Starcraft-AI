@@ -100,7 +100,7 @@ public class BattleManager{
 			Position unitPosition = unit.getPosition();
 			
 			//the unit is too far away from the attacked unit, send it to the battle
-			if (unitPosition.distanceTo(attackedUnitPosition) > FARAWAY)
+			if (unitPosition.getApproxDistance(attackedUnitPosition) > FARAWAY)
 			{
 				unit.attack(attackedUnitPosition);
 			}
