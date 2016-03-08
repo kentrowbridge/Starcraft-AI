@@ -232,7 +232,7 @@ public class StateTest {
 		catch(Exception ex){
 			
 		}
-		assertTrue(value.equals(.9999));
+		assertTrue(value.equals(.999));
 	}
 	
 	@Test
@@ -242,7 +242,7 @@ public class StateTest {
 		strat11.writeEpsilonValue();
 		Double result = strat11.readEpsilonValue();
 		
-		assertTrue(result.equals(.9999));
+		assertTrue(result.equals(.999));
 	}
 	
 	////// ==== Helper methods =====  //////
