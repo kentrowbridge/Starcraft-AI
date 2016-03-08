@@ -294,7 +294,7 @@ public class StrategyManager extends DefaultBWListener {
     	// if this is less then epsilon, make a random move
     	if(role < Epsilon)
     	{
-    		int index = (int)Math.round(Math.random()*10);
+    		int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
 //    		productionGoal.add(VALID_GOALS[index]);
     		action = VALID_GOALS[index];
     	}
@@ -329,7 +329,7 @@ public class StrategyManager extends DefaultBWListener {
     	// if we get through the above, and action is still null
     	// select a random action to do. 
     	if(action == null){
-    		int index = (int)Math.round(Math.random()*10);
+    		int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
     		action = VALID_GOALS[index];
     	}
     	
