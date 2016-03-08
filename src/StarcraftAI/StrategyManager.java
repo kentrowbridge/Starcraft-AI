@@ -25,8 +25,6 @@ public class StrategyManager extends DefaultBWListener {
 	private double Epsilon = .999;
 	private double Lambda = .95;
 	
-	private boolean UsedMemory;
-	
 	// variable for holding the previous state.
     private State PreviousState;
 	
@@ -150,7 +148,6 @@ public class StrategyManager extends DefaultBWListener {
         initMemory();
         Alpha = readAlphaValue();
         Epsilon = readEpsilonValue();
-        UsedMemory = false;
         
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -173,7 +170,7 @@ public class StrategyManager extends DefaultBWListener {
         FrameTime = 0L;
         
         // Set Game Speed
-        game.setLocalSpeed(10);
+        game.setLocalSpeed(15);
         
     }
     
@@ -305,9 +302,6 @@ public class StrategyManager extends DefaultBWListener {
     		int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
 //    		productionGoal.add(VALID_GOALS[index]);
     		action = VALID_GOALS[index];
-    		
-    		// for Debugging
-    		UsedMemory = false;
     	}
     	else{
     		double maxUtil = -Integer.MAX_VALUE;
@@ -316,7 +310,7 @@ public class StrategyManager extends DefaultBWListener {
     		for(int i = 0; i < VALID_GOALS.length; i++)
     		{
     			// get the state we'd be in if we made this move
-    			State expandedState = StateTransition.transition(currentState, VALID_GOALS[i].toString());
+    			State expandedState = StateTransition.transition(currentState, VALID_GOALS[i].c_str());
     			
     			// get the hash code for the expanded state
     			int expandedStateKey = expandedState.hashCode();
@@ -333,9 +327,6 @@ public class StrategyManager extends DefaultBWListener {
     					maxUtil = utilAndET[UTIL_INDEX];
     					action = VALID_GOALS[i];
     				}
-    				
-    				// for debugging
-    				UsedMemory = true;
     			}
     		}
     	}
@@ -345,9 +336,6 @@ public class StrategyManager extends DefaultBWListener {
     	if(action == null){
     		int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
     		action = VALID_GOALS[index];
-    		
-    		// for debugging
-    		UsedMemory = false;
     	}
     	
     	productionGoal.add(action);
@@ -545,16 +533,7 @@ public class StrategyManager extends DefaultBWListener {
     		}   		
     		unitCount++;
     		//find out which region unit is in
-    		ArmyPosition uPos;
-    		if(BWTA.getRegion(u.getPosition()) != null)
-    		{
-    			uPos = regionCategories.get(BWTA.getRegion(u.getPosition()).getCenter());
-    		}
-    		else
-    		{
-    			uPos= null;
-    		}
-    		
+    		ArmyPosition uPos = regionCategories.get(BWTA.getRegion(u.getPosition()).getCenter());
     		if(armyPos == null)
     		{
     			armyPos = uPos;
@@ -713,7 +692,7 @@ public class StrategyManager extends DefaultBWListener {
     	}
     	
     	// ATTACK POSITION DEBUG CODE
-        game.setTextSize(bwapi.Text.Size.Enum.Small);
+        game.setTextSize(1);
 //        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
         game.drawTextScreen(10,10, "Army Count: " + militaryManager.getArmyCount());
         
@@ -738,16 +717,6 @@ public class StrategyManager extends DefaultBWListener {
         }
     	
     	
-    	// Draw if we used memory or not
-    	if(UsedMemory)
-    	{
-    		game.drawTextScreen(200, 10, "USED MEMORY");
-    	}
-    	else
-    	{
-    		game.drawTextScreen(200, 10, "DID NOT Use Memory");
-    	}
-    	
     	// Draw goals: 
     	game.drawTextScreen(10, 30, "Production Goals: " );
     	if( CURRENT_GOAL == null)
@@ -755,7 +724,7 @@ public class StrategyManager extends DefaultBWListener {
     		game.drawTextScreen(10, 0*10 + 40, "No GOAL");
     	}
     	else{
-    		game.drawTextScreen(10, 0*10 + 40, CURRENT_GOAL.toString());
+    		game.drawTextScreen(10, 0*10 + 40, CURRENT_GOAL.c_str());
     	}    	
     	
     	//display enemy army count
@@ -780,7 +749,7 @@ public class StrategyManager extends DefaultBWListener {
     	game.drawTextScreen(10, 30, "Production Goals: " );
     	for(int i = 0; i<goals.size(); i++)
     	{
-    		game.drawTextScreen(10, i*10 + 40, goals.get(i).toString());
+    		game.drawTextScreen(10, i*10 + 40, goals.get(i).c_str());
     	}
     }
     
@@ -911,7 +880,7 @@ public class StrategyManager extends DefaultBWListener {
     	// our Units <String, Integer> 
     	Hashtable<String, Integer> units = new Hashtable<String, Integer>();
     	for(Unit u : self.getUnits()){
-    		String uTypeString = u.getType().toString();
+    		String uTypeString = u.getType().c_str();
     		if(units.get(uTypeString) == null){
     			units.put(uTypeString, 1);
     		}
@@ -926,13 +895,13 @@ public class StrategyManager extends DefaultBWListener {
     	// Enemy Building Info <String>
     	HashSet<String> enemyBuildingInfoString = new HashSet<String>();
     	for(Position pos : enemyBuildingInfo.keySet()){
-    		enemyBuildingInfoString.add(enemyBuildingInfo.get(pos).toString());
+    		enemyBuildingInfoString.add(enemyBuildingInfo.get(pos).c_str());
     	}
     	
     	// EnemyArmy Info <UnitType>
     	HashSet<String> enemyArmyInfoString = new HashSet<String>();
     	for(UnitType ut : enemyArmyInfo){
-    		enemyArmyInfoString.add(ut.toString());
+    		enemyArmyInfoString.add(ut.c_str());
     	}
     	
     	// Enemy Army Count -  int

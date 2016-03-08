@@ -53,7 +53,7 @@ public class BuildingManager{
 		TilePosition placement = getPlacement(buildingType, builder);
 		if(placement != null)
 		{
-			builder.build(buildingType, placement);
+			builder.build(placement, buildingType);
 		}
 	}
 
@@ -80,7 +80,7 @@ public class BuildingManager{
 			Position position = BWTA.getStartLocation(self).getPosition();
 			for(Unit geyser : geysers)
 			{
-				if(game.canBuildHere(geyser.getTilePosition(), buildingType, builder, true))
+				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
 				{
 					if(closest == null || geyser.getDistance(position) < closest.getDistance(position))
 					{
@@ -107,7 +107,7 @@ public class BuildingManager{
 					{
 						continue;
 					}
-					if(game.canBuildHere(new TilePosition(i,j), buildingType, builder, true))
+					if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, true))
 					{
 						return new TilePosition(i,j);
 					}
