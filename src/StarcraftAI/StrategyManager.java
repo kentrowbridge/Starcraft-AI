@@ -18,7 +18,8 @@ public class StrategyManager extends DefaultBWListener {
 	private static final String alphaValueFileName = "alpha_value.txt";
 	private static final String epsilonValueFileName = "epsilon_value.txt";
 	
-	private int GameNumber = 1;
+	private int GamesPlayed = 0;
+	private int GamesWon = 0;
 	private double Gamma = .8;
 	private double Alpha = .999;
 	private double Epsilon = .999;
@@ -191,6 +192,13 @@ public class StrategyManager extends DefaultBWListener {
     	// save alpha and epsilon
     	writeAlphaValue();
     	writeEpsilonValue();
+    	
+    	// increase the game count
+    	GamesPlayed++;
+    	if(isWinner)
+    		GamesWon++;
+    	System.out.println("Games Played: " + GamesPlayed);
+    	System.out.println("Games Won: " + GamesWon);
     }
     
     /**
@@ -769,8 +777,9 @@ public class StrategyManager extends DefaultBWListener {
      */
     private void initGoals()
     {
+    	// removed cc: UnitType.Terran_Command_Center,
     	UnitType[] goals = {UnitType.Terran_Marine, UnitType.Terran_Medic, UnitType.Terran_SCV, UnitType.Terran_Siege_Tank_Tank_Mode,
-      			 UnitType.Terran_Vulture, UnitType.Terran_Academy, UnitType.Terran_Barracks, UnitType.Terran_Command_Center,
+      			 UnitType.Terran_Vulture, UnitType.Terran_Academy, UnitType.Terran_Barracks,
        			 UnitType.Terran_Factory, UnitType.Terran_Machine_Shop, UnitType.Terran_Supply_Depot};
     	VALID_GOALS = goals;
     }
