@@ -26,7 +26,7 @@ public class StrategyManager extends DefaultBWListener {
 	private double Lambda = .95;
 	
 	// variable for holding the previous state.
-    private State PreviousState = null;
+    private State PreviousState;
 	
     private Mirror mirror = new Mirror();
     protected Game game;
@@ -37,7 +37,7 @@ public class StrategyManager extends DefaultBWListener {
 
     private Hashtable<Position, UnitType> enemyBuildingInfo;
     private ArmyPosition enemyArmyPosition;
-    private int[] armyCountWindow = new int[ARMY_COUNT_WINDOW_SIZE];
+    private int[] armyCountWindow;
     private HashSet<Position> enemyBuildingLocation;
     private HashSet<UnitType> enemyArmyInfo;
     
@@ -138,12 +138,16 @@ public class StrategyManager extends DefaultBWListener {
         enemyBuildingLocation = new HashSet<Position>();
         enemyArmyInfo = new HashSet<UnitType>();
         
+        armyCountWindow = new int[ARMY_COUNT_WINDOW_SIZE];
+        
         isScouting = false;
         hasExtendedRange = false;
         
+        // Init TD Learning Stuff;
+        PreviousState = null;
         initMemory();
-        readAlphaValue();
-        readEpsilonValue();
+        Alpha = readAlphaValue();
+        Epsilon = readEpsilonValue();
         
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -152,6 +156,7 @@ public class StrategyManager extends DefaultBWListener {
         BWTA.analyze();
         System.out.println("Map data ready");
         
+        regionCategories = null;
         initRegionCategories();
         
 //        for(int i = 0; i<VALID_GOALS.length; i++)
