@@ -90,10 +90,10 @@ public class ProductionManager {
 		{
 			buildingManager.addUnit(unit);
 			//set rally point for barracks
-			if(unit.getType() == UnitType.Terran_Barracks)
-			{
-				unit.setRallyPoint(findClosestChokePoint(unit.getPosition()));
-			}
+//			if(unit.getType() == UnitType.Terran_Barracks)
+//			{
+//				unit.setRallyPoint(findClosestChokePoint(StrategyManager.convertTilePositionToPosition(self.getStartLocation())));
+//			}
 		}
 		else if(unit.getType() == UnitType.Terran_SCV)
 		{
@@ -101,23 +101,23 @@ public class ProductionManager {
 		}
 	}
 	
-	private Position findClosestChokePoint(Position pos) 
-	{
-		int dist = Integer.MAX_VALUE;
-		Position closest = pos;
-		for(Chokepoint c : BWTA.getChokepoints())
-		{
-			int temp = pos.getApproxDistance(c.getCenter());
-			if(temp < dist && game.isExplored(StrategyManager.convertPositionToTilePosition(pos)))
-			{
-				closest = c.getCenter();
-				dist = temp;
-			}
-		}
-		
-		//default to units position
-		return closest;
-	}
+//	private Position findClosestChokePoint(Position pos) 
+//	{
+//		int dist = Integer.MAX_VALUE;
+//		Position closest = pos;
+//		for(Chokepoint c : BWTA.getChokepoints())
+//		{
+//			int temp = pos.getApproxDistance(c.getCenter());
+//			if(temp < dist && game.isExplored(StrategyManager.convertPositionToTilePosition(pos)))
+//			{
+//				closest = c.getCenter();
+//				dist = temp;
+//			}
+//		}
+//		
+//		//default to units position
+//		return closest;
+//	}
 
 	/**
 	 * setGoal()

@@ -276,199 +276,199 @@ public class StrategyManager extends DefaultBWListener {
         ///                                                   ///
         /////////////////////////////////////////////////////////
     	
-//    	UnitType action = null; 
-//    	
-//    	// Get current State
-//    	State currentState = compressState();
-//    	
-//    	// Random role
-//    	double role = Math.random();
-//    	// if this is less then epsilon, make a random move
-//    	if(role < Epsilon)
-//    	{
-//    		int index = (int)Math.round(Math.random()*10);
-////    		productionGoal.add(VALID_GOALS[index]);
-//    		action = VALID_GOALS[index];
-//    	}
-//    	else{
-//    		double maxUtil = -Integer.MAX_VALUE;
-//    		
-//    		// for each of the valid moves, find the one that gives us the greates Util
-//    		for(int i = 0; i < VALID_GOALS.length; i++)
-//    		{
-//    			// get the state we'd be in if we made this move
-//    			State expandedState = StateTransition.transition(currentState, VALID_GOALS[i].c_str());
-//    			
-//    			// get the hash code for the expanded state
-//    			int expandedStateKey = expandedState.hashCode();
-//    			
-//    			// if that state exists in our memory then we will compare the value to our max Util
-//    			// else we can't judge
-//    			if(Memory.get(expandedStateKey) != null)
-//    			{
-//    				// get the values for that state
-//    				Double[] utilAndET = Memory.get(expandedStateKey);
-//    				
-//    				// if the util is greater than the current Util it's the best we've seen so far. 
-//    				if(utilAndET[UTIL_INDEX] > maxUtil){
-//    					maxUtil = utilAndET[UTIL_INDEX];
-//    					action = VALID_GOALS[i];
-//    				}
-//    			}
-//    		}
-//    	}
-//    	
-//    	// if we get through the above, and action is still null
-//    	// select a random action to do. 
-//    	if(action == null){
-//    		int index = (int)Math.round(Math.random()*10);
-//    		action = VALID_GOALS[index];
-//    	}
-//    	
-//    	productionGoal.add(action);
-//    	productionManager.setGoal(productionGoal);
-//    	CURRENT_GOAL = action;
+    	UnitType action = null; 
+    	
+    	// Get current State
+    	State currentState = compressState();
+    	
+    	// Random role
+    	double role = Math.random();
+    	// if this is less then epsilon, make a random move
+    	if(role < Epsilon)
+    	{
+    		int index = (int)Math.round(Math.random()*10);
+//    		productionGoal.add(VALID_GOALS[index]);
+    		action = VALID_GOALS[index];
+    	}
+    	else{
+    		double maxUtil = -Integer.MAX_VALUE;
+    		
+    		// for each of the valid moves, find the one that gives us the greates Util
+    		for(int i = 0; i < VALID_GOALS.length; i++)
+    		{
+    			// get the state we'd be in if we made this move
+    			State expandedState = StateTransition.transition(currentState, VALID_GOALS[i].c_str());
+    			
+    			// get the hash code for the expanded state
+    			int expandedStateKey = expandedState.hashCode();
+    			
+    			// if that state exists in our memory then we will compare the value to our max Util
+    			// else we can't judge
+    			if(Memory.get(expandedStateKey) != null)
+    			{
+    				// get the values for that state
+    				Double[] utilAndET = Memory.get(expandedStateKey);
+    				
+    				// if the util is greater than the current Util it's the best we've seen so far. 
+    				if(utilAndET[UTIL_INDEX] > maxUtil){
+    					maxUtil = utilAndET[UTIL_INDEX];
+    					action = VALID_GOALS[i];
+    				}
+    			}
+    		}
+    	}
+    	
+    	// if we get through the above, and action is still null
+    	// select a random action to do. 
+    	if(action == null){
+    		int index = (int)Math.round(Math.random()*10);
+    		action = VALID_GOALS[index];
+    	}
+    	
+    	productionGoal.add(action);
+    	productionManager.setGoal(productionGoal);
+    	CURRENT_GOAL = action;
     	
     	
     	
     	
     	// ** Simplified workable build queue!
-    	productionGoal.add(UnitType.Terran_Marine);
-    	productionGoal.add(UnitType.Terran_Medic);
-    	productionGoal.add(UnitType.Terran_Siege_Tank_Tank_Mode);
-    	
-    	if(self.allUnitCount(UnitType.Terran_Refinery) < 1)
-    		productionGoal.add(UnitType.Terran_Refinery);
-    	
-    	if(self.allUnitCount(UnitType.Terran_SCV) < 28)
-    		productionGoal.add(UnitType.Terran_SCV);
-    	
-    	if(self.allUnitCount(UnitType.Terran_Barracks) < 2)
-    		productionGoal.add(UnitType.Terran_Barracks);
-    	
-    	if((self.supplyTotal() - self.supplyUsed() <= 6 
-    		|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)
-    		&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1){
-    		productionGoal.add(UnitType.Terran_Supply_Depot);
-    	}
+//    	productionGoal.add(UnitType.Terran_Marine);
+//    	productionGoal.add(UnitType.Terran_Medic);
+//    	productionGoal.add(UnitType.Terran_Siege_Tank_Tank_Mode);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_Refinery) < 1)
+//    		productionGoal.add(UnitType.Terran_Refinery);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_SCV) < 28)
+//    		productionGoal.add(UnitType.Terran_SCV);
+//    	
+//    	if(self.allUnitCount(UnitType.Terran_Barracks) < 2)
+//    		productionGoal.add(UnitType.Terran_Barracks);
+//    	
+//    	if((self.supplyTotal() - self.supplyUsed() <= 6 
+//    		|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)
+//    		&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1){
+//    		productionGoal.add(UnitType.Terran_Supply_Depot);
+//    	}
     	
 		
     	//grab the current resource count
-    	int minerals = self.minerals();
-    	int gas = self.gas();
-    	
-    	// If we are almost supply capped build a supply depot.
-    	// Should supply cap - supplyused < = # of production buildings * 2
-    	if((self.supplyTotal() - self.supplyUsed() <= 6 
-    			|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)  
-    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1
-    			&& minerals >= 100)
-    	{
-//    		System.out.println("BUILD SUPPLY DEPOT!");
-			productionGoal.add(UnitType.Terran_Supply_Depot);
-			minerals -= 100;
-    	}
-    	
-    	// Upgrade Marine attack range. 
-    	if(minerals >= 150 && gas >= 150 
-    			&& self.completedUnitCount(UnitType.Terran_Academy)>=1 
-    			&& !hasExtendedRange)
-    	{
-    		
-    		for(Unit u : self.getUnits())
-    		{
-    			if(u.getType().equals(UnitType.Terran_Academy))
-    			{
-    				u.upgrade(UpgradeType.U_238_Shells);
-    				hasExtendedRange = true;
-    			}
-    		}
-    		
-    		minerals -= 150;
-    		gas -= 150;
-    	}
-    	
-    	// build Academy
-    	if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>1 
-    			&& self.allUnitCount(UnitType.Terran_Academy) < 1)
-    	{
-    		productionGoal.add(UnitType.Terran_Academy);
-    		minerals -= 150;
-    	}
-    	
-    	// build refinery 
-    	if(minerals >= 100 && self.supplyTotal() > 12 && self.allUnitCount(UnitType.Terran_Refinery) < 1
-    			&& self.allUnitCount(UnitType.Terran_Barracks) >= 1)
-    	{
-//        	System.out.println("BUILD Refinery!!!");
-    		productionGoal.add(UnitType.Terran_Refinery);
-    		minerals -= 100;
-    	}
-    	
-    	// else if we don't have a barracks build a barracks. 
-        if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 3)
-        {
-//        	System.out.println("BUILD BARRACKS!!!");
-        	productionGoal.add(UnitType.Terran_Barracks);
-        	minerals -= 150;
-        }
-        
-        // else build marines
-        if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0)
-        {
-//        	System.out.println("BUILD Marine!!!");
-        	// If we have an academy and marines make up less than 75 percent of our army then build a marine
-        	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 
-        			&& militaryManager.getUnitRatio(UnitType.Terran_Marine) <= .75 )
-        	{
-	        	productionGoal.add(UnitType.Terran_Marine);
-	        	minerals -= 100;
-        	}
-        	// else if there is no academy, just build the marine
-        	else if(self.completedUnitCount(UnitType.Terran_Academy) < 1)
-        	{
-        		productionGoal.add(UnitType.Terran_Marine);
-	        	minerals -= 100;
-        	}
-        	//else don't build a marine. We have too many. 
-        }
-        
-        // else build Medics 
-        if(minerals >= 50 && gas >= 25 && self.allUnitCount(UnitType.Terran_Barracks)>0 
-        		&& self.completedUnitCount(UnitType.Terran_Academy) >= 1)
-        {
-//        	System.out.println("BUILD Marine!!!");
-        	if(militaryManager.getUnitRatio(UnitType.Terran_Medic) != null 
-        			&& militaryManager.getUnitRatio(UnitType.Terran_Medic) <= .25){
-	        	productionGoal.add(UnitType.Terran_Medic);
-	        	minerals -= 50;
-	        	gas -= 25;
-        	}
-        }
-    	
-    	//if there's enough minerals, and not currently training an SCV, and we don't infringe on building a supply depot
-        //train an SCV
-    	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28)
-    	{
-    		//check the amount of supply available
-    		if(self.supplyTotal() - self.supplyUsed() != 6 
-    				|| (self.supplyTotal() - self.supplyUsed() == 6 
-    				&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) >= 1))
-    		{
-    			productionGoal.add(UnitType.Terran_SCV);
-                minerals -= 50;
-    		}
-    	}
-    	
-    	//Contingency to build more barracks over time. 
-    	if (minerals >= 150*3) 
-    	{
-    		productionGoal.add(UnitType.Terran_Barracks);
-        	minerals -= 150;
-    	}
-    	
-        //set goal for the production manager
-    	productionManager.setGoal(productionGoal);
+//    	int minerals = self.minerals();
+//    	int gas = self.gas();
+//    	
+//    	// If we are almost supply capped build a supply depot.
+//    	// Should supply cap - supplyused < = # of production buildings * 2
+//    	if((self.supplyTotal() - self.supplyUsed() <= 6 
+//    			|| self.supplyTotal() - self.supplyUsed() <= productionBuildings*3 + 1)  
+//    			&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) < 1
+//    			&& minerals >= 100)
+//    	{
+////    		System.out.println("BUILD SUPPLY DEPOT!");
+//			productionGoal.add(UnitType.Terran_Supply_Depot);
+//			minerals -= 100;
+//    	}
+//    	
+//    	// Upgrade Marine attack range. 
+//    	if(minerals >= 150 && gas >= 150 
+//    			&& self.completedUnitCount(UnitType.Terran_Academy)>=1 
+//    			&& !hasExtendedRange)
+//    	{
+//    		
+//    		for(Unit u : self.getUnits())
+//    		{
+//    			if(u.getType().equals(UnitType.Terran_Academy))
+//    			{
+//    				u.upgrade(UpgradeType.U_238_Shells);
+//    				hasExtendedRange = true;
+//    			}
+//    		}
+//    		
+//    		minerals -= 150;
+//    		gas -= 150;
+//    	}
+//    	
+//    	// build Academy
+//    	if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks)>1 
+//    			&& self.allUnitCount(UnitType.Terran_Academy) < 1)
+//    	{
+//    		productionGoal.add(UnitType.Terran_Academy);
+//    		minerals -= 150;
+//    	}
+//    	
+//    	// build refinery 
+//    	if(minerals >= 100 && self.supplyTotal() > 12 && self.allUnitCount(UnitType.Terran_Refinery) < 1
+//    			&& self.allUnitCount(UnitType.Terran_Barracks) >= 1)
+//    	{
+////        	System.out.println("BUILD Refinery!!!");
+//    		productionGoal.add(UnitType.Terran_Refinery);
+//    		minerals -= 100;
+//    	}
+//    	
+//    	// else if we don't have a barracks build a barracks. 
+//        if(minerals >= 150 && self.allUnitCount(UnitType.Terran_Barracks) < 3)
+//        {
+////        	System.out.println("BUILD BARRACKS!!!");
+//        	productionGoal.add(UnitType.Terran_Barracks);
+//        	minerals -= 150;
+//        }
+//        
+//        // else build marines
+//        if(minerals >= 100 && self.allUnitCount(UnitType.Terran_Barracks)>0)
+//        {
+////        	System.out.println("BUILD Marine!!!");
+//        	// If we have an academy and marines make up less than 75 percent of our army then build a marine
+//        	if(self.completedUnitCount(UnitType.Terran_Academy) >= 1 
+//        			&& militaryManager.getUnitRatio(UnitType.Terran_Marine) <= .75 )
+//        	{
+//	        	productionGoal.add(UnitType.Terran_Marine);
+//	        	minerals -= 100;
+//        	}
+//        	// else if there is no academy, just build the marine
+//        	else if(self.completedUnitCount(UnitType.Terran_Academy) < 1)
+//        	{
+//        		productionGoal.add(UnitType.Terran_Marine);
+//	        	minerals -= 100;
+//        	}
+//        	//else don't build a marine. We have too many. 
+//        }
+//        
+//        // else build Medics 
+//        if(minerals >= 50 && gas >= 25 && self.allUnitCount(UnitType.Terran_Barracks)>0 
+//        		&& self.completedUnitCount(UnitType.Terran_Academy) >= 1)
+//        {
+////        	System.out.println("BUILD Marine!!!");
+//        	if(militaryManager.getUnitRatio(UnitType.Terran_Medic) != null 
+//        			&& militaryManager.getUnitRatio(UnitType.Terran_Medic) <= .25){
+//	        	productionGoal.add(UnitType.Terran_Medic);
+//	        	minerals -= 50;
+//	        	gas -= 25;
+//        	}
+//        }
+//    	
+//    	//if there's enough minerals, and not currently training an SCV, and we don't infringe on building a supply depot
+//        //train an SCV
+//    	if (minerals >= 50 && self.allUnitCount(UnitType.Terran_SCV) < 28)
+//    	{
+//    		//check the amount of supply available
+//    		if(self.supplyTotal() - self.supplyUsed() != 6 
+//    				|| (self.supplyTotal() - self.supplyUsed() == 6 
+//    				&& self.incompleteUnitCount(UnitType.Terran_Supply_Depot) >= 1))
+//    		{
+//    			productionGoal.add(UnitType.Terran_SCV);
+//                minerals -= 50;
+//    		}
+//    	}
+//    	
+//    	//Contingency to build more barracks over time. 
+//    	if (minerals >= 150*3) 
+//    	{
+//    		productionGoal.add(UnitType.Terran_Barracks);
+//        	minerals -= 150;
+//    	}
+//    	
+//        //set goal for the production manager
+//    	productionManager.setGoal(productionGoal);
     	
     	// Debugging 
 //    	drawGoals(productionGoal);
