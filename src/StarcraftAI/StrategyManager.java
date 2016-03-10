@@ -57,6 +57,7 @@ public class StrategyManager extends DefaultBWListener {
     private UnitType[] VALID_GOALS;
     
     private UnitType CURRENT_GOAL; 
+    private ArrayList<UnitType> CURRENT_GOALS;
     
     // VARIABLE FOR DE BUGGING 
     private long UpdateTime;
@@ -130,6 +131,7 @@ public class StrategyManager extends DefaultBWListener {
         // init Possible goals
         initGoals();
         CURRENT_GOAL = null;
+        CURRENT_GOALS = null;
         
         // Init variables for enemy info
         enemyArmyCount = 0;
@@ -293,6 +295,7 @@ public class StrategyManager extends DefaultBWListener {
         /////////////////////////////////////////////////////////
     	
     	UnitType action = null; 
+    	ArrayList<UnitType> actions = new ArrayList<UnitType>();
     	
     	// Get current State
     	State currentState = compressState();
@@ -302,9 +305,22 @@ public class StrategyManager extends DefaultBWListener {
     	// if this is less then epsilon, make a random move
     	if(role < Epsilon)
     	{
-    		int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
-//    		productionGoal.add(VALID_GOALS[index]);
-    		action = VALID_GOALS[index];
+    		int numGoals = (int)Math.round(Math.random()*3);
+    		numGoals = numGoals == 0 ? 1 : numGoals;
+    		
+    		for(int i = 0; i < numGoals; i++){
+				int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
+		//    		productionGoal.add(VALID_GOALS[index]);
+//				action = VALID_GOALS[index];
+				
+				// pick different index if goal already in actions 
+				while(actions.contains(VALID_GOALS[index])){
+					index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
+				}
+				
+				// add the action
+				actions.add(VALID_GOALS[index]);
+    		}
     		
     		// for Debugging
     		UsedMemory = false;
@@ -312,7 +328,9 @@ public class StrategyManager extends DefaultBWListener {
     	else{
     		double maxUtil = -Integer.MAX_VALUE;
     		
-    		// for each of the valid moves, find the one that gives us the greates Util
+    		State intermediateState = null;
+    		
+    		// for each of the valid moves, find the one that gives us the greatest Util
     		for(int i = 0; i < VALID_GOALS.length; i++)
     		{
     			// get the state we'd be in if we made this move
@@ -332,27 +350,62 @@ public class StrategyManager extends DefaultBWListener {
     				if(utilAndET[UTIL_INDEX] > maxUtil){
     					maxUtil = utilAndET[UTIL_INDEX];
     					action = VALID_GOALS[i];
+    					actions.add(VALID_GOALS[i]);
+    					intermediateState = expandedState;
     				}
     				
     				// for debugging
     				UsedMemory = true;
     			}
     		}
+    		
+    		// if found a previous action
+    		if(intermediateState != null){
+	    		// look for other goals that improve the state. 
+	    		for(int i = 1; i < 3; i++){
+	    			UnitType nextAction = findNextBestState(intermediateState);
+	    			if( nextAction != null){
+	    				actions.add(nextAction);
+	    			}
+	    			else{
+	    				break;
+	    			}
+	    		}
+    		}
+    		
     	}
     	
     	// if we get through the above, and action is still null
     	// select a random action to do. 
-    	if(action == null){
-    		int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
-    		action = VALID_GOALS[index];
+    	if(actions.isEmpty()){
+//    		int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
+//    		action = VALID_GOALS[index];
+    		
+    		int numGoals = (int)Math.round(Math.random()*3);
+    		numGoals = numGoals == 0 ? 1 : numGoals;
+    		
+    		for(int i = 0; i < numGoals; i++){
+				int index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
+		//    		productionGoal.add(VALID_GOALS[index]);
+//				action = VALID_GOALS[index];
+				
+				// pick different index if goal already in actions 
+				while(actions.contains(VALID_GOALS[index])){
+					index = (int)Math.round(Math.random()*(VALID_GOALS.length-1));
+				}
+				// add the action
+				actions.add(VALID_GOALS[index]);
+    		}
     		
     		// for debugging
     		UsedMemory = false;
     	}
     	
-    	productionGoal.add(action);
-    	productionManager.setGoal(productionGoal);
-    	CURRENT_GOAL = action;
+//    	productionGoal.add(action);
+//    	productionManager.setGoal(productionGoal);
+    	productionManager.setGoal(actions);
+//    	CURRENT_GOAL = action;
+    	CURRENT_GOALS = actions;
     	
     	
     	
@@ -749,14 +802,25 @@ public class StrategyManager extends DefaultBWListener {
     	}
     	
     	// Draw goals: 
+//    	game.drawTextScreen(10, 30, "Production Goals: " );
+//    	if( CURRENT_GOAL == null)
+//    	{
+//    		game.drawTextScreen(10, 0*10 + 40, "No GOAL");
+//    	}
+//    	else{
+//    		game.drawTextScreen(10, 0*10 + 40, CURRENT_GOAL.toString());
+//    	}
+    	// Draw goals: 
     	game.drawTextScreen(10, 30, "Production Goals: " );
-    	if( CURRENT_GOAL == null)
+    	if( CURRENT_GOALS == null)
     	{
-    		game.drawTextScreen(10, 0*10 + 40, "No GOAL");
+    		game.drawTextScreen(10, 0*10 + 40, "No GOALS");
     	}
     	else{
-    		game.drawTextScreen(10, 0*10 + 40, CURRENT_GOAL.toString());
-    	}    	
+    		for(int i = 0; i<CURRENT_GOALS.size(); i++){
+    			game.drawTextScreen(10, i*10 + 40, CURRENT_GOALS.get(i).toString());
+    		}
+    	}
     	
     	//display enemy army count
     	game.drawTextScreen(500, 280, "Enemy Army Count: " + enemyArmyCount);
@@ -900,6 +964,66 @@ public class StrategyManager extends DefaultBWListener {
     	
     	// Last Thing, set Previous state to current State'
     	PreviousState = currentState;
+    }
+    
+    /**
+     * findNextBestState
+     * 
+     * Given a state, this method tries to find if taking an action will increase the utility
+     * from the current states utility. 
+     * If a current States utility is .1 this method will see if it can find an action who, 
+     * after doing the action, will result in a state with > Utility than .1. 
+     * 
+     * If it is unable to find such an action, it will return null. 
+     * 
+     * otherwise it will return the action to take. 
+     * 
+     * THIS METHOD MODIFIES THE STATE THAT IT WAS HANDED!
+     *     * this is so that it can return the state that was transitioned to... *
+     *     * this makes it more efficient when called again in succession. * 
+     *     * See execute Strategy to see what I mean *
+     * 
+     * @param currentState
+     * @return
+     */
+    public UnitType findNextBestState(State currentState){
+    	
+    	// get the utility of the current state as the current Max Util. 
+    	double maxUtil = Memory.get(currentState.hashCode())[UTIL_INDEX];
+		
+//		State nextState = null;
+		
+    	UnitType action = null;
+    	
+		// for each of the valid moves, find the one that gives us the greates Util
+		for(int i = 0; i < VALID_GOALS.length; i++)
+		{
+			// get the state we'd be in if we made this move
+			State expandedState = StateTransition.transition(currentState, VALID_GOALS[i].toString());
+			
+			// get the hash code for the expanded state
+			int expandedStateKey = expandedState.hashCode();
+			
+			// if that state exists in our memory then we will compare the value to our max Util
+			// else we can't judge
+			if(Memory.get(expandedStateKey) != null)
+			{
+				// get the values for that state
+				Double[] utilAndET = Memory.get(expandedStateKey);
+				
+				// if the util is greater than the current Util it's the best we've seen so far. 
+				if(utilAndET[UTIL_INDEX] > maxUtil){
+					maxUtil = utilAndET[UTIL_INDEX];
+					action = VALID_GOALS[i];
+//					actions.add(VALID_GOALS[i]);
+					currentState = expandedState;
+				}
+				
+				// for debugging
+				UsedMemory = true;
+			}
+		}
+    	return action;
     }
     
     /**
