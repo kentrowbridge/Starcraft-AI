@@ -18,7 +18,7 @@ import bwapi.*;
  */
 public class StateTransition {
 	private static String[] unitsArr = {"Terran_Marine","Terran_Medic","Terran_SCV","Terran_Siege_Tank_Tank_Mode",
-						 "Terran_Vulture","Terran_Academy","Terran_Barracks","Terran_Command_Center",
+						 "Terran_Vulture","Terran_Academy","Terran_Barracks","Terran_Command_Center", "Terran_Refinery",
 						 "Terran_Factory","Terran_Machine_Shop","Terran_Supply_Depot"};
 	private static List<String> validUnits = new ArrayList<String>(Arrays.asList(unitsArr));
 	

@@ -413,8 +413,30 @@ public class StrategyManager extends DefaultBWListener {
 //    	CURRENT_GOAL = action;
     	CURRENT_GOALS = actions;
     	
+    	//=========== SPECIAL (this is to equalize code for upgrade).  ========//////////////
+    	//grab the current resource count
+    	int minerals = self.minerals();
+    	int gas = self.gas();
     	
-    	
+    	// Upgrade Marine attack range. 
+    	if(minerals >= 150 && gas >= 150 
+    			&& self.completedUnitCount(UnitType.Terran_Academy)>=1 
+    			&& !hasExtendedRange)
+    	{
+    		
+    		for(Unit u : self.getUnits())
+    		{
+    			if(u.getType().equals(UnitType.Terran_Academy))
+    			{
+    				u.upgrade(UpgradeType.U_238_Shells);
+    				hasExtendedRange = true;
+    			}
+    		}
+    		
+    		minerals -= 150;
+    		gas -= 150;
+    	}
+    	//=========== SPECIAL (this is to equalize code for upgrade.  ========//////////////    	
     	
     	// ** Simplified workable build queue!
 //    	productionGoal.add(UnitType.Terran_Marine);
@@ -885,7 +907,7 @@ public class StrategyManager extends DefaultBWListener {
     {
     	// removed cc: UnitType.Terran_Command_Center,
     	UnitType[] goals = {UnitType.Terran_Marine, UnitType.Terran_Medic, UnitType.Terran_SCV, UnitType.Terran_Siege_Tank_Tank_Mode,
-      			 UnitType.Terran_Vulture, UnitType.Terran_Academy, UnitType.Terran_Barracks,
+      			 UnitType.Terran_Vulture, UnitType.Terran_Academy, UnitType.Terran_Barracks, UnitType.Terran_Refinery,
        			 UnitType.Terran_Factory, UnitType.Terran_Machine_Shop, UnitType.Terran_Supply_Depot};
     	VALID_GOALS = goals;
     }

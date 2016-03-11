@@ -88,7 +88,13 @@ public class BuildingManager{
 					}
 				}
 			}
-			return closest.getTilePosition();
+			if(closest == null)
+			{
+				return null;
+			}
+			else{
+				return closest.getTilePosition();
+			}
 		}
 
 		// search for a an empty tile position that can build a given building type
