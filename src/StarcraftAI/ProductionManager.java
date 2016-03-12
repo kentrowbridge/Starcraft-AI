@@ -142,6 +142,19 @@ public class ProductionManager {
 	{
 		if(unitType.isBuilding())
 		{
+			// handels just the machine shop addon. 
+			if(unitType.isAddon()){
+				if(unitType.equals(UnitType.Terran_Machine_Shop))
+				{
+					Unit getFactory = buildingManager.getBuilding(UnitType.Terran_Factory, false);
+					if(getFactory != null && getFactory.canBuildAddon(UnitType.Terran_Machine_Shop))
+					{
+						getFactory.buildAddon(UnitType.Terran_Machine_Shop);
+						return true;
+					}
+				}
+			}
+			
 			Unit builder = workerManager.getWorker();
 			
 			// make sure the builder is not null
