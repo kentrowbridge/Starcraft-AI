@@ -142,7 +142,18 @@ public class MilitaryManager{
      */
     private void updateArmyCount()
     {
-    	armyCount = self.completedUnitCount(UnitType.Terran_Marine) + self.completedUnitCount(UnitType.Terran_Medic);
+    	int count = 0;
+    	
+    	for(Unit u : self.getUnits())
+    	{
+    		if( !u.getType().isBuilding() && !u.getType().isAddon() && 
+    				!u.getType().equals(UnitType.Terran_SCV))
+    		{
+    			count++;
+    		}
+    	}
+    	
+    	armyCount = count;
     }
     
     /**
