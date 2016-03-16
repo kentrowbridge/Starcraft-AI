@@ -175,7 +175,7 @@ public class StrategyManager extends DefaultBWListener {
         FrameTime = 0L;
         
         // Set Game Speed
-        game.setLocalSpeed(10);
+        game.setLocalSpeed(15);
         
     }
     
