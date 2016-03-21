@@ -829,6 +829,15 @@ public class StrategyManager extends DefaultBWListener {
     		game.drawTextScreen(200, 10, "DID NOT Use Memory");
     	}
     	
+    	// print previous  state Util and ET
+    	if(PreviousState != null)
+    	{
+    		int hashcode = PreviousState.hashCode();
+    		game.drawTextScreen(200, 20, "Previous State Values:");
+    		game.drawTextScreen(210, 30, "Util: " + Memory.get(hashcode)[UTIL_INDEX]);
+    		game.drawTextScreen(210, 40, "ET: " + Memory.get(hashcode)[ET_INDEX]);
+    	}
+    	
     	// Draw goals: 
 //    	game.drawTextScreen(10, 30, "Production Goals: " );
 //    	if( CURRENT_GOAL == null)
