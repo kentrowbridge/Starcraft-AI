@@ -18,6 +18,8 @@ public class BuildingManager{
 	private String mapFileName;
 	private String mapAndCoords;
 	
+	private Hashtable<TilePosition, Integer> tileBuffer = new Hashtable<TilePosition, Integer>();//holds tilepositions to prevent duplicate build orders  
+	private static final int BUFFER_SIZE = 200; //keeps tilepositions for 200 frames
 	
 	private Game game;
 	private Player self;
@@ -179,9 +181,12 @@ public class BuildingManager{
 	public void build(UnitType buildingType, Unit builder)
 	{ 
 		TilePosition placement = getPlacement(buildingType, builder);
-		if(placement != null)
+		if(placement != null && !tileBuffer.containsKey(placement))
 		{
 			builder.build(placement, buildingType);
+			//save position and when the placement occurs
+			tileBuffer.put(placement, game.getFrameCount() % BUFFER_SIZE);
+			game.printf("added: " + placement);
 		}
 	}
 	
@@ -305,7 +310,7 @@ public class BuildingManager{
 	 * This updates the building list in order to prune dead units
 	 */
 	public void update()
-	{
+	{	
 		//examine buildings and remove dead units
 		ArrayList<Unit> buildingsToRemove = new ArrayList<Unit>();
 		for(Unit building : buildingList)
@@ -320,8 +325,18 @@ public class BuildingManager{
 			buildingList.remove(building);
 		}
 		
-		//remove repaired buildings from damaged list
-		
+		//remove values from tile buffer
+		//buffer keeps at most 50 frames of data, each frame may have multiple keys associated with it
+		int frameVal = game.getFrameCount() % BUFFER_SIZE;
+		Iterator<TilePosition> tbIterator = tileBuffer.keySet().iterator();
+		while(tbIterator.hasNext()){
+			TilePosition t = tbIterator.next();
+			if(tileBuffer.get(t) == frameVal) {
+				tbIterator.remove();
+			}
+		}
+		game.drawTextScreen(10, 10, ""+frameVal);
+		drawTileBuffer();
 	}
 
 	/**
@@ -616,5 +631,11 @@ public class BuildingManager{
 		}
 	}
 	
-
+	private void drawTileBuffer() {
+		int y = 20;
+		for(TilePosition t : tileBuffer.keySet()) {
+			game.drawTextScreen(10, y, ""+t);
+			y+=10;
+		}
+	}
 }
