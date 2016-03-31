@@ -64,7 +64,7 @@ public class StrategyManager extends DefaultBWListener {
     private long FrameTime;
     
     // Game Timing
-    private long TIME_LIMIT = 1600000L;
+    private long TIME_LIMIT = 1200000L;
     private long EARLY_TIME_LIMIT = 1140000L;
     private long START_TIME;
     private long DELTA_TIME;
@@ -166,6 +166,7 @@ public class StrategyManager extends DefaultBWListener {
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
         System.out.println("Analyzing map...");
+        BWTA.cleanMemory();
         BWTA.readMap();
         BWTA.analyze();
         System.out.println("Map data ready");
