@@ -130,16 +130,17 @@ public class Squad {
 					&& unit.isCompleted()){
 				if(unit.getTargetPosition() != null && !unit.getTargetPosition().equals(position)){
 					//					System.out.println("set: "+ unit+ "   Attack position " + position);
-					if(unit.getType() == UnitType.Terran_Medic && !marines.isEmpty())
-					{
-						//have medic follow another unit in the squad
-						Unit marine = marines.remove(0);
-						unit.follow(marine);
-					}
-					else
-					{
-						unit.attack(position);
-					}
+//					if(unit.getType() == UnitType.Terran_Medic && !marines.isEmpty())
+//					{
+//						//have medic follow another unit in the squad
+//						Unit marine = marines.remove(0);
+//						unit.follow(marine);
+//					}
+//					else
+//					{
+//						unit.attack(position);
+//					}
+					unit.attack(position);
 				}
 			}
 		}
