@@ -1165,10 +1165,10 @@ public class StrategyManager extends DefaultBWListener {
      */
     public double getReward(State state){
     	if(state.isHasLost()){
-    		return -10;
+    		return -1000;
     	}
     	else if(state.isHasWon()){
-    		return 10;
+    		return 1000;
     	}
     	else{
     		return -0.01;
