@@ -64,8 +64,8 @@ public class StrategyManager extends DefaultBWListener {
     private long FrameTime;
     
     // Game Timing
-    private long THIRTY_MINUTES = 1800000L;
-    private long TWENTY_NINE_MINUTES = 1740000L;
+    private long TIME_LIMIT = 1600000L;
+    private long EARLY_TIME_LIMIT = 1140000L;
     private long START_TIME;
     private long DELTA_TIME;
 
@@ -197,7 +197,7 @@ public class StrategyManager extends DefaultBWListener {
     	// create end State
     	State endState = new State();
     	
-    	if(DELTA_TIME >  TWENTY_NINE_MINUTES){
+    	if(DELTA_TIME >  EARLY_TIME_LIMIT){
     		endState.setHasWon(false);
         	endState.setHasLost(true);
     	}
@@ -242,7 +242,7 @@ public class StrategyManager extends DefaultBWListener {
     	// timing stuff. 
     	DELTA_TIME = System.currentTimeMillis() - START_TIME; 
     	
-    	if(DELTA_TIME > THIRTY_MINUTES){
+    	if(DELTA_TIME > TIME_LIMIT){
     		game.leaveGame();
     	}
     	
