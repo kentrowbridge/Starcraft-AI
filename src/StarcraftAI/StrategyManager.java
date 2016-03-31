@@ -62,6 +62,12 @@ public class StrategyManager extends DefaultBWListener {
     // VARIABLE FOR DE BUGGING 
     private long UpdateTime;
     private long FrameTime;
+    
+    // Game Timing
+    private long THIRTY_MINUTES = 1800000L;
+    private long TWENTY_NINE_MINUTES = 1740000L;
+    private long START_TIME;
+    private long DELTA_TIME;
 
     /**
      * run()
@@ -123,6 +129,9 @@ public class StrategyManager extends DefaultBWListener {
     {
         game = mirror.getGame();
         self = game.self();
+        
+        //Set Time
+        START_TIME = System.currentTimeMillis();
         
         // init production manager and military manager
         productionManager = new ProductionManager(game, self);
@@ -187,8 +196,15 @@ public class StrategyManager extends DefaultBWListener {
     {
     	// create end State
     	State endState = new State();
-    	endState.setHasWon(isWinner);
-    	endState.setHasWon(!isWinner);
+    	
+    	if(DELTA_TIME >  TWENTY_NINE_MINUTES){
+    		endState.setHasWon(false);
+        	endState.setHasLost(true);
+    	}
+    	else{
+    		endState.setHasWon(isWinner);
+        	endState.setHasLost(!isWinner);
+    	}
     	
     	// update Memory with the win State
     	updateMemory(endState);
@@ -220,7 +236,16 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onFrame() 
     {
+    	// Graphic Debugging
     	displayGameInfo();
+    	
+    	// timing stuff. 
+    	DELTA_TIME = System.currentTimeMillis() - START_TIME; 
+    	
+    	if(DELTA_TIME > THIRTY_MINUTES){
+    		game.leaveGame();
+    	}
+    	
     	
         try
         {
@@ -866,6 +891,9 @@ public class StrategyManager extends DefaultBWListener {
     	game.drawTextScreen(500, 290, "Frame Time: " + FrameTime + " ms");
     	// Display update time
     	game.drawTextScreen(500, 300, "Update Time: " + UpdateTime + " ms");
+    	
+    	// Display Delta Game Time in Minutes
+    	game.drawTextScreen(30, 300, "Time Elapsed: " + DELTA_TIME/60000 + " Minutes");
     }
     
     /**
