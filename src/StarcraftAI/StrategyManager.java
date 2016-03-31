@@ -222,7 +222,7 @@ public class StrategyManager extends DefaultBWListener {
     	
     	// increase the game count
     	GamesPlayed++;
-    	if(isWinner)
+    	if(isWinner && DELTA_TIME <= EARLY_TIME_LIMIT)
     		GamesWon++;
     	System.out.println("Games Played: " + GamesPlayed);
     	System.out.println("Games Won: " + GamesWon);
