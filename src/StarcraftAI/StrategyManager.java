@@ -157,6 +157,7 @@ public class StrategyManager extends DefaultBWListener {
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
         System.out.println("Analyzing map...");
+        BWTA.cleanMemory();
         BWTA.readMap();
         BWTA.analyze();
         System.out.println("Map data ready");
@@ -188,7 +189,7 @@ public class StrategyManager extends DefaultBWListener {
     	// create end State
     	State endState = new State();
     	endState.setHasWon(isWinner);
-    	endState.setHasWon(!isWinner);
+    	endState.setHasLost(!isWinner);
     	
     	// update Memory with the win State
     	updateMemory(endState);
@@ -1172,7 +1173,7 @@ public class StrategyManager extends DefaultBWListener {
     	}
     	catch(IOException ex)
     	{
-    		System.out.println("IOException: " + ex.getMessage());
+    		System.out.println("IOException: READ MEMORY " + ex.getMessage() );
     	}
     	catch(ClassNotFoundException ex){
     		System.out.println("ClassNotFoundException: " + ex.getMessage());
