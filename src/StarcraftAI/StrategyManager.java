@@ -328,7 +328,7 @@ public class StrategyManager extends DefaultBWListener {
     		UsedMemory = false;
     	}
     	else{
-    		double maxUtil = -Integer.MAX_VALUE;
+    		double maxUtil = -Double.MAX_VALUE;
     		UnitType bestAction = null;
     		State intermediateState = null;
     		
