@@ -1141,7 +1141,7 @@ public class StrategyManager extends DefaultBWListener {
     		return -10;
     	}
     	else if(state.isHasWon()){
-    		return 10;
+    		return 1000000;
     	}
     	else{
     		return -0.01;
