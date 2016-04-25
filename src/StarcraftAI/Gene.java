@@ -11,9 +11,7 @@ import java.util.List;
  * @author Casey Sigelmann
  * @author Alex Bowns
  */
-public class Gene implements Serializable{
-
-	private static final long serialVersionUID = 4107160788130307474L;
+public class Gene {
 
 	private ArrayList<Integer> gene;
 	private ArrayList<Integer> geneClone;
@@ -147,7 +145,7 @@ public class Gene implements Serializable{
 
 	/**
 	 * getFitness()
-	 * return the fitness value
+	 * @return the fitness value
 	 */
 	public double getFitness()
 	{

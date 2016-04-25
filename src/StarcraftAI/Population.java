@@ -11,11 +11,11 @@ import java.io.Serializable;
  * @author Casey Sigelmann
  *
  */
-public class Population implements Serializable{
+public class Population {
+	
 	private Gene[] population;
 	public static final int POPULATION_SIZE = 20;
 	private int generationCount;
-	private static final long serialVersionUID = 7808275998841633772L;
 	
 	public Population(int geneSize, int generationCount)
 	{
@@ -44,6 +44,13 @@ public class Population implements Serializable{
 		return null;
 	}
 	
+	/**
+	 * setGene()
+	 * Sets the value of the given index in the population to be the given gene.
+	 * 
+	 * @param index	the index of the gene to set.
+	 * @param gene	the gene to set.
+	 */
 	public void setGene(int index, Gene gene)
 	{
 		population[index] = gene; 
@@ -66,6 +73,13 @@ public class Population implements Serializable{
 		return true;
 	}
 	
+	/**
+	 * getGene()
+	 * gets the gene at the given index
+	 * 
+	 * @param index	the index of the gene
+	 * @return	the gene
+	 */
 	public Gene getGene(int index)
 	{
 		return population[index];

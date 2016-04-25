@@ -18,17 +18,13 @@ public class BuildingManager{
 	private String mapFileName;
 	private String mapAndCoords;
 	
-	
 	private Game game;
 	private Player self;
 
-	private final boolean IS_TRAINING = false;
+	private final boolean IS_TRAINING = true;
 
 	private ArrayList<TilePosition> mappedGenesToTilePositions;
 
-	// hash table where key is "map-name" concatenated with the starting base coordinates,
-	// value is the population of genes
-	//private Hashtable<String, Population> populations;
 	private Population population;
 	private Gene gene;
 	private HashMap<String, int[]> trainedGenes;
@@ -74,7 +70,8 @@ public class BuildingManager{
 	
 	/**
 	 * initTrainedGenes()
-	 * Initializes the trained genes for use when not learning
+	 * Initializes the trained genes for use when not learning.
+	 * Split into multiple methods due to Java method size limit.
 	 */
 	private void initTrainedGenes1()
 	{
@@ -217,6 +214,70 @@ public class BuildingManager{
 			searchTile = new TilePosition(x, y);
 		}
 	}
+	
+	/**
+	 * getPlacementNonGenetic()
+	 * Finds the best location to place a given type of building.
+	 * This is currently not used.
+	 * 
+	 * @param buildingType - type of building to be placed
+	 * @return TilePosition - returns the location to place the building
+	 */
+	private TilePosition getPlacementNonGenetic(UnitType buildingType, Unit builder)
+	{
+		// values to help determine the search radius of where to build different constructs
+		int maxDist = 8;
+		int changeRate = 2;
+		int stopDist = 40;
+		TilePosition aroundTile = self.getStartLocation();
+
+		// build a refinery at the nearest geyser location to the starting point
+		if(buildingType == UnitType.Terran_Refinery)
+		{
+			List<Unit> geysers = game.getGeysers();
+			Unit closest = null;
+			Position position = BWTA.getStartLocation(self).getPosition();
+			for(Unit geyser : geysers)
+			{
+				if(game.canBuildHere(builder, geyser.getTilePosition(), buildingType, true))
+				{
+					if(closest == null || geyser.getDistance(position) < geyser.getDistance(position))
+					{
+						closest = geyser;
+					}
+				}
+			}
+			return closest.getTilePosition();
+		}
+
+		// search for a an empty tile position that can build a given building type
+		while((maxDist < stopDist))
+		{
+			int minX = aroundTile.getX()-maxDist;
+			int maxX = aroundTile.getX()+maxDist;
+			int minY = aroundTile.getY()-maxDist;
+			int maxY = aroundTile.getY()+maxDist;
+			// loop through the defined area
+			for(int i = minX; i <= maxX; i++)
+			{
+				for(int j = minY; j <= maxY; j++)
+				{
+					if(i < maxX && i > minX && j < maxY && j > minY)
+					{
+						continue;
+					}
+					if(game.canBuildHere(builder, new TilePosition(i,j), buildingType, true))
+					{
+						return new TilePosition(i,j);
+					}
+				}
+			}
+			// we didn't find a valid tile, so increase max distance
+			maxDist+=changeRate;
+		}
+		game.printf("Unable to find suitable build position for "+buildingType.toString());
+		return null;
+	}
 
 	/**
 	 * getPlacement()
@@ -319,8 +380,6 @@ public class BuildingManager{
 		{
 			buildingList.remove(building);
 		}
-		
-		//remove repaired buildings from damaged list
 		
 	}
 
@@ -611,7 +670,6 @@ public class BuildingManager{
 				}	
 				population = tempPopulation; 
 			}
-			//saveToFile();
 			population.savePopulationFile(mapFileName);
 		}
 	}

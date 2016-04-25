@@ -26,6 +26,9 @@ public class StrategyManager extends DefaultBWListener {
     private boolean isScouting = false;
     
     private boolean hasExtendedRange = false;
+    
+    private int wins = 0;
+    private int games = 0;
 
     /**
      * run()
@@ -78,7 +81,10 @@ public class StrategyManager extends DefaultBWListener {
     @Override
     public void onEnd(boolean isWinner)
     {
-    	System.out.println("Game ended. IsWinner=" + isWinner);
+    	games++;
+    	if(isWinner) wins++;
+    	System.out.println("Game ended: " + wins + "/" + games);
+    	if(games>99) System.exit(0);
     	endTime = System.nanoTime();
     	long elapsedTime = endTime - startTime; 
     	elapsedTime = TimeUnit.NANOSECONDS.toSeconds(elapsedTime);
