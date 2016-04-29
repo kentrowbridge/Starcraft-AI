@@ -18,7 +18,6 @@ public class MilitaryManager{
 	protected HashMap<SquadType, Squad> squads;
 	private ArmyManager armyManager;
 	private BattleManager battleManager;
-	private boolean doScout = false;
 	private int armyCount;
     private Hashtable<UnitType, Double> armyRatio;
 
@@ -169,11 +168,20 @@ public class MilitaryManager{
     	armyRatio.put(UnitType.Terran_Medic, medicCount/total);
     }
     
+    /**
+     * getArmyCount()
+     * @return size of army
+     */
     public int getArmyCount()
     {
     	return armyCount;
     }
     
+    /**
+     * getUnitRatio()
+     * @param type 
+     * @return The percentage of the army that is the given UnitType
+     */
     public Double getUnitRatio(UnitType type)
     {
     	return armyRatio.get(type);

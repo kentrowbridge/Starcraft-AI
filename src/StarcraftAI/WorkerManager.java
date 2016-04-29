@@ -16,6 +16,11 @@ public class WorkerManager{
 	private List<Unit> neutralUnits = new ArrayList<Unit>();
 	private List<Unit> workerList = new ArrayList<Unit>();
 	
+	/**
+	 * constructor
+	 * @param self  Player object for bot
+	 * @param neutralUnits  List of neutral units in the game (Only used to task workers to gather)
+	 */
 	public WorkerManager(Player self, List<Unit> neutralUnits)
 	{
 		this.self = self;
@@ -33,9 +38,9 @@ public class WorkerManager{
 		
 		boolean gatheringGas = false;
 		
-		for(Unit u : workerList)
+		for(Unit worker : workerList)
 		{			
-			if(u.isIdle() && u.isCompleted())
+			if(worker.isIdle() && worker.isCompleted())
 			{
 				//assign a task
 				// protect against not finding any closest minerals. 
@@ -43,17 +48,17 @@ public class WorkerManager{
 				Unit closestMineral = findClosestMineral(BWTA.getStartLocation(self).getPosition());
 				if(closestMineral != null)
 				{
-					u.gather(closestMineral);
+					worker.gather(closestMineral);
 				}
 			}
 			
 			//save dead units for deletion	
-			if(!u.exists())
+			if(!worker.exists())
 			{
-				workersToRemove.add(u);
+				workersToRemove.add(worker);
 			}
 			
-			if(u.isGatheringGas())
+			if(worker.isGatheringGas())
 			{
 				gatheringGas = true;
 			}
@@ -77,27 +82,27 @@ public class WorkerManager{
 
 	/**
 	 * getWorker()
-	 * Finds a worker unit
+	 * Finds an available worker unit
 	 * 
 	 * @return - a worker unit
 	 */
 	public Unit getWorker()
 	{
 		Unit availableWorker = null;
-		for(Unit u : workerList)
+		for(Unit worker : workerList)
 		{			
 			//make sure no workers are on there way to build at the same time
-			if(u.getOrder().equals(Order.PlaceBuilding))
+			if(worker.getOrder().equals(Order.PlaceBuilding))
 			{
 				return null;
 			}		
 			
-			Order order = u.getOrder();
+			Order order = worker.getOrder();
 			//find a free worker
-			if(!u.isConstructing() && u.isInterruptible() 
-					&& u.isCompleted() && order != Order.Repair)
+			if(!worker.isConstructing() && worker.isInterruptible() 
+					&& worker.isCompleted() && order != Order.Repair)
 			{
-				availableWorker = u;
+				availableWorker = worker;
 			}
 		}
 		
@@ -131,7 +136,7 @@ public class WorkerManager{
 
 	/**
 	 * findClosestMineral()
-	 * Finds the closest mineral to the given unit
+	 * Finds the closest mineral to the given position
 	 * 
 	 * @param pos - position of the unit
 	 */
@@ -160,7 +165,13 @@ public class WorkerManager{
 		return closest;
 	}
 	
-	
+	/**
+	 * findClosestRefiner()
+	 * Finds the closest refinery to the given position
+	 * 
+	 * @param pos
+	 * @return
+	 */
 	private Unit findClosestRefinery(Position pos){
 		if(pos == null)
 		{

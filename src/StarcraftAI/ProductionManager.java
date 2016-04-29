@@ -12,6 +12,7 @@ import bwapi.*;
  * @author Kenny Trowbridge
  * @author Alex Bowns
  * @author Max Robinson
+ * @author Casey Sigelmann
  */
 public class ProductionManager {
 	
@@ -23,8 +24,7 @@ public class ProductionManager {
 	private ArrayList<List<UnitType>> productionQueue = new ArrayList<List<UnitType>>(); 
 	private ArrayList<UnitType> goals = new ArrayList<UnitType>();
 	private ArrayList<UnitType> newGoal = new ArrayList<UnitType>();
-	private ArrayList<List<UnitType>> techDag; 
-	private ArrayList<List<UnitType>> paths;  
+	
 	private BuildingManager buildingManager;
 	private WorkerManager workerManager;
 	
@@ -51,8 +51,6 @@ public class ProductionManager {
 		this.productionQueue = new ArrayList<List<UnitType>>();
 		this.goals = new ArrayList<UnitType>();
 		this.newGoal = new ArrayList<UnitType>();
-		this.techDag = new ArrayList<List<UnitType>>();
-		this.paths = new ArrayList<List<UnitType>>();
 		
 		//add starting workers to worker list
 		for(Unit u : game.self().getUnits())
@@ -63,13 +61,10 @@ public class ProductionManager {
 			}
 		}
 		
+		//initialize hashtable that maps units to the buildings that create them
 		initBuildingsForUnits();
 		
-		techPaths = initTechPaths();
-//		for(UnitType key : techPaths.keySet()){
-//			System.out.println(techPaths.get(key).toString());
-//		}
-		
+		techPaths = initTechPaths();		
 	}
 
 	/**
@@ -112,8 +107,9 @@ public class ProductionManager {
 	 * the building type specified.
 	 *  
 	 * @param unitType - type of building to build
+	 * @return true if order is sent
 	 */
-	public boolean buildBuilding(UnitType unitType)
+	private boolean buildBuilding(UnitType unitType)
 	{
 		if(unitType.isBuilding())
 		{
@@ -136,8 +132,9 @@ public class ProductionManager {
 	 * 
 	 * @param unitType - unit type to train
 	 * @param building - building to train from
+	 * @return true if order is sent
 	 */
-	public boolean training(UnitType unitType, Unit building)
+	private boolean training(UnitType unitType, Unit building)
 	{
 		if(unitType == null || building == null)
 		{
@@ -180,15 +177,9 @@ public class ProductionManager {
 				for(UnitType u : goals)
 				{
 					//create paths for goals
-//					List<UnitType> path = new ArrayList<UnitType>();
 					ArrayList<UnitType> path = findTechPath(u);
 					
-					//only add end goal for now
-					//THIS WILL BE CHANGED LATER ON IN IMPLEMENTATION
-//					path.add(u);
-					
 					path = examinePath(path);
-					//System.out.println("Path changed to: " + path.toString());
 					
 					//add path to production q
 					productionQueue.add(path);
@@ -198,8 +189,10 @@ public class ProductionManager {
 				//printProcutionQueue();
 			}
 			
+			//issue orders to repair damaged buildings
 			repairBuildings();
 			
+			//issue builder orders
 			processQueue();
 		}
 		catch(Exception e)
@@ -281,26 +274,22 @@ public class ProductionManager {
 	/**
 	 * processQueue()
 	 * The process queue method is responsible for sending out build orders based on the 
-	 * contents of the priority queue. This method will be called every time update() is run. 
-	 * This method will examine the front of the first of the priority queue and use the Worker 
-	 * Manager to acquire a builder unit and then send a build order to the Building Manager using 
-	 * that unit and the building type taken from the priority queue.
+	 * contents of the priority queue. 
 	 * 
 	 */
-	public void processQueue()
+	private void processQueue()
 	{
 		for(List<UnitType> buildPath : productionQueue)
 		{
-			boolean pop = false;
-			//temporarily: build path is always going to be the next thing that needs to be built
-			// dependency conflicts are handled by strategy manager FOR NOW
+			boolean buildSuccess = false;
+
 			UnitType item = buildPath.get(0);
 			
 			if(item != null)
 			{
 				if(item.isBuilding())
 				{
-					pop = buildBuilding(item);
+					buildSuccess = buildBuilding(item);
 				}
 				else
 				{
@@ -312,13 +301,13 @@ public class ProductionManager {
 
 					if(building != null)
 					{
-						pop = training(item, building);
+						buildSuccess = training(item, building);
 					}
 				}
 			}
 			
 			// build the thing in the front of the queue, not pop it off it is not the last thing
-			if( buildPath.size() > 1 && pop)
+			if(buildPath.size() > 1 && buildSuccess)
 			{
 				buildPath.remove(0);
 			}
@@ -334,10 +323,9 @@ public class ProductionManager {
 	 * @param goalUnit - end point of the path
 	 * @return a dependency list of what to construct (in what order) for the specific unit
 	 */
-	public ArrayList<UnitType> findTechPath(UnitType goalUnit)
+	private ArrayList<UnitType> findTechPath(UnitType goalUnit)
 	{
-		ArrayList<UnitType> path = new ArrayList<UnitType>(techPaths.get(goalUnit));
-		return path;
+		return new ArrayList<UnitType>(techPaths.get(goalUnit));
 	}
 	
 	/**
@@ -349,19 +337,19 @@ public class ProductionManager {
 	 * @param path - path to examine
 	 * @return path of buildings that have not been constructed yet
 	 */
-	public ArrayList<UnitType> examinePath(ArrayList<UnitType> path)
+	private ArrayList<UnitType> examinePath(ArrayList<UnitType> path)
 	{
 		//remove units from path that we already have. 
 		ArrayList<UnitType> toRemove = new ArrayList<UnitType>();
-		for(UnitType ut : path)
+		for(UnitType uType : path)
 		{
-			if(buildingManager.getBuilding(ut, false) != null)
+			if(buildingManager.getBuilding(uType, false) != null)
 			{
 				// If it is the last element, don't remove it. 
-				if(path.lastIndexOf(ut) == path.size()-1){
+				if(path.lastIndexOf(uType) == path.size()-1){
 					break;
 				}
-				toRemove.add(ut);
+				toRemove.add(uType);
 			}
 			else
 			{
@@ -378,12 +366,113 @@ public class ProductionManager {
 	}
 	
 	/**
+	 * onEnd()
+	 * Execute code when a game ends
+	 * 
+	 * @param isWinner  If the bot is the winner
+	 * @param elapsedTime  Game time length
+	 */
+	public void onEnd(boolean isWinner, long elapsedTime)
+	{
+		buildingManager.onEnd(isWinner, elapsedTime);		
+	}
+
+	/**
+	 * reduceCrossover()
+	 * Examines all build paths and removes redundant build orders. This prevents the building of 
+	 * multiple required buildings for different path destinations.
+	 * 
+	 * @param ProdQueue current production queue
+	 * @return the altered production queue
+	 */
+	private ArrayList<List<UnitType>> reduceCrossover(ArrayList<List<UnitType>> ProdQueue)
+	{
+		ArrayList<List<UnitType>> queue = new ArrayList<List<UnitType>>(ProdQueue);
+		
+		ArrayList<UnitType> seen = new ArrayList<UnitType>();
+		for(int i = 0; i<queue.size(); i++)
+		{
+			for(int j = 0; j<queue.get(i).size(); j++)
+			{
+				UnitType ut = queue.get(i).get(j); 
+				if(!seen.contains(ut))
+				{
+					seen.add(ut);
+				}
+				else{
+					// already been seen, remove from this list.
+					// unless it is the last element.
+					if(j != queue.get(i).size()-1 ){
+						queue.get(i).remove(j);
+						
+						// Decrement the index to relook at the same j spot. 
+						j--;
+					}
+				}
+			}
+		}
+		
+		return queue;
+	}
+	
+	/**
+	 * getValueAtIndex()
+	 * Finds the unit type at the specified index in all of the build paths
+	 * 
+	 * @param idx
+	 * @param queue production queue to examine
+	 * @return array of UnitTypes the size of the number of paths in queue
+	 */
+	public UnitType[] getValueAtIndex(int idx, ArrayList<List<UnitType>> queue)
+	{
+		UnitType[] values = new UnitType[queue.size()];
+		for(int list_idx = 0; list_idx < queue.size(); list_idx++)
+		{
+			// if the index is "off the end" of one of the queue arrays, that entry is null
+			if(idx > queue.get(list_idx).size()-1)
+			{
+				values[list_idx] = null; 
+			}
+			else{
+				values[list_idx] = queue.get(list_idx).get(idx);
+			}
+		}
+		return values;
+	}
+	
+	/**
+	 * getTechPaths()
+	 * Getter method for Tech paths. 
+	 * @return Hashtable of tech paths. 1 path for each unit type. 
+	 */
+	public Hashtable<UnitType, ArrayList<UnitType>> getTechPaths()
+	{
+		return techPaths;
+	}
+	
+	/**
+	 * printProductionQueue
+	 * prints the production queue as it currently is. 
+	 */
+	public void printProcutionQueue()
+	{
+		if(productionQueue.size() > 0)
+		{
+			System.out.println("Production QUEUE");
+			for(List<UnitType> list : productionQueue)
+			{
+				System.out.println(list.toString());
+			}
+		}
+	}
+
+	/**
 	 * initTechPaths()
 	 * creates a Hashtable of all of the tech paths needed to get to a given unit.  
 	 * This runs once at the instantiation of the class and never again. 
 	 * 
 	 */
-	public Hashtable<UnitType, ArrayList<UnitType>> initTechPaths()
+	private Hashtable<UnitType, ArrayList<UnitType>> initTechPaths()
 	{
 		Hashtable<UnitType, ArrayList<UnitType>> techPaths = new Hashtable<UnitType, ArrayList<UnitType>>();
 		// command center
@@ -540,10 +629,10 @@ public class ProductionManager {
 		valkyrie.add(UnitType.Terran_Armory);
 		valkyrie.add(UnitType.Terran_Valkyrie);
 		techPaths.put(UnitType.Terran_Valkyrie, valkyrie);
-
+	
 		return techPaths;
 	}
-	
+
 	/**
 	 * initBuildingsForUnits()
 	 * initializes the hashtable that determines what buildings builds a unit
@@ -570,141 +659,5 @@ public class ProductionManager {
 		
 		//command center
 		buildingsForUnits.put(UnitType.Terran_SCV, UnitType.Terran_Command_Center);
-	}
-	
-	public void onEnd(boolean isWinner, long elapsedTime)
-	{
-		buildingManager.onEnd(isWinner, elapsedTime);
-		
-	}
-
-	/**
-	 * 
-	 * @param ProdQueue
-	 * @return
-	 */
-	public ArrayList<List<UnitType>> reduceCrossover(ArrayList<List<UnitType>> ProdQueue)
-	{
-		ArrayList<List<UnitType>> queue = new ArrayList<List<UnitType>>(ProdQueue);
-		
-//		int maxLength = 0;
-//		int numLists = queue.size();
-//		
-//		// find the max length of the queue lists
-//		for(List<UnitType> list : queue)
-//		{
-//			if(list.size() > maxLength)
-//			{
-//				maxLength = list.size();
-//			}
-//		}
-		
-		// compare starting at index 0 to max length -1 the items that are in each queue.
-		// itterate along the lists
-//		for(int idx = 0; idx < maxLength-1; idx++)
-//		{
-//			UnitType[] values = getValueAtIndex(idx, queue);
-//			
-//			// compare each value to each other value. 
-//			// find the ones that are the same.
-//			for(int list_idx = 0; list_idx < values.length; list_idx++)
-//			{
-//				if(values[list_idx] == null)
-//				{
-//					continue;
-//				}
-//				
-//				// idx with same values as in list i . 
-//				ArrayList<Integer> idxOfSameValues = new ArrayList<Integer>();
-//				for(int nextList = list_idx + 1; nextList < values.length; nextList++)
-//				{
-//					if(values[list_idx] == values[nextList])
-//					{
-//						idxOfSameValues.add(nextList);
-//					}
-//				}
-//				
-//				// we should now have a list of integers
-//				// this list has indecies that coorespond to lists with the same values as list i
-//				// ie [[1,2,3,4], [7,2,5,6], [9,2,8]]  => the list would have [1,2] 
-//				
-//				// if we have any overlap
-//				if(!idxOfSameValues.isEmpty())
-//				{
-//					// find shortest list of those list
-//					int shortest = 1000;
-//					
-//					
-//				}
-//			}
-//		}
-		
-		ArrayList<UnitType> seen = new ArrayList<UnitType>();
-		for(int i = 0; i<queue.size(); i++)
-		{
-			for(int j = 0; j<queue.get(i).size(); j++)
-			{
-				UnitType ut = queue.get(i).get(j); 
-				if(!seen.contains(ut))
-				{
-					seen.add(ut);
-				}
-				else{
-					// already been seen, remove from this list.
-					// unless it is the last element.
-					if(j != queue.get(i).size()-1 ){
-						queue.get(i).remove(j);
-						
-						// Decrement the index to relook at the same j spot. 
-						j--;
-					}
-				}
-			}
-		}
-		
-		return queue;
-	}
-	
-	public UnitType[] getValueAtIndex(int idx, ArrayList<List<UnitType>> queue)
-	{
-		UnitType[] values = new UnitType[queue.size()];
-		for(int list_idx = 0; list_idx < queue.size(); list_idx++)
-		{
-			// if the index is "off the end" of one of the queue arrays, that entry is null
-			if(idx > queue.get(list_idx).size()-1)
-			{
-				values[list_idx] = null; 
-			}
-			else{
-				values[list_idx] = queue.get(list_idx).get(idx);
-			}
-		}
-		return values;
-	}
-	
-	/**
-	 * getTechPaths()
-	 * Getter method for Tech paths. 
-	 * @return Hashtable of tech paths. 1 path for each unit type. 
-	 */
-	public Hashtable<UnitType, ArrayList<UnitType>> getTechPaths()
-	{
-		return techPaths;
-	}
-	
-	/**
-	 * printProductionQueue
-	 * prints the production queue as it currently is. 
-	 */
-	public void printProcutionQueue()
-	{
-		if(productionQueue.size() > 0)
-		{
-			System.out.println("Production QUEUE");
-			for(List<UnitType> list : productionQueue)
-			{
-				System.out.println(list.toString());
-			}
-		}
 	}
 }

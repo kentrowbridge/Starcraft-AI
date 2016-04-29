@@ -9,13 +9,11 @@ import bwapi.*;
  * 
  * @author Max Robinson
  * @author Alex Bowns
+ * @author Kenny Trowbridge
  *
  */
-public class BattleManager{
-	private Game game; 
-	private Player self;
-	
-	//A constant to determine if a unit is far away from a position
+public class BattleManager{	
+	//A constant to determine if a unit is "far away" from a position (arbitrary)
 	private static final double FARAWAY = 10.0;
 	
 	private Squad[] squads;
